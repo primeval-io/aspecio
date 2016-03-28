@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>io.lambdacube.aspecio</groupId>
+	<artifactId>aspecio-demo</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<!-- OSGi -->
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>6.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>osgi.cmpn</artifactId>
+			<version>6.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.lambdacube.aspecio</groupId>
+			<artifactId>aspecio-core</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.12</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<_plugin>
+							io.lambdacube.bnd.component.annotation.properties.DSAPPlugin
+						</_plugin>
+						<_include>-src/main/osgi/osgi.bnd</_include>
+					</instructions>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>io.lambdacube.bnd</groupId>
+						<artifactId>bnd-dsap-plugin</artifactId>
+						<version>1.0-SNAPSHOT</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+</project>
