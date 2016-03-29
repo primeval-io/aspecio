@@ -23,17 +23,16 @@ import org.osgi.framework.hooks.service.FindHook;
 import org.osgi.framework.hooks.service.ListenerHook.ListenerInfo;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.lambdacube.aspecio.AspecioConstants;
+import io.lambdacube.aspecio.internal.logging.AspecioLogger;
+import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 import io.lambdacube.aspecio.internal.weaving.AspectWeaver;
 import io.lambdacube.aspecio.internal.weaving.WovenClassHolder;
 
-// Can't be a DS component because of getService() cycle error with Felix :(
-public class AspecioServiceHook implements FindHook, EventListenerHook {
+public class AspecioImpl implements FindHook, EventListenerHook {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AspecioServiceHook.class);
+    private static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(AspecioImpl.class);
 
     private static final String SERVICE_ASPECT_WOVEN = ".service.aspect.woven";
 
@@ -55,7 +54,7 @@ public class AspecioServiceHook implements FindHook, EventListenerHook {
 
                         Object delegateToWeave = registeringBc.getService(reference);
 
-                        LOGGER.info("Weaving service {} of class {}", reference.getProperty(Constants.SERVICE_ID),
+                        LOGGER.debug("Weaving service {} of class {}", reference.getProperty(Constants.SERVICE_ID),
                                 delegateToWeave.getClass().getName());
 
                         Dictionary<String, Object> newProps = new Hashtable<>();

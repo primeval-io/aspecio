@@ -1,6 +1,7 @@
 package io.lambdacube.aspecio.internal.weaving;
 
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
 import io.lambdacube.aspecio.internal.weaving.testset.api.generic.GenericService;
@@ -12,8 +13,7 @@ public class TypeUtilsTest {
     public void shouldReturnNullForNonGeneric() {
         String actual = TypeUtils.getTypeSignature(SimplestService.class);
 
-        Assertions.assertThat(actual).isNull();
-
+        assertThat(actual).isNull();
     }
 
     @Test
@@ -24,8 +24,7 @@ public class TypeUtilsTest {
                 + "Lio/lambdacube/aspecio/internal/weaving/testset/api/GenericInterface"
                 + "<Ljava/lang/Object;Ljava/lang/String;>;";
 
-        Assertions.assertThat(actual).isEqualTo(expected);
-
+        assertThat(actual).isEqualTo(expected);
     }
 
 }

@@ -1,1 +1,2 @@
 Bundle-Activator: io.lambdacube.aspecio.internal.AspecioActivator
+Import-Package: org.slf4j;resolution:=optional, *

@@ -1,5 +1,7 @@
 package io.lambdacube.aspecio.internal.weaving;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -13,7 +15,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 
@@ -33,16 +34,16 @@ public final class AspectWeaverTest {
         SimplestService simplestService = new SimplestService();
 
         WovenClassHolder wovenClassHolder = AspectWeaver.weave(SimplestService.class, new Class[] { SimplestInterface.class });
-        Assertions.assertThat(SimplestInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
+        assertThat(SimplestInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
         Object wovenService = wovenClassHolder.weavingFactory.apply(simplestService);
-        Assertions.assertThat(wovenService).isInstanceOf(SimplestInterface.class);
+        assertThat(wovenService).isInstanceOf(SimplestInterface.class);
 
         SimplestInterface wovenItf = (SimplestInterface) wovenService;
         try {
             System.clearProperty(SimplestService.PROP_NAME);
             wovenItf.foo();
-            Assertions.assertThat(System.getProperty(SimplestService.PROP_NAME)).isEqualTo("true");
+            assertThat(System.getProperty(SimplestService.PROP_NAME)).isEqualTo("true");
         } finally {
             System.clearProperty(SimplestService.PROP_NAME);
         }
@@ -53,22 +54,22 @@ public final class AspectWeaverTest {
         SimpleService simpleService = new SimpleService();
 
         WovenClassHolder wovenClassHolder = AspectWeaver.weave(SimpleService.class, new Class[] { SimpleInterface.class });
-        Assertions.assertThat(SimpleInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
+        assertThat(SimpleInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
         Object wovenService = wovenClassHolder.weavingFactory.apply(simpleService);
-        Assertions.assertThat(wovenService).isInstanceOf(SimpleInterface.class);
+        assertThat(wovenService).isInstanceOf(SimpleInterface.class);
 
         SimpleInterface wovenItf = (SimpleInterface) wovenService;
-        Assertions.assertThat(wovenItf.times()).isEqualTo(simpleService.times());
+        assertThat(wovenItf.times()).isEqualTo(simpleService.times());
 
-        Assertions.assertThat(wovenItf.hello()).isEqualTo(simpleService.hello());
+        assertThat(wovenItf.hello()).isEqualTo(simpleService.hello());
 
-        Assertions.assertThat(extractSayHello(wovenItf)).isEqualTo(extractSayHello(simpleService));
+        assertThat(extractFromPrintStream(ps -> wovenItf.sayHello(ps))).isEqualTo(extractFromPrintStream(ps -> simpleService.sayHello(ps)));
     }
 
-    private String extractSayHello(SimpleInterface itf) throws UnsupportedEncodingException, IOException {
+    private String extractFromPrintStream(Consumer<PrintStream> psConsumer) throws UnsupportedEncodingException, IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); PrintStream ps = new PrintStream(baos)) {
-            itf.sayHello(ps);
+            psConsumer.accept(ps);
             return baos.toString("UTF-8");
         }
     }
@@ -78,7 +79,7 @@ public final class AspectWeaverTest {
             throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         WovenClassHolder wovenClassHolder = AspectWeaver.weave(AnnotatedService.class, new Class[0]);
 
-        Assertions.assertThat(wovenClassHolder.wovenClass.getAnnotations()).containsExactly(AnnotatedService.class.getAnnotations());
+        assertThat(wovenClassHolder.wovenClass.getAnnotations()).containsExactly(AnnotatedService.class.getAnnotations());
 
         AnnotatedService annotatedService = new AnnotatedService();
         Object wovenService = wovenClassHolder.weavingFactory.apply(annotatedService);
@@ -86,17 +87,17 @@ public final class AspectWeaverTest {
         Method method = AnnotatedService.class.getMethod("someMethod");
         Method wovenMethod = wovenClassHolder.wovenClass.getMethod("someMethod");
 
-        Assertions.assertThat(wovenMethod.invoke(wovenService)).isEqualTo(method.invoke(annotatedService));
-        Assertions.assertThat(wovenMethod.getAnnotations()).containsExactly(method.getAnnotations());
+        assertThat(wovenMethod.invoke(wovenService)).isEqualTo(method.invoke(annotatedService));
+        assertThat(wovenMethod.getAnnotations()).containsExactly(method.getAnnotations());
     }
 
     @Test
     public void shouldWeaveGenericServices() {
         WovenClassHolder wovenClassHolder = AspectWeaver.weave(GenericService.class, new Class<?>[] { GenericInterface.class });
 
-        Assertions.assertThat(GenericInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
+        assertThat(GenericInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
-        Assertions.assertThat(wovenClassHolder.wovenClass.getGenericInterfaces())
+        assertThat(wovenClassHolder.wovenClass.getGenericInterfaces())
                 .containsExactly(GenericService.class.getGenericInterfaces());
 
         GenericService genericService = new GenericService();
@@ -107,9 +108,9 @@ public final class AspectWeaverTest {
                 .apply(genericService);
 
         String someB = wovenService.makeB();
-        Assertions.assertThat(someB).isEqualTo(genericService.makeB());
+        assertThat(someB).isEqualTo(genericService.makeB());
         wovenService.doSome();
-        Assertions.assertThat(mutableObjects).containsExactly(someB);
+        assertThat(mutableObjects).containsExactly(someB);
     }
 
     @Test
@@ -121,7 +122,7 @@ public final class AspectWeaverTest {
         String[] typeParameters = Stream.of(GenericParamsService.class.getTypeParameters()).map(TypeVariable::getName)
                 .toArray(String[]::new);
 
-        Assertions.assertThat(wovenTypeParameters).containsExactly(typeParameters);
+        assertThat(wovenTypeParameters).containsExactly(typeParameters);
 
         ArrayList<MethodIdentifier> methodsToCompare = Lists.newArrayList(new MethodIdentifier("myMethod", Consumer.class),
                 new MethodIdentifier("fooMaker"), new MethodIdentifier("unsafe"), new MethodIdentifier("unsafeGeneric"));
@@ -129,23 +130,23 @@ public final class AspectWeaverTest {
             Method method = GenericParamsService.class.getMethod(methodId.name, methodId.parameterTypes);
             Method wovenMethod = wovenClassHolder.wovenClass.getMethod(methodId.name, methodId.parameterTypes);
 
-            Assertions.assertThat(wovenMethod.getAnnotations()).containsExactly(method.getAnnotations());
+            assertThat(wovenMethod.getAnnotations()).containsExactly(method.getAnnotations());
 
             String[] methodParameterNames = Stream.of(method.getParameters()).map(Parameter::getName).toArray(String[]::new);
             String[] wovenMethodParameterNames = Stream.of(wovenMethod.getParameters()).map(Parameter::getName).toArray(String[]::new);
 
-            Assertions.assertThat(wovenMethodParameterNames).containsExactly(methodParameterNames);
-            Assertions.assertThat(wovenMethod.getParameterTypes()).containsExactly(method.getParameterTypes());
-            Assertions.assertThat(wovenMethod.getGenericParameterTypes()).containsExactly(method.getGenericParameterTypes());
-            Assertions.assertThat(wovenMethod.getParameterAnnotations()).containsExactly(method.getParameterAnnotations());
-            Assertions.assertThat(wovenMethod.getReturnType()).isEqualTo(method.getReturnType());
-            Assertions.assertThat(wovenMethod.getGenericReturnType()).isEqualTo(method.getGenericReturnType());
-            Assertions.assertThat(wovenMethod.getExceptionTypes()).isEqualTo(method.getExceptionTypes());
+            assertThat(wovenMethodParameterNames).containsExactly(methodParameterNames);
+            assertThat(wovenMethod.getParameterTypes()).containsExactly(method.getParameterTypes());
+            assertThat(wovenMethod.getGenericParameterTypes()).containsExactly(method.getGenericParameterTypes());
+            assertThat(wovenMethod.getParameterAnnotations()).containsExactly(method.getParameterAnnotations());
+            assertThat(wovenMethod.getReturnType()).isEqualTo(method.getReturnType());
+            assertThat(wovenMethod.getGenericReturnType()).isEqualTo(method.getGenericReturnType());
+            assertThat(wovenMethod.getExceptionTypes()).isEqualTo(method.getExceptionTypes());
             String[] wovenGenericExceptionTypes = Stream.of(wovenMethod.getGenericExceptionTypes()).map(java.lang.reflect.Type::getTypeName)
                     .toArray(String[]::new);
             String[] genericExceptionTypes = Stream.of(method.getGenericExceptionTypes()).map(java.lang.reflect.Type::getTypeName)
                     .toArray(String[]::new);
-            Assertions.assertThat(wovenGenericExceptionTypes).isEqualTo(genericExceptionTypes);
+            assertThat(wovenGenericExceptionTypes).isEqualTo(genericExceptionTypes);
         }
 
     }

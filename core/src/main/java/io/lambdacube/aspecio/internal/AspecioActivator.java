@@ -7,11 +7,11 @@ import org.osgi.framework.hooks.service.FindHook;
 
 public final class AspecioActivator implements BundleActivator {
 
-    private AspecioServiceHook aspecio;
+    private AspecioImpl aspecio;
 
     @Override
     public void start(BundleContext context) throws Exception {
-        aspecio = new AspecioServiceHook();
+        aspecio = new AspecioImpl();
         aspecio.activate(context);
         context.registerService(new String[] { FindHook.class.getName(), EventListenerHook.class.getName() }, aspecio, null);
     }

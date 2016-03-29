@@ -1,15 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>io.lambdacube.aspecio</groupId>
-	<artifactId>aspecio-demo</artifactId>
-	<version>1.0-SNAPSHOT</version>
-	<packaging>bundle</packaging>
+	<parent>
+		<groupId>io.lambdacube.aspecio</groupId>
+		<artifactId>aspecio</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
 
-	<properties>
-		<java.version>1.8</java.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+	<artifactId>aspecio-examples</artifactId>
+	<packaging>bundle</packaging>
 
 	<dependencies>
 		<!-- OSGi -->
@@ -34,9 +33,8 @@
 		<dependency>
 			<groupId>io.lambdacube.aspecio</groupId>
 			<artifactId>aspecio-core</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
-
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -49,18 +47,9 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
+				<version>${bnd.version}</version>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>

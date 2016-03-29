@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import io.lambdacube.aspecio.internal.AspecioImpl;
 import io.lambdacube.aspecio.internal.AspecioUtils;
+import io.lambdacube.aspecio.internal.logging.AspecioLogger;
+import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 
 /**
  * Entry point to weave a class and specify which interfaces to implement
@@ -18,7 +18,7 @@ import io.lambdacube.aspecio.internal.AspecioUtils;
  *
  */
 public final class AspectWeaver {
-    private final static Logger LOGGER = LoggerFactory.getLogger(AspectWeaver.class);
+    private static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(AspecioImpl.class);
 
     public static WovenClassHolder weave(Class<?> clazzToWeave, Class<?>[] interfaces) {
         try {

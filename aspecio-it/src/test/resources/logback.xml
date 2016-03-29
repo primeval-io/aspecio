@@ -1,0 +1,22 @@
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<root level="info" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	<!-- Logger configuration -->
+	<logger name="io.lambdacube.aspecio" level="TRACE" />
+	<logger name="io.lambdacube" level="INFO" />
+	<logger name="ch.qos.logback" level="WARN" />
+
+	<!-- Pax-Exam configuration -->
+	<logger name="org.ops4j.pax.exam" level="ERROR" />
+	<logger name="org.ops4j.pax.url.mvn" level="ERROR" />
+
+</configuration>
