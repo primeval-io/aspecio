@@ -30,8 +30,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 import io.lambdacube.aspecio.examples.DemoConsumer;
-import io.lambdacube.aspecio.examples.Goodbye;
-import io.lambdacube.aspecio.examples.Hello;
+import io.lambdacube.aspecio.examples.greetings.Goodbye;
+import io.lambdacube.aspecio.examples.greetings.Hello;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -45,6 +45,7 @@ public class AspecioIntegrationTest {
 
     public static Option exampleApplication() {
         return composite(dsAndFriends(),
+                mavenBundle("com.google.guava", "guava", "18.0"),
                 mavenBundle("io.lambdacube.aspecio", "aspecio-examples").versionAsInProject());
     }
 
@@ -91,7 +92,7 @@ public class AspecioIntegrationTest {
         Goodbye goodbye = goodbyeTracker.getService();
 
         assertThat(hello).isSameAs(goodbye);
-        assertThat(hello.getClass().getName()).isEqualTo("io.lambdacube.aspecio.examples.internal.HelloGoodbyeImpl$Woven$");
+        assertThat(hello.getClass().getName()).isEqualTo("io.lambdacube.aspecio.examples.greetings.internal.HelloGoodbyeImpl$Woven$");
 
         helloTracker.close();
         goodbyeTracker.close();

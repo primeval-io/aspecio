@@ -30,8 +30,8 @@
 	</build>
 
 	<modules>
-		<module>core</module>
-		<module>demo</module>
+		<module>aspecio-core</module>
+		<module>aspecio-examples</module>
 		<module>aspecio-it</module>
 	</modules>
 </project>
