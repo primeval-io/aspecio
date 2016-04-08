@@ -1,5 +1,8 @@
 package io.lambdacube.aspecio.examples.aspect.timed.internal;
 
+import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Stopwatch;
@@ -8,19 +11,30 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.util.promise.Promise;
 
 import io.lambdacube.aspecio.aspect.Aspect;
-import io.lambdacube.aspecio.aspect.CallContext;
 import io.lambdacube.aspecio.aspect.interceptor.Advice;
 import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
-import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
-import io.lambdacube.aspecio.examples.aspect.count.CountAspect;
+import io.lambdacube.aspecio.aspect.interceptor.AnnotationInterceptor;
+import io.lambdacube.aspecio.aspect.interceptor.CallContext;
+import io.lambdacube.aspecio.examples.aspect.timed.MetricAspect;
 import io.lambdacube.aspecio.examples.aspect.timed.Timed;
 
 @Component
-@Aspect(CountAspect.class)
-public final class TimedInterceptor implements Interceptor<Timed> {
+@Aspect(provides = MetricAspect.class, extraProperties = "measured")
+public final class MetricAspectImpl implements AnnotationInterceptor, MetricAspect {
+
+    private static final Set<Class<? extends Annotation>> ANNOTATIONS = Collections.singleton(Timed.class);
 
     @Override
-    public Advice intercept(Timed annotation, CallContext callContext) {
+    public <A extends Annotation> Advice onCall(A annotation, CallContext callContext) {
+        return time((Timed) annotation, callContext);
+    }
+
+    @Override
+    public Set<Class<? extends Annotation>> intercept() {
+        return ANNOTATIONS;
+    }
+
+    private Advice time(Timed annotation, CallContext callContext) {
         Stopwatch started = Stopwatch.createStarted();
         String methodName = callContext.target.getName() + "::" + callContext.method.getName();
 
@@ -47,11 +61,6 @@ public final class TimedInterceptor implements Interceptor<Timed> {
                 System.out.println("Sync call to " + methodName + " took " + started.elapsed(TimeUnit.MICROSECONDS) + " µs");
             }
         };
-    }
-
-    @Override
-    public Class<Timed> annotation() {
-        return Timed.class;
     }
 
 }

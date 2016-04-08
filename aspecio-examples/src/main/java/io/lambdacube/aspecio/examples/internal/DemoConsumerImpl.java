@@ -22,7 +22,10 @@ public final class DemoConsumerImpl implements DemoConsumer {
 
     @Override
     public void consumeTo(PrintStream out) {
-        out.println(hello.hello() + " " + goodbye.goodbye());
+        try {
+            out.println(hello.hello() + " " + goodbye.goodbye());
+        } catch (Throwable e) {
+        }
     }
 
     @Override

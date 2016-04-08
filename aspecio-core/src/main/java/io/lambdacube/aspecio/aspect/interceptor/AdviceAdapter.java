@@ -8,7 +8,7 @@ public interface AdviceAdapter extends Advice, Advice.SkipCall, Advice.ArgumentH
 
     default Arguments updateArguments(Arguments arguments) { return arguments; }
     
-    default Object skipCallAndReturnObject() { return null; }
+    default <T> T skipCallAndReturnObject() { return null; }
     default int skipCallAndReturnInt() { return 0; }
     default void skipCallAndReturnVoid() { }
     default short skipCallAndReturnShort() { return 0; }
@@ -37,7 +37,7 @@ public interface AdviceAdapter extends Advice, Advice.SkipCall, Advice.ArgumentH
     default boolean onBooleanReturn(boolean result) { onSuccessfulReturn(); return result; }
     
     @Override
-    default void onThrow(Throwable t) throws Throwable { throw t; }
+    default Throwable reThrow(Throwable t) { return t; }
     
     @Override
     default void runFinally() { }

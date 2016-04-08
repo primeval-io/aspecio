@@ -6,10 +6,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import io.lambdacube.component.annotation.ComponentProperty;
+import io.lambdacube.component.annotation.ComponentPropertyGroup;
 
-@ComponentProperty("service.aspect")
+@ComponentPropertyGroup
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.TYPE_USE})
+@Target({ ElementType.TYPE, ElementType.TYPE_USE })
 public @interface Aspect {
-    Class<?> value();
+
+    @ComponentProperty("service.aspect")
+    Class<?>provides();
+
+    @ComponentProperty("service.aspect.extraProperties")
+    String[]extraProperties() default {};
 }

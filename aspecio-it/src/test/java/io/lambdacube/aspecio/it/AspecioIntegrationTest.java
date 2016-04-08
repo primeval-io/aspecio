@@ -45,7 +45,7 @@ public class AspecioIntegrationTest {
 
     public static Option exampleApplication() {
         return composite(dsAndFriends(),
-                mavenBundle("com.google.guava", "guava", "18.0"),
+                mavenBundle("com.google.guava", "guava").versionAsInProject(),
                 mavenBundle("io.lambdacube.aspecio", "aspecio-examples").versionAsInProject());
     }
 
@@ -96,6 +96,8 @@ public class AspecioIntegrationTest {
 
         helloTracker.close();
         goodbyeTracker.close();
+        
+        System.out.println(demoConsumer.getLongResult());
 
         assertThat(extractFromPrintStream(ps -> demoConsumer.consumeTo(ps))).isEqualTo("hello goodbye\n");
     }

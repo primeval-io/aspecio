@@ -9,7 +9,7 @@ public interface Advice {
     }
     
     interface SkipCall {
-        Object skipCallAndReturnObject();
+        <T> T skipCallAndReturnObject();
         int skipCallAndReturnInt();
         void skipCallAndReturnVoid();
         short skipCallAndReturnShort();
@@ -43,7 +43,7 @@ public interface Advice {
         // You should only use this to propagate exceptions already thrown,
         // checked exceptions declared in the method's `throws` clause
         // or RuntimeExceptions.
-        void onThrow(Throwable t) throws Throwable;
+        Throwable reThrow(Throwable t);
     }
 
     interface Finally {
@@ -54,7 +54,7 @@ public interface Advice {
     // @formatter:on
 
     
-    public static final Advice NOOP = new Advice() {
+    public static final Advice DEFAULT = new Advice() {
 
         @Override
         public BeforeAction initialAction() {
@@ -70,4 +70,9 @@ public interface Advice {
     BeforeAction initialAction();
 
     int afterPhases();
+    
+    default boolean hasPhase(int phase) {
+        return (phase & afterPhases()) != 0;
+    }
+    
 }

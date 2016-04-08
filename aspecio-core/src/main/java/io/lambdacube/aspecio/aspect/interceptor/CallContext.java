@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.aspect;
+package io.lambdacube.aspecio.aspect.interceptor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
