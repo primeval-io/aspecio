@@ -1,12 +1,10 @@
 package io.lambdacube.aspecio.aspect.interceptor;
 
-import java.util.List;
-
 public final class CompositeAdvice implements AdviceAdapter {
 
-    public final List<Advice> advices;
+    private final Advice[] advices;
 
-    public CompositeAdvice(List<Advice> advices) {
+    public CompositeAdvice(Advice[] advices) {
         super();
         this.advices = advices;
     }

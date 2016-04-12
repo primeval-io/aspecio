@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.component.annotation.ComponentProperty;
 import io.lambdacube.component.annotation.ComponentPropertyGroup;
 
@@ -13,9 +14,9 @@ import io.lambdacube.component.annotation.ComponentPropertyGroup;
 @Target({ ElementType.TYPE, ElementType.TYPE_USE })
 public @interface Aspect {
 
-    @ComponentProperty("service.aspect")
+    @ComponentProperty(AspecioConstants.SERVICE_ASPECT)
     Class<?>provides();
 
-    @ComponentProperty("service.aspect.extraProperties")
+    @ComponentProperty(AspecioConstants.SERVICE_ASPECT_EXTRAPROPERTIES)
     String[]extraProperties() default {};
 }

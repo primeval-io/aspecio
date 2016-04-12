@@ -5,6 +5,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.hooks.service.EventListenerHook;
 import org.osgi.framework.hooks.service.FindHook;
 
+import io.lambdacube.aspecio.internal.service.AspecioImpl;
+
 public final class AspecioActivator implements BundleActivator {
 
     private AspecioImpl aspecio;

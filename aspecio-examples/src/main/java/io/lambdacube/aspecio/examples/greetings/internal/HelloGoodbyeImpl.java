@@ -9,7 +9,7 @@ import io.lambdacube.aspecio.examples.greetings.Goodbye;
 import io.lambdacube.aspecio.examples.greetings.Hello;
 
 @Component
-@Weave(CountingAspect.class)
+@Weave(required = CountingAspect.class)
 public final class HelloGoodbyeImpl implements Hello, Goodbye {
 
     @Override

@@ -1,8 +1,6 @@
 package io.lambdacube.aspecio.examples.greetings.internal;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 import io.lambdacube.aspecio.aspect.interceptor.Advice;
 import io.lambdacube.aspecio.aspect.interceptor.Advice.ArgumentHook;
@@ -19,7 +17,7 @@ import io.lambdacube.aspecio.examples.greetings.Hello;
 public final class TheoreticallyWovenComp implements Hello, Goodbye {
 
     private final HelloGoodbyeImpl delegate;
-    private final List<Interceptor> aspectProviders = new ArrayList<>();
+    private volatile Interceptor[] interceptors;
 
     public TheoreticallyWovenComp(HelloGoodbyeImpl delegate) {
         this.delegate = delegate;
@@ -29,13 +27,20 @@ public final class TheoreticallyWovenComp implements Hello, Goodbye {
     public String hello() throws Throwable {
         Method m = getClass().getMethod("hello");
         CallContext cc = new CallContext(getClass(), m, m.getParameters());
-        // PRE CODE
-        List<Advice> advices = new ArrayList<>();
-        for (Interceptor aspectProvider : aspectProviders) {
-            Advice advice = aspectProvider.onCall(cc);
-            advices.add(advice);
+        
+        Advice adv = Advice.DEFAULT;
+        
+        int size = interceptors.length;
+        if (size == 1) {
+            adv = interceptors[0].onCall(cc);
+        } else if (size > 1) {
+            Advice[] advices = new Advice[size];
+            for (int i = 0; i < size; i++) {
+                Advice advice = interceptors[i].onCall(cc);
+                advices[i] = advice;
+            }
+            adv = Advices.compose(advices);
         }
-        Advice adv = Advices.compose(advices);
 
         Arguments currentArgs = null;
 

@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.lambdacube.aspecio.internal.AspecioImpl;
 import io.lambdacube.aspecio.internal.AspecioUtils;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
 import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
+import io.lambdacube.aspecio.internal.service.AspecioImpl;
 
 /**
  * Entry point to weave a class and specify which interfaces to implement

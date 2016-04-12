@@ -30,6 +30,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 import io.lambdacube.aspecio.examples.DemoConsumer;
+import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
 import io.lambdacube.aspecio.examples.greetings.Goodbye;
 import io.lambdacube.aspecio.examples.greetings.Hello;
 
@@ -86,7 +87,9 @@ public class AspecioIntegrationTest {
         ServiceReference<?> commonSr = helloSr;
 
         // Hidden property added to woven services
-        assertThat(commonSr.getProperty(".service.aspect.woven")).isEqualTo(Boolean.TRUE);
+        Object wovenProperty = commonSr.getProperty(".service.aspect.woven");
+        assertThat(wovenProperty).isNotNull().isInstanceOf(String[].class);
+        assertThat((String[]) wovenProperty).containsExactly(CountingAspect.class.getName());
 
         Hello hello = helloTracker.getService();
         Goodbye goodbye = goodbyeTracker.getService();
@@ -96,7 +99,7 @@ public class AspecioIntegrationTest {
 
         helloTracker.close();
         goodbyeTracker.close();
-        
+
         System.out.println(demoConsumer.getLongResult());
 
         assertThat(extractFromPrintStream(ps -> demoConsumer.consumeTo(ps))).isEqualTo("hello goodbye\n");

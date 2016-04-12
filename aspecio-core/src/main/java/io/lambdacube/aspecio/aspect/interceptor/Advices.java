@@ -1,6 +1,5 @@
 package io.lambdacube.aspecio.aspect.interceptor;
 
-import java.util.Arrays;
 import java.util.List;
 
 public final class Advices {
@@ -18,7 +17,7 @@ public final class Advices {
         }
         // no defensive copy, trust the client not to share or mutate this
         // array.
-        return new CompositeAdvice(Arrays.asList(advices));
+        return new CompositeAdvice(advices);
     }
 
     public static Advice compose(List<Advice> advices) {
@@ -29,7 +28,7 @@ public final class Advices {
         } else if (advices.size() == 1) {
             return advices.get(0);
         } else {
-            return new CompositeAdvice(advices);
+            return new CompositeAdvice(advices.toArray(new Advice[0]));
         }
     }
 
