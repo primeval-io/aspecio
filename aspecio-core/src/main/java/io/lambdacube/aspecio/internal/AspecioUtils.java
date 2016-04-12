@@ -1,5 +1,6 @@
 package io.lambdacube.aspecio.internal;
 
+import java.util.SortedSet;
 import java.util.concurrent.Callable;
 
 public final class AspecioUtils {
@@ -30,5 +31,20 @@ public final class AspecioUtils {
             throw new IllegalArgumentException("Can only convert properties of type String or String[]");
         }
         return res;
+    }
+
+    public static int getIntValue(Object propObj, int defaultValue) {
+        if (propObj instanceof Integer) {
+            return ((Integer) propObj).intValue();
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public static <T> T firstOrNull(SortedSet<T> set) {
+        if (set.isEmpty()) {
+            return null;
+        }
+        return set.first();
     }
 }

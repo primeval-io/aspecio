@@ -37,7 +37,7 @@ public final class ServiceWeavingManager implements AllServiceListener {
     private static final String SERVICE_FILTER = MessageFormat.format("(&(|({0}=*)({1}=*))(!({2}=*)))", SERVICE_ASPECT_WEAVE,
             SERVICE_ASPECT_WEAVE_OPTIONAL, _SERVICE_ASPECT_WOVEN);
 
-    private Map<ServiceReference<?>, ServiceRegistration<?>> wovenServices = Collections.synchronizedSortedMap(new TreeMap<>());
+    private final Map<ServiceReference<?>, WovenService> wovenServices = Collections.synchronizedSortedMap(new TreeMap<>());
 
     private final BundleContext bundleContext;
 
@@ -218,90 +218,17 @@ public final class ServiceWeavingManager implements AllServiceListener {
         }
 
         ServiceRegistration<?> serviceRegistration = registeringBc.registerService(objectClass, toRegister, newProps);
-        wovenServices.put(reference, serviceRegistration);
+
+        WovenService wovenService = new WovenService(reference, serviceRegistration, delegateToWeave, toRegister);
+        wovenServices.put(reference, wovenService);
 
     }
 
     private synchronized void onServiceUpdate(ServiceReference<?> reference) {
-        ServiceRegistration<?> wovenServiceRegistration = wovenServices.get(reference);
-        if (wovenServiceRegistration == null) {
-            LOGGER.warn("Got notified about a service of class we don't know about, but should...");
-            return;
-        }
-
-        // Don't wanna weave anymore..?
-        if (reference.getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE) == null) {
-            wovenServiceRegistration.unregister();
-            wovenServices.remove(reference);
-            return;
-        }
-
-        Dictionary<String, Object> newProps = new Hashtable<>();
-
-        String[] objectClass = null;
-        Integer ranking = 0;
-
-        for (String key : reference.getPropertyKeys()) {
-            Object val = reference.getProperty(key);
-            switch (key) {
-            case Constants.SERVICE_ID:
-            case Constants.SERVICE_PID:
-            case Constants.SERVICE_BUNDLEID:
-            case AspecioConstants.SERVICE_ASPECT_WEAVE:
-                break;
-            case Constants.SERVICE_RANKING:
-                if (val instanceof Integer)
-                    ranking = (Integer) val;
-                break;
-            case Constants.OBJECTCLASS:
-                if (val instanceof String[]) {
-                    objectClass = (String[]) val;
-                } else if (val instanceof String) {
-                    objectClass = new String[] { (String) val };
-                }
-                break;
-            default:
-                newProps.put(key, val);
-                break;
-            }
-        }
-        ranking++;
-
-        List<Class<?>> interfaces = new ArrayList<>();
-        for (String intf : objectClass) {
-            try {
-                Class<?> cls = reference.getBundle().loadClass(intf);
-                if (!cls.isInterface()) {
-                    return;
-                }
-                interfaces.add(cls);
-            } catch (ClassNotFoundException e) {
-                // Should not happen
-                LOGGER.error("Could not find class", e);
-            }
-        }
-
-        newProps.put(Constants.SERVICE_RANKING, ranking);
-
-        newProps.put(_SERVICE_ASPECT_WOVEN, Boolean.TRUE);
-
-        wovenServiceRegistration.setProperties(newProps);
 
     }
 
     private synchronized void onServiceDeparture(ServiceReference<?> reference) {
-        ServiceRegistration<?> wovenServiceRegistration = wovenServices.get(reference);
-        if (wovenServiceRegistration == null) {
-            LOGGER.warn("Got notified about a service of class we don't know about, but should...");
-            return;
-        }
-
-        // Don't wanna weave anymore..?
-        if (reference.getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE) == null) {
-            wovenServiceRegistration.unregister();
-            wovenServices.remove(reference);
-            return;
-        }
     }
 
     private Object weave(Bundle bundle, List<Class<?>> interfaces, Object delegateToWeave) {
