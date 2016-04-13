@@ -1,12 +1,14 @@
 package io.lambdacube.aspecio.internal.service;
 
-import java.util.List;
+import java.util.Set;
 
 import org.osgi.framework.ServiceReference;
 
 import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
 
-public final class AspectService implements Comparable<AspectService> {
+public final class AspectInterceptor implements Comparable<AspectInterceptor> {
+
+    public final String aspect;
 
     public final Interceptor interceptor;
 
@@ -14,22 +16,20 @@ public final class AspectService implements Comparable<AspectService> {
 
     public final int serviceRanking;
 
-    public final List<String> aspects;
+    public final Set<String> extraProperties;
 
-    public final List<String> extraProperties;
-
-    public AspectService(Interceptor interceptor, ServiceReference<?> serviceRef, int serviceRanking, List<String> aspects,
-            List<String> extraProperties) {
+    public AspectInterceptor(String aspect, Interceptor interceptor, ServiceReference<?> serviceRef, int serviceRanking,
+            Set<String> extraProperties) {
         super();
+        this.aspect = aspect;
         this.interceptor = interceptor;
         this.serviceRef = serviceRef;
         this.serviceRanking = serviceRanking;
-        this.aspects = aspects;
         this.extraProperties = extraProperties;
     }
 
     @Override
-    public int compareTo(AspectService o) {
+    public int compareTo(AspectInterceptor o) {
         return serviceRef.compareTo(o.serviceRef);
     }
 
@@ -49,7 +49,7 @@ public final class AspectService implements Comparable<AspectService> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        AspectService other = (AspectService) obj;
+        AspectInterceptor other = (AspectInterceptor) obj;
         if (serviceRef == null) {
             if (other.serviceRef != null)
                 return false;

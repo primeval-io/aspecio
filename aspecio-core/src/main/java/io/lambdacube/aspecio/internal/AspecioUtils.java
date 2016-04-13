@@ -19,6 +19,20 @@ public final class AspecioUtils {
         }
     }
 
+    public static String asStringProperty(Object propObj) {
+        String res;
+        if (propObj == null) {
+            res = null;
+        } else if (propObj instanceof String[] && ((String[]) propObj).length == 1) {
+            res = ((String[]) propObj)[0];
+        } else if (propObj instanceof String) {
+            res = (String) propObj;
+        } else {
+            throw new IllegalArgumentException("Can only convert properties of type String or String[] of size 1");
+        }
+        return res;
+    }
+
     public static String[] asStringProperties(Object propObj) {
         String[] res = null;
         if (propObj == null) {
@@ -33,6 +47,14 @@ public final class AspecioUtils {
         return res;
     }
 
+    public static long getLongValue(Object propObj) {
+        if (propObj instanceof Number) {
+            return ((Number) propObj).longValue();
+        } else {
+            throw new IllegalArgumentException("Required number!");
+        }
+    }
+
     public static int getIntValue(Object propObj, int defaultValue) {
         if (propObj instanceof Integer) {
             return ((Integer) propObj).intValue();
@@ -42,7 +64,7 @@ public final class AspecioUtils {
     }
 
     public static <T> T firstOrNull(SortedSet<T> set) {
-        if (set.isEmpty()) {
+        if (set == null || set.isEmpty()) {
             return null;
         }
         return set.first();

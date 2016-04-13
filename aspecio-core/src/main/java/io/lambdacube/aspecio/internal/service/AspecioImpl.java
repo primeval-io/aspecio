@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.hooks.service.EventListenerHook;
@@ -16,38 +15,42 @@ import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
 import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 
-public class AspecioImpl implements FindHook, EventListenerHook {
+public final class AspecioImpl implements FindHook, EventListenerHook {
 
     private static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(AspecioImpl.class);
 
-    private long bundleId;
+    private final long bundleId;
 
-    private ServiceWeavingManager serviceWeavingManager;
-    private AspectManager aspectsManager;
+    private final ServiceWeavingManager serviceWeavingManager;
+    private final AspectInterceptorManager aspectInterceptorManager;
+    private final AspecioServiceController aspecioServiceController;
 
-    public void activate(BundleContext bundleContext) throws InvalidSyntaxException {
-        LOGGER.info("Activating Aspecio");
+    public AspecioImpl(BundleContext bundleContext) {
         this.bundleId = bundleContext.getBundle().getBundleId();
-
-        aspectsManager = new AspectManager(bundleContext);
+        aspectInterceptorManager = new AspectInterceptorManager(bundleContext);
 
         serviceWeavingManager = new ServiceWeavingManager(bundleContext);
+        
+        aspecioServiceController = new AspecioServiceController(aspectInterceptorManager, serviceWeavingManager);
 
-        aspectsManager.open();
-        serviceWeavingManager.open();
+    }
+
+    public void activate() {
+        LOGGER.info("Activating Aspecio");
+        aspecioServiceController.open();
         LOGGER.info("Aspecio activated");
     }
 
     public void deactivate() {
-        aspectsManager.close();
-        serviceWeavingManager.close();
+        aspecioServiceController.close();
         LOGGER.info("Aspecio deactivated");
     }
 
     @Override
     public void event(ServiceEvent event, Map<BundleContext, Collection<ListenerInfo>> listeners) {
         // Is it an event we want to filter out?
-        if (event.getServiceReference().getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE) == null) {
+        if (event.getServiceReference().getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE) == null
+                && event.getServiceReference().getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL) == null) {
             return;
         }
         Iterator<BundleContext> iterator = listeners.keySet().iterator();
@@ -72,7 +75,8 @@ public class AspecioImpl implements FindHook, EventListenerHook {
         Iterator<ServiceReference<?>> iterator = references.iterator();
         while (iterator.hasNext()) {
             ServiceReference<?> reference = iterator.next();
-            if (reference.getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE) == null) {
+            if (reference.getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE) == null
+                    && reference.getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL) == null) {
                 continue;
             }
             iterator.remove();

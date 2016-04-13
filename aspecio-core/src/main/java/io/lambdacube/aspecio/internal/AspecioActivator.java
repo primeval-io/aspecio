@@ -12,14 +12,14 @@ public final class AspecioActivator implements BundleActivator {
     private AspecioImpl aspecio;
 
     @Override
-    public void start(BundleContext context) throws Exception {
-        aspecio = new AspecioImpl();
-        aspecio.activate(context);
+    public void start(BundleContext context) {
+        aspecio = new AspecioImpl(context);
+        aspecio.activate();
         context.registerService(new String[] { FindHook.class.getName(), EventListenerHook.class.getName() }, aspecio, null);
     }
 
     @Override
-    public void stop(BundleContext context) throws Exception {
+    public void stop(BundleContext context) {
         if (aspecio != null) {
             aspecio.deactivate();
         }

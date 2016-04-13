@@ -4,31 +4,36 @@ import static io.lambdacube.aspecio.AspecioConstants.SERVICE_ASPECT_WEAVE;
 import static io.lambdacube.aspecio.AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL;
 import static io.lambdacube.aspecio.AspecioConstants._SERVICE_ASPECT_WOVEN;
 import static io.lambdacube.aspecio.internal.AspecioUtils.asStringProperties;
+import static io.lambdacube.aspecio.internal.AspecioUtils.getIntValue;
+import static io.lambdacube.aspecio.internal.AspecioUtils.getLongValue;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Stream;
 
 import org.osgi.framework.AllServiceListener;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.PrototypeServiceFactory;
 import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 
 import io.lambdacube.aspecio.AspecioConstants;
+import io.lambdacube.aspecio.internal.AspecioUtils;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
 import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 import io.lambdacube.aspecio.internal.weaving.AspectWeaver;
+import io.lambdacube.aspecio.internal.weaving.Woven;
 import io.lambdacube.aspecio.internal.weaving.WovenClassHolder;
 
 public final class ServiceWeavingManager implements AllServiceListener {
@@ -37,7 +42,9 @@ public final class ServiceWeavingManager implements AllServiceListener {
     private static final String SERVICE_FILTER = MessageFormat.format("(&(|({0}=*)({1}=*))(!({2}=*)))", SERVICE_ASPECT_WEAVE,
             SERVICE_ASPECT_WEAVE_OPTIONAL, _SERVICE_ASPECT_WOVEN);
 
-    private final Map<ServiceReference<?>, WovenService> wovenServices = Collections.synchronizedSortedMap(new TreeMap<>());
+    private final Map<ServiceReference<?>, WovenService> wovenServiceByServiceRef = Collections.synchronizedSortedMap(new TreeMap<>());
+    private final Map<String, List<WovenService>> wovenServicesByAspect = new ConcurrentHashMap<>();
+    public final List<WovenServiceListener> wovenServiceListeners = new CopyOnWriteArrayList<>();
 
     private final BundleContext bundleContext;
 
@@ -70,10 +77,10 @@ public final class ServiceWeavingManager implements AllServiceListener {
         this.closed = true;
         this.bundleContext.removeServiceListener(this);
         synchronized (this) {
-            for (ServiceReference<?> sr : wovenServices.keySet()) {
+            for (ServiceReference<?> sr : wovenServiceByServiceRef.keySet()) {
                 this.bundleContext.ungetService(sr);
             }
-            wovenServices.clear();
+            wovenServiceByServiceRef.clear();
         }
     }
 
@@ -102,139 +109,160 @@ public final class ServiceWeavingManager implements AllServiceListener {
     }
 
     private synchronized void onServiceRegistration(ServiceReference<?> reference) {
-        BundleContext registeringBc = reference.getBundle().getBundleContext();
+        if (wovenServiceByServiceRef.containsKey(reference)) {
+            // This might happen if a service arrives between the listener registration and the initial getAllServiceReferences call
+            return;
+        }
 
-        Object delegateToWeave = registeringBc.getService(reference);
+        long originalServiceId = getLongValue(reference.getProperty(Constants.SERVICE_ID));
 
-        LOGGER.debug("Weaving service {} of class {}", reference.getProperty(Constants.SERVICE_ID),
-                delegateToWeave.getClass().getName());
+        LOGGER.debug("Preparing the weaving service id {} provided by {}", originalServiceId, reference.getBundle().getSymbolicName());
 
-        Dictionary<String, Object> newProps = new Hashtable<>();
-        String[] requiredAspectsToWeave = new String[0];
-        String[] optionalAspectsToWeave = new String[0];
+        List<String> requiredAspectsToWeave = new ArrayList<>(
+                Arrays.asList(asStringProperties(reference.getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE))));
+        List<String> optionalAspectsToWeave = new ArrayList<>(
+                Arrays.asList(asStringProperties(reference.getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL))));
+        List<String> objectClass = new ArrayList<>(Arrays.asList(asStringProperties(reference.getProperty(Constants.OBJECTCLASS))));
+        int serviceRanking = getIntValue(reference.getProperty(Constants.SERVICE_RANKING), 0);
+        ServiceScope serviceScope = ServiceScope.fromString(AspecioUtils.asStringProperty(reference.getProperty(Constants.SERVICE_SCOPE)));
 
-        String[] objectClass = null;
-        Integer ranking = 0;
-        ServiceScope serviceScope = ServiceScope.SINGLETON;
-
+        // Keep original properties, except for managed ones.
+        Hashtable<String, Object> serviceProperties = new Hashtable<>();
         for (String key : reference.getPropertyKeys()) {
             Object val = reference.getProperty(key);
             switch (key) {
             case Constants.SERVICE_ID:
             case Constants.SERVICE_PID:
             case Constants.SERVICE_BUNDLEID:
-                break;
-            case AspecioConstants.SERVICE_ASPECT_WEAVE:
-                requiredAspectsToWeave = asStringProperties(val);
-                break;
-            case AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL:
-                optionalAspectsToWeave = asStringProperties(val);
-                break;
             case Constants.SERVICE_RANKING:
-                if (val instanceof Integer)
-                    ranking = (Integer) val;
-                break;
-            case Constants.SERVICE_SCOPE:
-                if (val instanceof String) {
-                    String strVal = (String) val;
-                    if (Constants.SCOPE_PROTOTYPE.equals(strVal)) {
-                        serviceScope = ServiceScope.PROTOTYPE;
-                    } else if (Constants.SCOPE_BUNDLE.equals(strVal)) {
-                        serviceScope = ServiceScope.BUNDLE;
-                    }
-                }
-                newProps.put(Constants.SERVICE_SCOPE, val);
-                break;
             case Constants.OBJECTCLASS:
-                objectClass = asStringProperties(val);
-                break;
+            case Constants.SERVICE_SCOPE:
+            case AspecioConstants.SERVICE_ASPECT_WEAVE:
+            case AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL:
+                continue;
             default:
-                newProps.put(key, reference.getProperty(key));
-                break;
+                serviceProperties.put(key, val);
             }
         }
-        ranking++;
+        serviceRanking++;
 
+        // Check if we can weave it
         List<Class<?>> interfaces = new ArrayList<>();
         for (String intf : objectClass) {
             try {
                 Class<?> cls = reference.getBundle().loadClass(intf);
                 if (!cls.isInterface()) {
                     // Cannot weave!
-                    LOGGER.warn(
-                            "Cannot weave service class {} because it provides service that are not interfaces, such as {}",
-                            delegateToWeave.getClass().getName(), cls.getName());
+                    LOGGER.warn("Cannot weave service id {} because it provides service that are not interfaces, such as {}",
+                            originalServiceId, cls.getName());
                     bundleContext.ungetService(reference);
                     return;
                 }
                 interfaces.add(cls);
             } catch (ClassNotFoundException e) {
                 // Should not happen
-                LOGGER.error("Could not find class, not weaving service of class {}", delegateToWeave.getClass().getName(), e);
+                LOGGER.error("Could not find class, not weaving service id {}", originalServiceId, e);
                 bundleContext.ungetService(reference);
                 return;
             }
         }
 
-        newProps.put(Constants.SERVICE_RANKING, ranking);
+        serviceProperties.put(Constants.SERVICE_RANKING, serviceRanking);
 
         // This property is set to recognize the registration as a proxy, so it's not proxied again
-        newProps.put(_SERVICE_ASPECT_WOVEN, requiredAspectsToWeave);
+        // TODO add on publish
+        // serviceProperties.put(_SERVICE_ASPECT_WOVEN, requiredAspectsToWeave.toArray(new String[0]));
 
-        Object toRegister = null;
-        switch (serviceScope) {
-        case PROTOTYPE:
-            toRegister = new PrototypeServiceFactory<Object>() {
-                @Override
-                public Object getService(Bundle bundle, ServiceRegistration<Object> registration) {
-                    return weave(bundle, interfaces, delegateToWeave);
-                }
+        AspecioServiceObject aspecioServiceObject = new AspecioServiceObject(serviceScope, reference,
+                originalService -> weave(interfaces, originalService));
 
-                @Override
-                public void ungetService(Bundle bundle, ServiceRegistration<Object> registration, Object service) {
-                    //
-                }
-            };
-            break;
+        WovenService wovenService = new WovenService(originalServiceId, requiredAspectsToWeave, optionalAspectsToWeave, reference,
+                objectClass, serviceProperties, aspecioServiceObject);
+        wovenServiceByServiceRef.put(reference, wovenService);
 
-        case BUNDLE:
-            toRegister = new ServiceFactory<Object>() {
-
-                @Override
-                public Object getService(Bundle bundle, ServiceRegistration<Object> registration) {
-                    return weave(bundle, interfaces, delegateToWeave);
-                }
-
-                @Override
-                public void ungetService(Bundle bundle, ServiceRegistration<Object> registration, Object service) {
-                    //
-                }
-            };
-            break;
-        default:
-            toRegister = weave(reference.getBundle(), interfaces, delegateToWeave);
-
-            break;
+        Iterator<String> aspectIt = Stream.concat(requiredAspectsToWeave.stream(), optionalAspectsToWeave.stream()).distinct().iterator();
+        while (aspectIt.hasNext()) {
+            String aspect = aspectIt.next();
+            List<WovenService> wovenServices = wovenServicesByAspect.computeIfAbsent(aspect, k -> new ArrayList<>());
+            wovenServices.add(wovenService);
         }
 
-        ServiceRegistration<?> serviceRegistration = registeringBc.registerService(objectClass, toRegister, newProps);
-
-        WovenService wovenService = new WovenService(reference, serviceRegistration, delegateToWeave, toRegister);
-        wovenServices.put(reference, wovenService);
-
+        fireEvent(WovenServiceEvent.SERVICE_REGISTRATION, wovenService);
     }
 
     private synchronized void onServiceUpdate(ServiceReference<?> reference) {
+        WovenService wovenService = wovenServiceByServiceRef.get(reference);
+        if (wovenService == null) {
+            return;
+        }
+
+        List<String> requiredAspectsToWeave = new ArrayList<>(
+                Arrays.asList(asStringProperties(reference.getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE))));
+        List<String> optionalAspectsToWeave = new ArrayList<>(
+                Arrays.asList(asStringProperties(reference.getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL))));
+        int serviceRanking = getIntValue(reference.getProperty(Constants.SERVICE_RANKING), 0);
+
+        // Keep original properties, except for managed ones.
+        Hashtable<String, Object> serviceProperties = new Hashtable<>();
+        for (String key : reference.getPropertyKeys()) {
+            Object val = reference.getProperty(key);
+            switch (key) {
+            case Constants.SERVICE_ID:
+            case Constants.SERVICE_PID:
+            case Constants.SERVICE_BUNDLEID:
+            case Constants.SERVICE_RANKING:
+            case Constants.OBJECTCLASS:
+            case Constants.SERVICE_SCOPE:
+            case AspecioConstants.SERVICE_ASPECT_WEAVE:
+            case AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL:
+                continue;
+            default:
+                serviceProperties.put(key, val);
+            }
+        }
+        serviceRanking++;
+        serviceProperties.put(Constants.SERVICE_RANKING, serviceRanking);
+
+        boolean requiredAspectsChanged = !Objects.equals(requiredAspectsToWeave, wovenService.requiredAspects);
+        boolean optionalAspectsChanged = !Objects.equals(optionalAspectsToWeave, wovenService.optionalAspects);
+        boolean servicePropertiesChanged = !Objects.equals(serviceProperties, wovenService.serviceProperties);
+
+        WovenService updatedWovenService = wovenService.update(requiredAspectsToWeave, optionalAspectsToWeave, serviceProperties);
+
+        int mask = requiredAspectsChanged ? WovenServiceEvent.REQUIRED_ASPECT_CHANGE : 0;
+        mask |= optionalAspectsChanged ? WovenServiceEvent.OPTIONAL_ASPECT_CHANGE : 0;
+        mask |= servicePropertiesChanged ? WovenServiceEvent.SERVICE_PROPERTIES_CHANGE : 0;
+
+        if (mask != 0) {
+            fireEvent(new WovenServiceEvent(WovenServiceEvent.EventKind.SERVICE_UPDATE, mask), updatedWovenService);
+        }
 
     }
 
     private synchronized void onServiceDeparture(ServiceReference<?> reference) {
+        WovenService wovenService = wovenServiceByServiceRef.get(reference);
+        if (wovenService == null) {
+            return;
+        }
+
+        fireEvent(WovenServiceEvent.SERVICE_DEPARTURE, wovenService);
+
     }
 
-    private Object weave(Bundle bundle, List<Class<?>> interfaces, Object delegateToWeave) {
-        // BundleWiring bw = bundle.adapt(BundleWiring.class);
-        // ClassLoader cl = bw.getClassLoader();
+    private Woven weave(List<Class<?>> interfaces, Object delegateToWeave) {
         WovenClassHolder wovenClassHolder = AspectWeaver.weave(delegateToWeave.getClass(), interfaces.toArray(new Class<?>[0]));
         return wovenClassHolder.weavingFactory.apply(delegateToWeave);
+    }
+
+    private void fireEvent(WovenServiceEvent event, WovenService wovenService) {
+        wovenServiceListeners.forEach(l -> l.onWovenServiceEvent(event, wovenService));
+    }
+
+    public void addListener(WovenServiceListener wovenServiceListener) {
+        wovenServiceListeners.add(wovenServiceListener);
+    }
+
+    public void removeListener(WovenServiceListener wovenServiceListener) {
+        wovenServiceListeners.remove(wovenServiceListener);
     }
 }

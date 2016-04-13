@@ -25,11 +25,12 @@ public final class AspectWeaver {
             Method[] methods = getMethods(clazzToWeave);
 
             String className = clazzToWeave.getName() + WovenClassGenerator.WOVEN_TARGET_CLASS_SUFFIX;
-            DynamicClassLoader dynamicClassLoader = new DynamicClassLoader(clazzToWeave.getClassLoader(),
-                    className, WovenClassGenerator.weave(clazzToWeave, interfaces, methods));
+            DynamicClassLoader dynamicClassLoader = new DynamicClassLoader(new BridgingClassLoader(clazzToWeave.getClassLoader(),
+                    AspectWeaver.class.getClassLoader()), className, WovenClassGenerator.weave(clazzToWeave, interfaces, methods));
             Class<?> wovenClass = dynamicClassLoader.loadClass(className);
 
-            return new WovenClassHolder(wovenClass, o -> AspecioUtils.trust(() -> wovenClass.getConstructor(clazzToWeave).newInstance(o)));
+            return new WovenClassHolder(wovenClass,
+                    o -> AspecioUtils.trust(() -> (Woven) wovenClass.getConstructor(clazzToWeave).newInstance(o)));
         } catch (Exception e) {
             LOGGER.error("Could not weave class {}", clazzToWeave.getName());
             throw new RuntimeException(e);
@@ -73,4 +74,3 @@ public final class AspectWeaver {
         return res;
     }
 }
-

@@ -6,9 +6,9 @@ public final class WovenClassHolder {
 
     public final Class<?> wovenClass;
 
-    public final Function<Object, Object> weavingFactory;
+    public final Function<Object, Woven> weavingFactory;
 
-    public WovenClassHolder(Class<?> wovenClass, Function<Object, Object> weavingFactory) {
+    public WovenClassHolder(Class<?> wovenClass, Function<Object, Woven> weavingFactory) {
         super();
         this.wovenClass = wovenClass;
         this.weavingFactory = weavingFactory;

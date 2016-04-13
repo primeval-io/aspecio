@@ -50,16 +50,14 @@ public final class WovenClassGenerator {
         String targetClassInternalName = wovenClassInternalName + WOVEN_TARGET_CLASS_SUFFIX;
         String targetClassDescriptor = makeTargetClassDescriptor(wovenClassDescriptor);
 
-        // Managing superclasses would be nice, but what about non-empty super
-        // constructors? :( General support is doomed...
-        // Class<?> superclass = clazzToWeave.getSuperclass();
+        Class<?> superclass = Woven.class;
         // String superClassDescriptor = Type.getDescriptor(superclass);
-        // String superClassInternalName = Type.getInternalName(superclass);
+        String superClassInternalName = Type.getInternalName(superclass);
 
         String typeSignature = TypeUtils.getTypeSignature(clazzToWeave);
         String[] itfs = Stream.of(interfaces).map(Type::getInternalName).toArray(String[]::new);
         cw.visit(52, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, targetClassInternalName, typeSignature,
-                "java/lang/Object", itfs);
+                superClassInternalName, itfs);
 
         addTypeAnnotations(clazzToWeave, cw);
 
@@ -77,7 +75,7 @@ public final class WovenClassGenerator {
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+            mv.visitMethodInsn(INVOKESPECIAL, superClassInternalName, "<init>", "()V", false);
             Label l1 = new Label();
             mv.visitLabel(l1);
             mv.visitVarInsn(ALOAD, 0);
