@@ -2,6 +2,7 @@ package io.lambdacube.aspecio.internal.weaving.testset.simpleservice;
 
 import java.io.PrintStream;
 
+import io.lambdacube.aspecio.internal.weaving.testset.api.BadValueException;
 import io.lambdacube.aspecio.internal.weaving.testset.api.SimpleInterface;
 
 public final class DelegatingSimpleService implements SimpleInterface {
@@ -26,9 +27,9 @@ public final class DelegatingSimpleService implements SimpleInterface {
     public int times() {
         return delegate.times();
     }
-    
+
     @Override
-    public int increase(int a) {
+    public int increase(int a) throws BadValueException {
         return delegate.increase(a);
     }
 

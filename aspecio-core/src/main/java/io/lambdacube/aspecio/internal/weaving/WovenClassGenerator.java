@@ -87,6 +87,7 @@ public final class WovenClassGenerator {
         FieldVisitor fv;
         MethodVisitor mv;
 
+        cw.visitSource("@dynamic@aspecio", null);
         String wovenClassDescriptor = Type.getDescriptor(clazzToWeave);
         String wovenClassInternalName = Type.getInternalName(clazzToWeave);
 

@@ -64,5 +64,10 @@ public final class CountingAspectImpl implements Interceptor, CountingAspect {
     public void printCounts() {
         methodCallCount.forEach((m, count) -> System.out.println(m.getDeclaringClass().getName() + "::" + m.getName() + " -> " + count));
     }
+    
+    @Override
+    public String toString() {
+        return "Counting";
+    }
 
 }

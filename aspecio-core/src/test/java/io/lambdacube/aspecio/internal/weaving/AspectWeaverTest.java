@@ -18,7 +18,13 @@ import java.util.stream.Stream;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 
+import io.lambdacube.aspecio.aspect.interceptor.Advice;
+import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
+import io.lambdacube.aspecio.aspect.interceptor.BeforeAction;
+import io.lambdacube.aspecio.aspect.interceptor.CallContext;
+import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
 import io.lambdacube.aspecio.internal.weaving.testset.annotated.AnnotatedService;
+import io.lambdacube.aspecio.internal.weaving.testset.api.BadValueException;
 import io.lambdacube.aspecio.internal.weaving.testset.api.GenericInterface;
 import io.lambdacube.aspecio.internal.weaving.testset.api.SimpleInterface;
 import io.lambdacube.aspecio.internal.weaving.testset.api.SimplestInterface;
@@ -50,17 +56,57 @@ public final class AspectWeaverTest {
     }
 
     @Test
-    public void shouldWeaveSimpleClass() throws IOException {
+    public void shouldWeaveSimpleClass() throws IOException, BadValueException {
         SimpleService simpleService = new SimpleService();
 
         WovenClassHolder wovenClassHolder = AspectWeaver.weave(SimpleService.class, new Class[] { SimpleInterface.class });
         assertThat(SimpleInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
-        
-        Object wovenService = wovenClassHolder.weavingFactory.apply(simpleService);
+        Woven wovenService = wovenClassHolder.weavingFactory.apply(simpleService);
+
+        wovenService.setInterceptor(new Interceptor() {
+
+            @Override
+            public Advice onCall(CallContext callContext) {
+                if (callContext.method.getName().equals("increase")) {
+                    return new AdviceAdapter() {
+                        @Override
+                        public BeforeAction initialAction() {
+                            return BeforeAction.PROCEED;
+                        }
+
+                        public int afterPhases() {
+                            return CallReturn.PHASE + Catch.PHASE;
+                        };
+
+                        public void onSuccessfulReturn() {
+                            System.out.println("yay!");
+                        };
+
+                        public int onIntReturn(int result) {
+                            return result / 2;
+                        };
+                        
+                        public Throwable reThrow(Throwable t) {
+                            return new IllegalArgumentException(t);
+                        };
+                        
+                        public void runFinally() {
+                            System.out.println("whateva");
+                        };
+                    };
+                } else
+                    return Advice.DEFAULT;
+            }
+        });
+
         assertThat(wovenService).isInstanceOf(SimpleInterface.class);
 
         SimpleInterface wovenItf = (SimpleInterface) wovenService;
+
+        System.out.println(simpleService.increase(10));
+        System.out.println(wovenItf.increase(10));
+//        System.out.println(wovenItf.increase(-42));
 
         assertThat(wovenItf.hello()).isEqualTo(simpleService.hello());
 

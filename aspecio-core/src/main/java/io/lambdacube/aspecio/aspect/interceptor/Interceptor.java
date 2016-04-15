@@ -7,6 +7,10 @@ public interface Interceptor {
         public Advice onCall(CallContext callContext) {
             return Advice.DEFAULT;
         }
+        
+        public String toString() {
+            return "NOOP Interceptor";
+        };
     };
 
     Advice onCall(CallContext callContext);

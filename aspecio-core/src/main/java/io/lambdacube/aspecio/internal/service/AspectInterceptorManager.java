@@ -251,6 +251,10 @@ public final class AspectInterceptorManager implements ServiceListener {
 
             @Override
             public int compare(AspectInterceptor o1, AspectInterceptor o2) {
+                int res  = o1.aspect.compareTo(o2.aspect);
+                if (res != 0) {
+                    return res;
+                }
                 int a = o1.serviceRanking;
                 int b = o2.serviceRanking;
                 return (a < b) ? -1 : ((a > b) ? 1 : 0);

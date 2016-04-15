@@ -1,8 +1,12 @@
 package io.lambdacube.aspecio.aspect.interceptor;
 
+import java.util.Iterator;
+import java.util.stream.Stream;
+
 public final class CompositeInterceptor implements Interceptor {
 
     private final Interceptor[] interceptors;
+    private String repr;
 
     public CompositeInterceptor(Interceptor[] interceptors) {
         this.interceptors = interceptors;
@@ -25,6 +29,19 @@ public final class CompositeInterceptor implements Interceptor {
         }
 
         return advice;
+    }
+
+    @Override
+    public String toString() {
+        if (repr == null) {
+            repr = new StringBuilder().append("Composite{").append(String.join(",", new Iterable<String>() {
+                public Iterator<String> iterator() {
+                    return Stream.of(interceptors).map(Object::toString).iterator();
+                }
+            })).append('}').toString();
+        }
+        return repr;
+
     }
 
 }

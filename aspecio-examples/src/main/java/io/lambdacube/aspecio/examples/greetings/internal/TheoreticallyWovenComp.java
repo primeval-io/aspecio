@@ -18,7 +18,8 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
     private final static Method meth0 = null; // WovenUtils.getMethodUnchecked(HelloGoodbyeImpl.class, "hello");
     private final static CallContext cc0 = new CallContext(HelloGoodbyeImpl.class, meth0, meth0.getParameters());
 
-    private final static Method meth1 =  null; // WovenUtils.getMethodUnchecked(HelloGoodbyeImpl.class, "test", PrintStream.class, int.class, byte.class, String.class);
+    private final static Method meth1 = null; // WovenUtils.getMethodUnchecked(HelloGoodbyeImpl.class, "test", PrintStream.class, int.class,
+                                              // byte.class, String.class);
     private final static CallContext cc1 = new CallContext(HelloGoodbyeImpl.class, meth1, meth1.getParameters());
 
     private final HelloGoodbyeImpl delegate;
@@ -28,7 +29,7 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
     }
 
     @Override
-    public String hello() throws Throwable {
+    public String hello() {
         Advice adv = interceptor.onCall(cc0);
 
         Arguments currentArgs = null;
@@ -68,7 +69,8 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
             if ((adv.hasPhase(Advice.Catch.PHASE))) {
                 throwable = ((Advice.Catch) adv).reThrow(throwable);
             }
-            throw throwable;
+
+            throw new RuntimeException(throwable); // throwable;
         } finally {
             if ((adv.hasPhase(Advice.Finally.PHASE))) {
                 ((Advice.Finally) adv).runFinally();

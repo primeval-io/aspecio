@@ -3,6 +3,7 @@ package io.lambdacube.aspecio.internal.weaving.testset.simpleservice;
 import java.io.PrintStream;
 import java.util.stream.IntStream;
 
+import io.lambdacube.aspecio.internal.weaving.testset.api.BadValueException;
 import io.lambdacube.aspecio.internal.weaving.testset.api.SimpleInterface;
 
 public final class SimpleService implements SimpleInterface {
@@ -25,10 +26,13 @@ public final class SimpleService implements SimpleInterface {
     }
 
     @Override
-    public int increase(int a) {
+    public int increase(int a) throws BadValueException {
+        if (a < 0) {
+            throw new BadValueException("cannot accept negative values!");
+        }
         return a * 2;
     }
-    
+
     @Override
     public int reduce(int[] arr) {
         return IntStream.of(arr).sum();

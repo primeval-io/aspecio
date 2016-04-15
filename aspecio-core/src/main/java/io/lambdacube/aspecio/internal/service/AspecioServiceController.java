@@ -73,6 +73,7 @@ public final class AspecioServiceController implements AspectInterceptorListener
 
         managedWovenService.wovenService = wovenService;
         managedWovenService.aspectContext = context;
+        managedWovenService.wovenService.aspecioServiceObject.setInterceptor(context.interceptor);
 
         boolean satisfied = context.unsatisfiedRequiredAspects.isEmpty();
         if (satisfied) {

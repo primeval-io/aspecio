@@ -1,13 +1,13 @@
 package io.lambdacube.aspecio.internal.weaving;
 
+import static io.lambdacube.aspecio.internal.AspecioUtils.trust;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
-import io.lambdacube.aspecio.internal.AspecioUtils;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
 import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 import io.lambdacube.aspecio.internal.service.AspecioImpl;
@@ -36,11 +36,7 @@ public final class AspectWeaver {
             Class<?> wovenClass = dynamicClassLoader.loadClass(className);
 
             return new WovenClassHolder(wovenClass,
-                    o -> AspecioUtils.trust(() -> {
-                        Woven newInstance = (Woven) wovenClass.getConstructor(clazzToWeave).newInstance(o);
-                        newInstance.setInterceptor(Interceptor.NOOP);
-                        return newInstance;
-                    }));
+                    o -> trust(() -> (Woven) wovenClass.getConstructor(clazzToWeave).newInstance(o)));
         } catch (Exception e) {
             LOGGER.error("Could not weave class {}", clazzToWeave.getName());
             e.printStackTrace();

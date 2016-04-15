@@ -97,12 +97,22 @@ public class AspecioIntegrationTest {
         assertThat(hello).isSameAs(goodbye);
         assertThat(hello.getClass().getName()).isEqualTo("io.lambdacube.aspecio.examples.greetings.internal.HelloGoodbyeImpl$Woven$");
 
+        hello.hello();
+        
         helloTracker.close();
         goodbyeTracker.close();
 
         System.out.println(demoConsumer.getLongResult());
 
         assertThat(extractFromPrintStream(ps -> demoConsumer.consumeTo(ps))).isEqualTo("hello goodbye\n");
+
+        ServiceTracker<CountingAspect, CountingAspect> caTracker = new ServiceTracker<>(bundleContext, CountingAspect.class, null);
+        caTracker.open();
+        CountingAspect countingAspect = caTracker.getService();
+        
+        countingAspect.printCounts();
+        
+        caTracker.close();
     }
 
     private String extractFromPrintStream(Consumer<PrintStream> psConsumer) throws UnsupportedEncodingException, IOException {

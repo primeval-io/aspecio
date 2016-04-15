@@ -20,7 +20,7 @@ import io.lambdacube.aspecio.examples.aspect.timed.Timed;
 
 @Component
 @Aspect(provides = MetricAspect.class, extraProperties = "measured")
-public final class MetricAspectImpl implements AnnotationInterceptor, MetricAspect {
+public final class MetricInterceptorImpl implements AnnotationInterceptor {
 
     private static final Set<Class<? extends Annotation>> ANNOTATIONS = Collections.singleton(Timed.class);
 
@@ -63,4 +63,8 @@ public final class MetricAspectImpl implements AnnotationInterceptor, MetricAspe
         };
     }
 
+    @Override
+    public String toString() {
+        return "MetricsInterceptor";
+    }
 }
