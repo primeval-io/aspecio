@@ -56,13 +56,15 @@ public final class AspectWeaverTest {
         WovenClassHolder wovenClassHolder = AspectWeaver.weave(SimpleService.class, new Class[] { SimpleInterface.class });
         assertThat(SimpleInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
+        
         Object wovenService = wovenClassHolder.weavingFactory.apply(simpleService);
         assertThat(wovenService).isInstanceOf(SimpleInterface.class);
 
         SimpleInterface wovenItf = (SimpleInterface) wovenService;
-        assertThat(wovenItf.times()).isEqualTo(simpleService.times());
 
         assertThat(wovenItf.hello()).isEqualTo(simpleService.hello());
+
+        assertThat(wovenItf.times()).isEqualTo(simpleService.times());
 
         assertThat(extractFromPrintStream(ps -> wovenItf.sayHello(ps))).isEqualTo(extractFromPrintStream(ps -> simpleService.sayHello(ps)));
     }

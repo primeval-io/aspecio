@@ -9,6 +9,8 @@ import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
 import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 
+
+// Owned by AspecioServiceController (i.e, sync is done there)
 public final class ManagedWovenService {
     public static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(ManagedWovenService.class);
 

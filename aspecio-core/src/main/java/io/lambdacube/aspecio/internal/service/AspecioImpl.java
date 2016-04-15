@@ -27,12 +27,10 @@ public final class AspecioImpl implements FindHook, EventListenerHook {
 
     public AspecioImpl(BundleContext bundleContext) {
         this.bundleId = bundleContext.getBundle().getBundleId();
-        aspectInterceptorManager = new AspectInterceptorManager(bundleContext);
-
-        serviceWeavingManager = new ServiceWeavingManager(bundleContext);
         
+        aspectInterceptorManager = new AspectInterceptorManager(bundleContext);
+        serviceWeavingManager = new ServiceWeavingManager(bundleContext);
         aspecioServiceController = new AspecioServiceController(aspectInterceptorManager, serviceWeavingManager);
-
     }
 
     public void activate() {
@@ -44,6 +42,10 @@ public final class AspecioImpl implements FindHook, EventListenerHook {
     public void deactivate() {
         aspecioServiceController.close();
         LOGGER.info("Aspecio deactivated");
+    }
+
+    public void list() {
+        System.out.println("hello world");
     }
 
     @Override

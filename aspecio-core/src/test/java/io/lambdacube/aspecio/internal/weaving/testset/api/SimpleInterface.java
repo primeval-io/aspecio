@@ -10,4 +10,7 @@ public interface SimpleInterface {
     
     int times();
     
+    int increase(int a);
+    
+    int reduce(int[] arr);
 }

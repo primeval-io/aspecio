@@ -1,5 +1,7 @@
 package io.lambdacube.aspecio.internal;
 
+import java.util.Hashtable;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.hooks.service.EventListenerHook;
@@ -15,7 +17,11 @@ public final class AspecioActivator implements BundleActivator {
     public void start(BundleContext context) {
         aspecio = new AspecioImpl(context);
         aspecio.activate();
-        context.registerService(new String[] { FindHook.class.getName(), EventListenerHook.class.getName() }, aspecio, null);
+
+        Hashtable<String, Object> props = new Hashtable<>();
+        props.put("osgi.command.scope", "aspect");
+        props.put("osgi.command.function", new String[] { "list" });
+        context.registerService(new String[] { FindHook.class.getName(), EventListenerHook.class.getName() }, aspecio, props);
     }
 
     @Override

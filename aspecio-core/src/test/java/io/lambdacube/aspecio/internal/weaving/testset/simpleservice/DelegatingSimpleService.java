@@ -26,5 +26,15 @@ public final class DelegatingSimpleService implements SimpleInterface {
     public int times() {
         return delegate.times();
     }
+    
+    @Override
+    public int increase(int a) {
+        return delegate.increase(a);
+    }
+
+    @Override
+    public int reduce(int[] arr) {
+        return delegate.reduce(arr);
+    };
 
 }
