@@ -14,12 +14,12 @@ import org.osgi.util.promise.Promise;
 
 import io.lambdacube.aspecio.Weave;
 import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
-import io.lambdacube.aspecio.examples.aspect.timed.MetricAspect;
-import io.lambdacube.aspecio.examples.aspect.timed.Timed;
+import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
+import io.lambdacube.aspecio.examples.aspect.metric.Timed;
 import io.lambdacube.aspecio.examples.async.SuperSlowService;
 
 @Component
-@Weave(required = MetricAspect.class, optional = CountingAspect.class)
+@Weave(required = MetricAspect.AnnotatedOnly.class, optional = CountingAspect.class)
 public final class SuperSlowServiceImpl implements SuperSlowService {
 
     private ExecutorService executor;

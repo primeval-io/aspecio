@@ -1,8 +1,5 @@
-package io.lambdacube.aspecio.examples.aspect.timed.internal;
+package io.lambdacube.aspecio.examples.aspect.metric.internal;
 
-import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Stopwatch;
@@ -13,28 +10,16 @@ import org.osgi.util.promise.Promise;
 import io.lambdacube.aspecio.aspect.Aspect;
 import io.lambdacube.aspecio.aspect.interceptor.Advice;
 import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
-import io.lambdacube.aspecio.aspect.interceptor.AnnotationInterceptor;
 import io.lambdacube.aspecio.aspect.interceptor.CallContext;
-import io.lambdacube.aspecio.examples.aspect.timed.MetricAspect;
-import io.lambdacube.aspecio.examples.aspect.timed.Timed;
+import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
+import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
 
 @Component
-@Aspect(provides = MetricAspect.class, extraProperties = "measured")
-public final class MetricInterceptorImpl implements AnnotationInterceptor {
-
-    private static final Set<Class<? extends Annotation>> ANNOTATIONS = Collections.singleton(Timed.class);
+@Aspect(provides = MetricAspect.All.class, extraProperties = "measured")
+public final class AllMetricInterceptorImpl implements Interceptor {
 
     @Override
-    public <A extends Annotation> Advice onCall(A annotation, CallContext callContext) {
-        return time((Timed) annotation, callContext);
-    }
-
-    @Override
-    public Set<Class<? extends Annotation>> intercept() {
-        return ANNOTATIONS;
-    }
-
-    private Advice time(Timed annotation, CallContext callContext) {
+    public Advice onCall(CallContext callContext) {
         Stopwatch started = Stopwatch.createStarted();
         String methodName = callContext.target.getName() + "::" + callContext.method.getName();
 
@@ -65,6 +50,6 @@ public final class MetricInterceptorImpl implements AnnotationInterceptor {
 
     @Override
     public String toString() {
-        return "MetricsInterceptor";
+        return "MetricsInterceptor:ALL";
     }
 }

@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.examples.greetings.internal;
+package io.lambdacube.aspecio.internal.weaving.theory;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
@@ -10,21 +10,26 @@ import io.lambdacube.aspecio.aspect.interceptor.Advice.SkipCall;
 import io.lambdacube.aspecio.aspect.interceptor.Arguments;
 import io.lambdacube.aspecio.aspect.interceptor.BeforeAction;
 import io.lambdacube.aspecio.aspect.interceptor.CallContext;
-import io.lambdacube.aspecio.examples.greetings.Goodbye;
-import io.lambdacube.aspecio.examples.greetings.Hello;
+import io.lambdacube.aspecio.internal.weaving.Woven;
+import io.lambdacube.aspecio.internal.weaving.WovenUtils;
 
-public final class TheoreticallyWovenComp extends Woven implements Hello, Goodbye {
+public final class TheoreticallyWovenComp extends Woven implements Hello, Goodbye, Stuff {
 
-    private final static Method meth0 = null; // WovenUtils.getMethodUnchecked(HelloGoodbyeImpl.class, "hello");
-    private final static CallContext cc0 = new CallContext(HelloGoodbyeImpl.class, meth0, meth0.getParameters());
+    private final static Method meth0 = WovenUtils.getMethodUnchecked(TheoreticalDelegate.class, "hello");
+    private final static CallContext cc0 = new CallContext(TheoreticalDelegate.class, meth0, meth0.getParameters());
 
-    private final static Method meth1 = null; // WovenUtils.getMethodUnchecked(HelloGoodbyeImpl.class, "test", PrintStream.class, int.class,
-                                              // byte.class, String.class);
-    private final static CallContext cc1 = new CallContext(HelloGoodbyeImpl.class, meth1, meth1.getParameters());
+    private final static Method meth1 = WovenUtils.getMethodUnchecked(TheoreticalDelegate.class, "test", PrintStream.class, int.class,
+            byte.class, String.class);
+    private final static CallContext cc1 = new CallContext(TheoreticalDelegate.class, meth1, meth1.getParameters());
 
-    private final HelloGoodbyeImpl delegate;
+    private final static Method meth2 = WovenUtils.getMethodUnchecked(TheoreticalDelegate.class, "foo", double.class, int[].class,
+            byte.class, String.class);
+    private final static CallContext cc2 = new CallContext(TheoreticalDelegate.class, meth2, meth2.getParameters());
 
-    public TheoreticallyWovenComp(HelloGoodbyeImpl delegate) {
+    
+    private final TheoreticalDelegate delegate;
+
+    public TheoreticallyWovenComp(TheoreticalDelegate delegate) {
         this.delegate = delegate;
     }
 
@@ -79,8 +84,8 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
     }
 
     @Override
-    public void test(PrintStream ps, int i, byte b, String s) throws Throwable {
-        Advice adv = interceptor.onCall(cc0);
+    public void test(PrintStream ps, int i, byte b, String s) {
+        Advice adv = interceptor.onCall(cc1);
 
         Arguments currentArgs = null;
 
@@ -121,7 +126,7 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
             if ((adv.hasPhase(Advice.Catch.PHASE))) {
                 throwable = ((Advice.Catch) adv).reThrow(throwable);
             }
-            throw throwable;
+            throw new RuntimeException(throwable); // throwable
         } finally {
             if ((adv.hasPhase(Advice.Finally.PHASE))) {
                 ((Advice.Finally) adv).runFinally();
@@ -130,8 +135,8 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
     }
 
     @Override
-    public double foo(double a, int[] b) throws Throwable {
-        Advice adv = interceptor.onCall(cc0);
+    public double foo(double a, int[] b) {
+        Advice adv = interceptor.onCall(cc2);
 
         Arguments currentArgs = null;
 
@@ -170,7 +175,7 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
             if ((adv.hasPhase(Advice.Catch.PHASE))) {
                 throwable = ((Advice.Catch) adv).reThrow(throwable);
             }
-            throw throwable;
+            throw new RuntimeException(throwable); // throwable
         } finally {
             if ((adv.hasPhase(Advice.Finally.PHASE))) {
                 ((Advice.Finally) adv).runFinally();

@@ -1,7 +1,6 @@
 package io.lambdacube.aspecio.examples.internal;
 
 import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -29,7 +28,7 @@ public final class DemoConsumerImpl implements DemoConsumer {
     }
 
     @Override
-    public Long getLongResult() {
+    public Promise<Long> getLongResult() {
         Deferred<Long> d = new Deferred<>();
 
         Promise<Long> promise = superSlowService.compute();
@@ -43,13 +42,8 @@ public final class DemoConsumerImpl implements DemoConsumer {
             }).start();
         });
         Promise<Long> promise2 = d.getPromise();
-        
-        try {
-            return promise2.getValue();
-        } catch (InvocationTargetException e) {
-        } catch (InterruptedException e) {
-        }
-        return null;
+
+        return promise2;
     }
 
     @Reference

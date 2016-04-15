@@ -27,10 +27,12 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.util.promise.Promise;
 import org.osgi.util.tracker.ServiceTracker;
 
 import io.lambdacube.aspecio.examples.DemoConsumer;
 import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
+import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
 import io.lambdacube.aspecio.examples.greetings.Goodbye;
 import io.lambdacube.aspecio.examples.greetings.Hello;
 
@@ -89,7 +91,7 @@ public class AspecioIntegrationTest {
         // Hidden property added to woven services
         Object wovenProperty = commonSr.getProperty(".service.aspect.woven");
         assertThat(wovenProperty).isNotNull().isInstanceOf(String[].class);
-        assertThat((String[]) wovenProperty).containsExactly(CountingAspect.class.getName());
+        assertThat((String[]) wovenProperty).containsExactly(CountingAspect.class.getName(), MetricAspect.All.class.getName());
 
         Hello hello = helloTracker.getService();
         Goodbye goodbye = goodbyeTracker.getService();
@@ -98,19 +100,21 @@ public class AspecioIntegrationTest {
         assertThat(hello.getClass().getName()).isEqualTo("io.lambdacube.aspecio.examples.greetings.internal.HelloGoodbyeImpl$Woven$");
 
         hello.hello();
-        
+
         helloTracker.close();
         goodbyeTracker.close();
 
-        System.out.println(demoConsumer.getLongResult());
+        Promise<Long> longResult = demoConsumer.getLongResult();
 
         assertThat(extractFromPrintStream(ps -> demoConsumer.consumeTo(ps))).isEqualTo("hello goodbye\n");
 
         ServiceTracker<CountingAspect, CountingAspect> caTracker = new ServiceTracker<>(bundleContext, CountingAspect.class, null);
         caTracker.open();
         CountingAspect countingAspect = caTracker.getService();
-        
+
         countingAspect.printCounts();
+
+        System.out.println(longResult.getValue());
         
         caTracker.close();
     }
