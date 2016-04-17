@@ -44,10 +44,6 @@ public final class AspecioImpl implements FindHook, EventListenerHook {
         LOGGER.info("Aspecio deactivated");
     }
 
-    public void list() {
-        System.out.println("hello world");
-    }
-
     @Override
     public void event(ServiceEvent event, Map<BundleContext, Collection<ListenerInfo>> listeners) {
         // Is it an event we want to filter out?

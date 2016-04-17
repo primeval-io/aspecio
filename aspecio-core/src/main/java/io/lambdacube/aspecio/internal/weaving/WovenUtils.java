@@ -2,11 +2,11 @@ package io.lambdacube.aspecio.internal.weaving;
 
 import java.lang.reflect.Method;
 
+// Class meant to be used *from* the woven classes.
 public final class WovenUtils {
 
     private WovenUtils() {
     }
-    
 
     public static Method getMethodUnchecked(Class<?> clazz, String methodName, Class<?>... params) {
         try {
@@ -15,4 +15,5 @@ public final class WovenUtils {
             throw new AssertionError("Inconsistent weaving");
         }
     }
+
 }

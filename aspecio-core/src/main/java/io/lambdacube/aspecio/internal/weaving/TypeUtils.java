@@ -1,14 +1,38 @@
 package io.lambdacube.aspecio.internal.weaving;
 
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.ARETURN;
+import static org.objectweb.asm.Opcodes.ASTORE;
+import static org.objectweb.asm.Opcodes.DLOAD;
+import static org.objectweb.asm.Opcodes.DRETURN;
+import static org.objectweb.asm.Opcodes.DSTORE;
+import static org.objectweb.asm.Opcodes.FLOAD;
+import static org.objectweb.asm.Opcodes.FRETURN;
+import static org.objectweb.asm.Opcodes.FSTORE;
+import static org.objectweb.asm.Opcodes.ILOAD;
+import static org.objectweb.asm.Opcodes.IRETURN;
+import static org.objectweb.asm.Opcodes.ISTORE;
+import static org.objectweb.asm.Opcodes.LLOAD;
+import static org.objectweb.asm.Opcodes.LRETURN;
+import static org.objectweb.asm.Opcodes.LSTORE;
+import static org.objectweb.asm.Opcodes.RETURN;
+
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 public final class TypeUtils {
 
+    public static final Set<Class<?>> IRETURN_TYPES = new HashSet<>(
+            Arrays.asList(new Class<?>[] { int.class, char.class, byte.class, short.class, boolean.class }));
+    
     private TypeUtils() {
     }
 
@@ -131,5 +155,105 @@ public final class TypeUtils {
         }
         throw new UnsupportedOperationException("unsupported reflection type: " + type.getClass());
 
+    }
+    
+
+    public static Class<?> getBoxed(Class<?> type) {
+        if (type == int.class) {
+            return Integer.class;
+        } else if (type == short.class) {
+            return Short.class;
+        } else if (type == boolean.class) {
+            return Boolean.class;
+        } else if (type == char.class) {
+            return Character.class;
+        } else if (type == byte.class) {
+            return Byte.class;
+        } else if (type == boolean.class) {
+            return Boolean.class;
+        } else if (type == long.class) {
+            return Long.class;
+        } else if (type == double.class) {
+            return Double.class;
+        } else if (type == float.class) {
+            return Float.class;
+        } else if (type == void.class) {
+            return Void.class;
+        } else {
+            return type;
+        }
+    }
+    
+    public static int getTypeSize(Class<?> type) {
+        if (type == void.class) {
+            return 0;
+        } else if (type == double.class || type == long.class) {
+            return 2;
+        }
+        return 1;
+    }
+    
+    static int getReturnCode(Class<?> returnType) {
+        if (returnType == void.class) {
+            return RETURN;
+        } else if (IRETURN_TYPES.contains(returnType)) {
+            return IRETURN;
+        } else if (returnType == long.class) {
+            return LRETURN;
+        } else if (returnType == double.class) {
+            return DRETURN;
+        } else if (returnType == float.class) {
+            return FRETURN;
+        } else {
+            return ARETURN;
+        }
+    }
+
+    public static int getStoreCode(Class<?> type) {
+        if (type == void.class) {
+            throw new IllegalArgumentException("No store code for void!");
+        } else if (IRETURN_TYPES.contains(type)) {
+            return ISTORE;
+        } else if (type == long.class) {
+            return LSTORE;
+        } else if (type == double.class) {
+            return DSTORE;
+        } else if (type == float.class) {
+            return FSTORE;
+        } else {
+            return ASTORE;
+        }
+    }
+
+    public static int getLoadCode(Class<?> type) {
+        if (type == void.class) {
+            throw new IllegalArgumentException("No load code for void!");
+        } else if (IRETURN_TYPES.contains(type)) {
+            return ILOAD;
+        } else if (type == long.class) {
+            return LLOAD;
+        } else if (type == double.class) {
+            return DLOAD;
+        } else if (type == float.class) {
+            return FLOAD;
+        } else {
+            return ALOAD;
+        }
+    }
+
+    public static Object getFrameType(Class<?> type) {
+        if (type == void.class) {
+            throw new IllegalArgumentException("No frame type for void, use f_same!");
+        } else if (IRETURN_TYPES.contains(type)) {
+            return Opcodes.INTEGER;
+        } else if (type == long.class) {
+            return Opcodes.LONG;
+        } else if (type == double.class) {
+            return Opcodes.DOUBLE;
+        } else if (type == float.class) {
+            return Opcodes.FLOAT;
+        } else {
+            return Type.getInternalName(type);
+        }
     }
 }

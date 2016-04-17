@@ -2,6 +2,7 @@ package io.lambdacube.aspecio.internal.weaving.theory;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import io.lambdacube.aspecio.aspect.interceptor.Advice;
 import io.lambdacube.aspecio.aspect.interceptor.Advice.ArgumentHook;
@@ -16,17 +17,16 @@ import io.lambdacube.aspecio.internal.weaving.WovenUtils;
 public final class TheoreticallyWovenComp extends Woven implements Hello, Goodbye, Stuff {
 
     private final static Method meth0 = WovenUtils.getMethodUnchecked(TheoreticalDelegate.class, "hello");
-    private final static CallContext cc0 = new CallContext(TheoreticalDelegate.class, meth0, meth0.getParameters());
+    private final static CallContext cc0 = new CallContext(TheoreticalDelegate.class, meth0, Arrays.asList(meth0.getParameters()));
 
     private final static Method meth1 = WovenUtils.getMethodUnchecked(TheoreticalDelegate.class, "test", PrintStream.class, int.class,
             byte.class, String.class);
-    private final static CallContext cc1 = new CallContext(TheoreticalDelegate.class, meth1, meth1.getParameters());
+    private final static CallContext cc1 = new CallContext(TheoreticalDelegate.class, meth1, Arrays.asList(meth1.getParameters()));
 
     private final static Method meth2 = WovenUtils.getMethodUnchecked(TheoreticalDelegate.class, "foo", double.class, int[].class,
             byte.class, String.class);
-    private final static CallContext cc2 = new CallContext(TheoreticalDelegate.class, meth2, meth2.getParameters());
+    private final static CallContext cc2 = new CallContext(TheoreticalDelegate.class, meth2, Arrays.asList(meth2.getParameters()));
 
-    
     private final TheoreticalDelegate delegate;
 
     public TheoreticallyWovenComp(TheoreticalDelegate delegate) {
@@ -47,7 +47,7 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
         case REQUEST_ARGUMENTS: {
             Advice.ArgumentHook argumentHook = (ArgumentHook) adv;
             if (currentArgs == null) {
-                currentArgs = Arguments.EMPTY_ARGUMENTS; // TODO gen Arguments
+                currentArgs = Arguments.EMPTY_ARGUMENTS;
             }
             BeforeAction nextAction = argumentHook.visitArguments(currentArgs);
             switch (nextAction) {
@@ -98,7 +98,7 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
         case REQUEST_ARGUMENTS: {
             Advice.ArgumentHook argumentHook = (ArgumentHook) adv;
             if (currentArgs == null) {
-                currentArgs = Arguments.EMPTY_ARGUMENTS; // TODO gen Arguments
+                currentArgs = new M1Args(cc1.parameters, ps, i, b, s); 
             }
             BeforeAction nextAction = argumentHook.visitArguments(currentArgs);
             switch (nextAction) {

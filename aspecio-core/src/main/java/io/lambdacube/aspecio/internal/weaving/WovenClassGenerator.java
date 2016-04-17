@@ -1,5 +1,11 @@
 package io.lambdacube.aspecio.internal.weaving;
 
+import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getBoxed;
+import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getFrameType;
+import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getLoadCode;
+import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getReturnCode;
+import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getStoreCode;
+import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getTypeSize;
 import static org.objectweb.asm.Opcodes.AASTORE;
 import static org.objectweb.asm.Opcodes.ACC_ABSTRACT;
 import static org.objectweb.asm.Opcodes.ACC_FINAL;
@@ -18,11 +24,9 @@ import static org.objectweb.asm.Opcodes.ASTORE;
 import static org.objectweb.asm.Opcodes.ATHROW;
 import static org.objectweb.asm.Opcodes.BIPUSH;
 import static org.objectweb.asm.Opcodes.CHECKCAST;
-import static org.objectweb.asm.Opcodes.DLOAD;
 import static org.objectweb.asm.Opcodes.DRETURN;
 import static org.objectweb.asm.Opcodes.DSTORE;
 import static org.objectweb.asm.Opcodes.DUP;
-import static org.objectweb.asm.Opcodes.FLOAD;
 import static org.objectweb.asm.Opcodes.FRETURN;
 import static org.objectweb.asm.Opcodes.FSTORE;
 import static org.objectweb.asm.Opcodes.GETFIELD;
@@ -40,14 +44,12 @@ import static org.objectweb.asm.Opcodes.ICONST_M1;
 import static org.objectweb.asm.Opcodes.IFEQ;
 import static org.objectweb.asm.Opcodes.IFNONNULL;
 import static org.objectweb.asm.Opcodes.IFNULL;
-import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.IRETURN;
 import static org.objectweb.asm.Opcodes.ISTORE;
-import static org.objectweb.asm.Opcodes.LLOAD;
 import static org.objectweb.asm.Opcodes.LRETURN;
 import static org.objectweb.asm.Opcodes.LSTORE;
 import static org.objectweb.asm.Opcodes.NEW;
@@ -62,9 +64,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -78,8 +78,6 @@ import org.objectweb.asm.Type;
 public final class WovenClassGenerator {
 
     public static final String WOVEN_TARGET_CLASS_SUFFIX = "$Woven$";
-    public static final Set<Class<?>> IRETURN_TYPES = new HashSet<>(
-            Arrays.asList(new Class<?>[] { int.class, char.class, byte.class, short.class, boolean.class }));
 
     public static byte[] weave(Class<?> clazzToWeave, Class<?>[] interfaces, Method[] methods) throws Exception {
 
@@ -170,10 +168,11 @@ public final class WovenClassGenerator {
             mv.visitInsn(DUP);
             mv.visitLdcInsn(Type.getType(wovenClassDescriptor));
             mv.visitFieldInsn(GETSTATIC, selfClassInternalName, "meth" + i, "Ljava/lang/reflect/Method;");
-            mv.visitFieldInsn(GETSTATIC, selfClassInternalName, "meth" + i, "Ljava/lang/reflect/Method;");
+            mv.visitInsn(DUP);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "getParameters", "()[Ljava/lang/reflect/Parameter;", false);
+            mv.visitMethodInsn(INVOKESTATIC, "java/util/Arrays", "asList", "([Ljava/lang/Object;)Ljava/util/List;", false);
             mv.visitMethodInsn(INVOKESPECIAL, "io/lambdacube/aspecio/aspect/interceptor/CallContext", "<init>",
-                    "(Ljava/lang/Class;Ljava/lang/reflect/Method;[Ljava/lang/reflect/Parameter;)V", false);
+                    "(Ljava/lang/Class;Ljava/lang/reflect/Method;Ljava/util/List;)V", false);
             mv.visitFieldInsn(PUTSTATIC, selfClassInternalName, "cc" + i, "Lio/lambdacube/aspecio/aspect/interceptor/CallContext;");
         }
         mv.visitInsn(RETURN);
@@ -231,131 +230,105 @@ public final class WovenClassGenerator {
         }
     }
 
-    private static Class<?> getBoxed(Class<?> type) {
-        if (type == int.class) {
-            return Integer.class;
-        } else if (type == short.class) {
-            return Short.class;
-        } else if (type == boolean.class) {
-            return Boolean.class;
-        } else if (type == char.class) {
-            return Character.class;
-        } else if (type == byte.class) {
-            return Byte.class;
-        } else if (type == boolean.class) {
-            return Boolean.class;
-        } else if (type == long.class) {
-            return Long.class;
-        } else if (type == double.class) {
-            return Double.class;
-        } else if (type == float.class) {
-            return Float.class;
-        } else {
-            throw new AssertionError("Unknown primitive type?");
-        }
-    }
-
     private static void addBeforeActionSwitchTable(ClassWriter cw, String selfClassInternalName) {
         MethodVisitor mv;
-        {
-            mv = cw.visitMethod(ACC_STATIC + ACC_SYNTHETIC, "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "()[I",
-                    null, null);
-            mv.visitCode();
-            Label l0 = new Label();
-            Label l1 = new Label();
-            Label l2 = new Label();
-            mv.visitTryCatchBlock(l0, l1, l2, "java/lang/NoSuchFieldError");
-            Label l3 = new Label();
-            Label l4 = new Label();
-            Label l5 = new Label();
-            mv.visitTryCatchBlock(l3, l4, l5, "java/lang/NoSuchFieldError");
-            Label l6 = new Label();
-            Label l7 = new Label();
-            Label l8 = new Label();
-            mv.visitTryCatchBlock(l6, l7, l8, "java/lang/NoSuchFieldError");
-            Label l9 = new Label();
-            Label l10 = new Label();
-            Label l11 = new Label();
-            mv.visitTryCatchBlock(l9, l10, l11, "java/lang/NoSuchFieldError");
-            Label l12 = new Label();
-            mv.visitLabel(l12);
-            mv.visitLineNumber(16, l12);
-            mv.visitFieldInsn(GETSTATIC, selfClassInternalName,
-                    "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "[I");
-            mv.visitInsn(DUP);
-            Label l13 = new Label();
-            mv.visitJumpInsn(IFNULL, l13);
-            mv.visitInsn(ARETURN);
-            mv.visitLabel(l13);
-            mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] { "[I" });
-            mv.visitInsn(POP);
-            mv.visitMethodInsn(INVOKESTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "values",
-                    "()[Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;", false);
-            mv.visitInsn(ARRAYLENGTH);
-            mv.visitIntInsn(NEWARRAY, T_INT);
-            mv.visitVarInsn(ASTORE, 0);
-            mv.visitLabel(l0);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "PROCEED",
-                    "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
-            mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
-            mv.visitInsn(ICONST_4);
-            mv.visitInsn(IASTORE);
-            mv.visitLabel(l1);
-            mv.visitJumpInsn(GOTO, l3);
-            mv.visitLabel(l2);
-            mv.visitFrame(Opcodes.F_FULL, 1, new Object[] { "[I" }, 1, new Object[] { "java/lang/NoSuchFieldError" });
-            mv.visitInsn(POP);
-            mv.visitLabel(l3);
-            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "REQUEST_ARGUMENTS",
-                    "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
-            mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
-            mv.visitInsn(ICONST_2);
-            mv.visitInsn(IASTORE);
-            mv.visitLabel(l4);
-            mv.visitJumpInsn(GOTO, l6);
-            mv.visitLabel(l5);
-            mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] { "java/lang/NoSuchFieldError" });
-            mv.visitInsn(POP);
-            mv.visitLabel(l6);
-            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "SKIP_AND_RETURN",
-                    "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
-            mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
-            mv.visitInsn(ICONST_1);
-            mv.visitInsn(IASTORE);
-            mv.visitLabel(l7);
-            mv.visitJumpInsn(GOTO, l9);
-            mv.visitLabel(l8);
-            mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] { "java/lang/NoSuchFieldError" });
-            mv.visitInsn(POP);
-            mv.visitLabel(l9);
-            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "UPDATE_ARGUMENTS_AND_PROCEED",
-                    "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
-            mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
-            mv.visitInsn(ICONST_3);
-            mv.visitInsn(IASTORE);
-            mv.visitLabel(l10);
-            Label l14 = new Label();
-            mv.visitJumpInsn(GOTO, l14);
-            mv.visitLabel(l11);
-            mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] { "java/lang/NoSuchFieldError" });
-            mv.visitInsn(POP);
-            mv.visitLabel(l14);
-            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitInsn(DUP);
-            mv.visitFieldInsn(PUTSTATIC, selfClassInternalName,
-                    "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "[I");
-            mv.visitInsn(ARETURN);
-            mv.visitMaxs(3, 1);
-            mv.visitEnd();
-        }
+        mv = cw.visitMethod(ACC_STATIC + ACC_SYNTHETIC, "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "()[I",
+                null, null);
+        mv.visitCode();
+        Label l0 = new Label();
+        Label l1 = new Label();
+        Label l2 = new Label();
+        mv.visitTryCatchBlock(l0, l1, l2, "java/lang/NoSuchFieldError");
+        Label l3 = new Label();
+        Label l4 = new Label();
+        Label l5 = new Label();
+        mv.visitTryCatchBlock(l3, l4, l5, "java/lang/NoSuchFieldError");
+        Label l6 = new Label();
+        Label l7 = new Label();
+        Label l8 = new Label();
+        mv.visitTryCatchBlock(l6, l7, l8, "java/lang/NoSuchFieldError");
+        Label l9 = new Label();
+        Label l10 = new Label();
+        Label l11 = new Label();
+        mv.visitTryCatchBlock(l9, l10, l11, "java/lang/NoSuchFieldError");
+        Label l12 = new Label();
+        mv.visitLabel(l12);
+        mv.visitLineNumber(16, l12);
+        mv.visitFieldInsn(GETSTATIC, selfClassInternalName,
+                "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "[I");
+        mv.visitInsn(DUP);
+        Label l13 = new Label();
+        mv.visitJumpInsn(IFNULL, l13);
+        mv.visitInsn(ARETURN);
+        mv.visitLabel(l13);
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] { "[I" });
+        mv.visitInsn(POP);
+        mv.visitMethodInsn(INVOKESTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "values",
+                "()[Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;", false);
+        mv.visitInsn(ARRAYLENGTH);
+        mv.visitIntInsn(NEWARRAY, T_INT);
+        mv.visitVarInsn(ASTORE, 0);
+        mv.visitLabel(l0);
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "PROCEED",
+                "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
+        mv.visitInsn(ICONST_4);
+        mv.visitInsn(IASTORE);
+        mv.visitLabel(l1);
+        mv.visitJumpInsn(GOTO, l3);
+        mv.visitLabel(l2);
+        mv.visitFrame(Opcodes.F_FULL, 1, new Object[] { "[I" }, 1, new Object[] { "java/lang/NoSuchFieldError" });
+        mv.visitInsn(POP);
+        mv.visitLabel(l3);
+        mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "REQUEST_ARGUMENTS",
+                "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
+        mv.visitInsn(ICONST_2);
+        mv.visitInsn(IASTORE);
+        mv.visitLabel(l4);
+        mv.visitJumpInsn(GOTO, l6);
+        mv.visitLabel(l5);
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] { "java/lang/NoSuchFieldError" });
+        mv.visitInsn(POP);
+        mv.visitLabel(l6);
+        mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "SKIP_AND_RETURN",
+                "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
+        mv.visitInsn(ICONST_1);
+        mv.visitInsn(IASTORE);
+        mv.visitLabel(l7);
+        mv.visitJumpInsn(GOTO, l9);
+        mv.visitLabel(l8);
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] { "java/lang/NoSuchFieldError" });
+        mv.visitInsn(POP);
+        mv.visitLabel(l9);
+        mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "UPDATE_ARGUMENTS_AND_PROCEED",
+                "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
+        mv.visitInsn(ICONST_3);
+        mv.visitInsn(IASTORE);
+        mv.visitLabel(l10);
+        Label l14 = new Label();
+        mv.visitJumpInsn(GOTO, l14);
+        mv.visitLabel(l11);
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] { "java/lang/NoSuchFieldError" });
+        mv.visitInsn(POP);
+        mv.visitLabel(l14);
+        mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitInsn(DUP);
+        mv.visitFieldInsn(PUTSTATIC, selfClassInternalName,
+                "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "[I");
+        mv.visitInsn(ARETURN);
+        mv.visitMaxs(3, 1);
+        mv.visitEnd();
     }
 
     private static String makeTargetClassDescriptor(String wovenClassDescriptor) {
@@ -440,62 +413,6 @@ public final class WovenClassGenerator {
         }
     }
 
-    private static void writeSimpleDelegatingMethod(Class<?> clazzToWeave, String wovenClassInternalName, String wovenClassDescriptor,
-            String selfClassInternalName, String selfClassDescriptor, ClassWriter cw,
-            MethodVisitor mv, Method method, int methId) throws IllegalAccessException, InvocationTargetException {
-        String methodDescriptor = Type.getMethodDescriptor(method);
-        String methodName = method.getName();
-        String methodSignature = TypeUtils.getMethodSignature(method);
-        String[] exceptionTypes = null;
-        Class<?>[] exceptionsClasses = method.getExceptionTypes();
-        if (exceptionsClasses.length != 0) {
-            exceptionTypes = Stream.of(exceptionsClasses).map(Type::getInternalName).toArray(String[]::new);
-        }
-
-        mv = cw.visitMethod(ACC_PUBLIC + ACC_FINAL, methodName, methodDescriptor, methodSignature, exceptionTypes);
-        Parameter[] parameters = method.getParameters();
-
-        addMethodAnnotations(method, mv);
-        addMethodParameterAnnotations(method, mv);
-
-        mv.visitCode();
-        Label l0 = new Label();
-        mv.visitLabel(l0);
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETFIELD, selfClassInternalName, "delegate", wovenClassDescriptor);
-        for (int i = 1; i <= parameters.length; i++) {
-            mv.visitVarInsn(ALOAD, i);
-        }
-        mv.visitMethodInsn(INVOKEVIRTUAL, wovenClassInternalName, methodName, methodDescriptor, false);
-        Label l1 = new Label();
-        mv.visitLabel(l1);
-
-        Class<?> returnType = method.getReturnType();
-        if (returnType == void.class) {
-            mv.visitInsn(RETURN);
-        } else if (IRETURN_TYPES.contains(returnType)) {
-            mv.visitInsn(IRETURN);
-        } else if (returnType == long.class) {
-            mv.visitInsn(LRETURN);
-        } else if (returnType == double.class) {
-            mv.visitInsn(DRETURN);
-        } else if (returnType == float.class) {
-            mv.visitInsn(FRETURN);
-        } else {
-            mv.visitInsn(ARETURN);
-        }
-        Label l2 = new Label();
-        mv.visitLabel(l2);
-        mv.visitLocalVariable("this", selfClassDescriptor, null, l0, l2, 0);
-        int i = 1;
-        for (Parameter param : parameters) {
-            mv.visitLocalVariable(param.getName(), Type.getDescriptor(param.getType()), null, l0, l2, i);
-            i++;
-        }
-        mv.visitMaxs(-1, -1);
-        mv.visitEnd();
-    }
-
     private static void writeInterceptedMethod(Class<?> clazzToWeave, String wovenClassInternalName, String wovenClassDescriptor,
             String selfClassInternalName, String selfClassDescriptor, ClassWriter cw,
             MethodVisitor mv, Method method, int methId) throws IllegalAccessException, InvocationTargetException {
@@ -510,9 +427,6 @@ public final class WovenClassGenerator {
         }
 
         Class<?> returnType = method.getReturnType();
-        String returnTypeInternalName = Type.getInternalName(returnType);
-        String returnTypeDescriptor = Type.getDescriptor(returnType);
-        int returnTypeSize = getTypeSize(returnType);
 
         mv = cw.visitMethod(ACC_PUBLIC + ACC_FINAL, methodName, methodDescriptor, methodSignature, exceptionTypes);
         Parameter[] parameters = method.getParameters();
@@ -618,8 +532,23 @@ public final class WovenClassGenerator {
         mv.visitJumpInsn(IFNONNULL, l13);
         Label l14 = new Label();
         mv.visitLabel(l14);
-        mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/Arguments", "EMPTY_ARGUMENTS",
-                "Lio/lambdacube/aspecio/aspect/interceptor/Arguments;");
+        if (method.getParameterCount() == 0) {
+            mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/Arguments", "EMPTY_ARGUMENTS",
+                    "Lio/lambdacube/aspecio/aspect/interceptor/Arguments;");
+        } else {
+            String argsClassInternalName = wovenClassInternalName + "$argsFor$" + method.getName();
+            mv.visitTypeInsn(NEW, argsClassInternalName);
+            mv.visitInsn(DUP);
+            mv.visitFieldInsn(GETSTATIC, selfClassInternalName, "cc" + methId, "Lio/lambdacube/aspecio/aspect/interceptor/CallContext;");
+            mv.visitFieldInsn(GETFIELD, "io/lambdacube/aspecio/aspect/interceptor/CallContext", "parameters", "Ljava/util/List;");
+            for (int i = 0; i < paramCount; i++) {
+                mv.visitVarInsn(getLoadCode(parameters[i].getType()), paramIndices[i]); // delegate parameters.
+            }
+            String constDesc = Type.getMethodDescriptor(Type.VOID_TYPE,
+                    Stream.concat(Stream.of(List.class), Stream.of(method.getParameterTypes())).map(Type::getType)
+                            .toArray(Type[]::new));
+            mv.visitMethodInsn(INVOKESPECIAL, argsClassInternalName, "<init>", constDesc, false);
+        }
         mv.visitVarInsn(ASTORE, varCurrentArgsIndex); // var "currentArgs"
 
         // BeforeAction nextAction = argumentHook.visitArguments(currentArgs);
@@ -838,7 +767,8 @@ public final class WovenClassGenerator {
         for (int i = 0; i < paramCount; i++) {
             Parameter param = parameters[i];
             Class<?> type = param.getType();
-            mv.visitLocalVariable(param.getName(), Type.getDescriptor(type), null, l4, l36, paramIndices[i]);
+            mv.visitLocalVariable(param.getName(), Type.getDescriptor(type),
+                    TypeUtils.getDescriptorForJavaType(param.getParameterizedType()), l4, l36, paramIndices[i]);
         }
         mv.visitLocalVariable("adv", "Lio/lambdacube/aspecio/aspect/interceptor/Advice;", null, l5, l36, varAdvIndex);
         mv.visitLocalVariable("currentArgs", "Lio/lambdacube/aspecio/aspect/interceptor/Arguments;", null, l6, l36, varCurrentArgsIndex);
@@ -852,15 +782,6 @@ public final class WovenClassGenerator {
         mv.visitMaxs(-1, -1);
         mv.visitEnd();
 
-    }
-
-    private static int getTypeSize(Class<?> type) {
-        if (type == void.class) {
-            return 0;
-        } else if (type == double.class || type == long.class) {
-            return 2;
-        }
-        return 1;
     }
 
     private static void callOnReturnAndStoreReturnIfPossible(MethodVisitor mv, Class<?> returnType, int varReturnValIndex) {
@@ -925,9 +846,6 @@ public final class WovenClassGenerator {
             locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Arguments";
             locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/BeforeAction";
             locals[idx++] = getFrameType(returnType);
-            // locals[idx++] = Opcodes.TOP;
-            // locals[idx++] = Opcodes.TOP;
-            // locals[idx++] = Type.getInternalName(returnType);
 
             mv.visitFrame(Opcodes.F_FULL, locals.length, locals, 0, new Object[] {});
 
@@ -1060,70 +978,6 @@ public final class WovenClassGenerator {
         default:
             mv.visitIntInsn(BIPUSH, i);
             break;
-        }
-    }
-
-    static int getReturnCode(Class<?> returnType) {
-        if (returnType == void.class) {
-            return RETURN;
-        } else if (IRETURN_TYPES.contains(returnType)) {
-            return IRETURN;
-        } else if (returnType == long.class) {
-            return LRETURN;
-        } else if (returnType == double.class) {
-            return DRETURN;
-        } else if (returnType == float.class) {
-            return FRETURN;
-        } else {
-            return ARETURN;
-        }
-    }
-
-    static int getStoreCode(Class<?> type) {
-        if (type == void.class) {
-            throw new IllegalArgumentException("No store code for void!");
-        } else if (IRETURN_TYPES.contains(type)) {
-            return ISTORE;
-        } else if (type == long.class) {
-            return LSTORE;
-        } else if (type == double.class) {
-            return DSTORE;
-        } else if (type == float.class) {
-            return FSTORE;
-        } else {
-            return ASTORE;
-        }
-    }
-
-    static int getLoadCode(Class<?> type) {
-        if (type == void.class) {
-            throw new IllegalArgumentException("No load code for void!");
-        } else if (IRETURN_TYPES.contains(type)) {
-            return ILOAD;
-        } else if (type == long.class) {
-            return LLOAD;
-        } else if (type == double.class) {
-            return DLOAD;
-        } else if (type == float.class) {
-            return FLOAD;
-        } else {
-            return ALOAD;
-        }
-    }
-
-    static Object getFrameType(Class<?> type) {
-        if (type == void.class) {
-            throw new IllegalArgumentException("No frame type for void, use f_same!");
-        } else if (IRETURN_TYPES.contains(type)) {
-            return Opcodes.INTEGER;
-        } else if (type == long.class) {
-            return Opcodes.LONG;
-        } else if (type == double.class) {
-            return Opcodes.DOUBLE;
-        } else if (type == float.class) {
-            return Opcodes.FLOAT;
-        } else {
-            return Type.getInternalName(type);
         }
     }
 

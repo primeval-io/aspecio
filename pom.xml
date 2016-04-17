@@ -23,6 +23,8 @@
 					<configuration>
 						<source>${java.version}</source>
 						<target>${java.version}</target>
+						<compilerArgument>-parameters</compilerArgument>
+            <testCompilerArgument>-parameters</testCompilerArgument>
 					</configuration>
 				</plugin>
 			</plugins>

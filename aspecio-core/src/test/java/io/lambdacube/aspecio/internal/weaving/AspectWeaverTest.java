@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import io.lambdacube.aspecio.aspect.interceptor.Advice;
 import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
+import io.lambdacube.aspecio.aspect.interceptor.Arguments;
 import io.lambdacube.aspecio.aspect.interceptor.BeforeAction;
 import io.lambdacube.aspecio.aspect.interceptor.CallContext;
 import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
@@ -72,8 +73,13 @@ public final class AspectWeaverTest {
                     return new AdviceAdapter() {
                         @Override
                         public BeforeAction initialAction() {
-                            return BeforeAction.PROCEED;
+                            return BeforeAction.REQUEST_ARGUMENTS;
                         }
+
+                        public BeforeAction visitArguments(Arguments arguments) {
+                            System.out.println("Got 'em args: " + arguments);
+                            return BeforeAction.PROCEED;
+                        };
 
                         public int afterPhases() {
                             return CallReturn.PHASE + Catch.PHASE;
@@ -86,11 +92,11 @@ public final class AspectWeaverTest {
                         public int onIntReturn(int result) {
                             return result / 2;
                         };
-                        
+
                         public Throwable reThrow(Throwable t) {
                             return new IllegalArgumentException(t);
                         };
-                        
+
                         public void runFinally() {
                             System.out.println("whateva");
                         };
@@ -106,7 +112,7 @@ public final class AspectWeaverTest {
 
         System.out.println(simpleService.increase(10));
         System.out.println(wovenItf.increase(10));
-//        System.out.println(wovenItf.increase(-42));
+        // System.out.println(wovenItf.increase(-42));
 
         assertThat(wovenItf.hello()).isEqualTo(simpleService.hello());
 
@@ -173,7 +179,8 @@ public final class AspectWeaverTest {
         assertThat(wovenTypeParameters).containsExactly(typeParameters);
 
         ArrayList<MethodIdentifier> methodsToCompare = Lists.newArrayList(new MethodIdentifier("myMethod", Consumer.class),
-                new MethodIdentifier("fooMaker"), new MethodIdentifier("unsafe"), new MethodIdentifier("unsafeGeneric"));
+                new MethodIdentifier("fooMaker"), new MethodIdentifier("unsafe"), new MethodIdentifier("unsafeGeneric"),
+                new MethodIdentifier("consumeA", Object.class));
         for (MethodIdentifier methodId : methodsToCompare) {
             Method method = GenericParamsService.class.getMethod(methodId.name, methodId.parameterTypes);
             Method wovenMethod = wovenClassHolder.wovenClass.getMethod(methodId.name, methodId.parameterTypes);
