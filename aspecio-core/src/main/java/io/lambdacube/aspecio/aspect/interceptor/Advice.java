@@ -1,5 +1,7 @@
 package io.lambdacube.aspecio.aspect.interceptor;
 
+import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
+
 public interface Advice {
     // @formatter:off
     interface ArgumentHook {

@@ -3,8 +3,6 @@ package io.lambdacube.aspecio.internal;
 import java.util.SortedSet;
 import java.util.concurrent.Callable;
 
-import org.objectweb.asm.MethodVisitor;
-
 public final class AspecioUtils {
 
     private AspecioUtils() {

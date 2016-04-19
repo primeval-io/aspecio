@@ -253,7 +253,6 @@ public final class WovenClassGenerator {
         mv.visitTryCatchBlock(l9, l10, l11, "java/lang/NoSuchFieldError");
         Label l12 = new Label();
         mv.visitLabel(l12);
-        mv.visitLineNumber(16, l12);
         mv.visitFieldInsn(GETSTATIC, selfClassInternalName,
                 "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "[I");
         mv.visitInsn(DUP);
@@ -441,7 +440,7 @@ public final class WovenClassGenerator {
         }
 
         int varAdvIndex = nextVarIndex; // Lio/lambdacube/aspecio/aspect/interceptor/Advice;
-        int varCurrentArgsIndex = nextVarIndex + 1; // Lio/lambdacube/aspecio/aspect/interceptor/Arguments;
+        int varCurrentArgsIndex = nextVarIndex + 1; // Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;
         int varInitialActionIndex = nextVarIndex + 2; // Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;
 
         int varArgumentHookIndex = nextVarIndex + 3; // Lio/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook;
@@ -508,7 +507,7 @@ public final class WovenClassGenerator {
         mv.visitLabel(l9);
         mv.visitFrame(
                 Opcodes.F_APPEND, 3, new Object[] { "io/lambdacube/aspecio/aspect/interceptor/Advice",
-                        "io/lambdacube/aspecio/aspect/interceptor/Arguments", "io/lambdacube/aspecio/aspect/interceptor/BeforeAction" },
+                        "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments", "io/lambdacube/aspecio/aspect/interceptor/BeforeAction" },
                 0, null);
         mv.visitVarInsn(ALOAD, varAdvIndex); // var "adv"
         mv.visitTypeInsn(CHECKCAST, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall");
@@ -518,7 +517,7 @@ public final class WovenClassGenerator {
         // case REQUEST_ARGUMENTS: {
         // Advice.ArgumentHook argumentHook = (ArgumentHook) adv;
         // if (currentArgs == null) {
-        // currentArgs = Arguments.EMPTY_ARGUMENTS; // TODO gen Arguments
+        // currentArgs = Arguments.EMPTY_ARGUMENTS OR dynamic arguments.
         // }
         mv.visitLabel(l10);
         mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
@@ -532,11 +531,12 @@ public final class WovenClassGenerator {
         mv.visitJumpInsn(IFNONNULL, l13);
         Label l14 = new Label();
         mv.visitLabel(l14);
+        String argsClassInternalName = null;
         if (method.getParameterCount() == 0) {
-            mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/Arguments", "EMPTY_ARGUMENTS",
-                    "Lio/lambdacube/aspecio/aspect/interceptor/Arguments;");
+            mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments", "EMPTY_ARGUMENTS",
+                    "Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;");
         } else {
-            String argsClassInternalName = wovenClassInternalName + "$argsFor$" + method.getName();
+            argsClassInternalName = wovenClassInternalName + "$argsFor$" + method.getName();
             mv.visitTypeInsn(NEW, argsClassInternalName);
             mv.visitInsn(DUP);
             mv.visitFieldInsn(GETSTATIC, selfClassInternalName, "cc" + methId, "Lio/lambdacube/aspecio/aspect/interceptor/CallContext;");
@@ -559,7 +559,7 @@ public final class WovenClassGenerator {
         mv.visitVarInsn(ALOAD, varArgumentHookIndex); // var "argumentHook"
         mv.visitVarInsn(ALOAD, varCurrentArgsIndex); // var "currentArgs"
         mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook", "visitArguments",
-                "(Lio/lambdacube/aspecio/aspect/interceptor/Arguments;)Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;", true);
+                "(Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;)Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;", true);
         mv.visitVarInsn(ASTORE, varNextActionIndex); // var "nextAction"
 
         // case SKIP_AND_RETURN:
@@ -591,7 +591,8 @@ public final class WovenClassGenerator {
         mv.visitVarInsn(ALOAD, varArgumentHookIndex); // var "argumentHook"
         mv.visitVarInsn(ALOAD, varCurrentArgsIndex); // var "currentArgs"
         mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook", "updateArguments",
-                "(Lio/lambdacube/aspecio/aspect/interceptor/Arguments;)Lio/lambdacube/aspecio/aspect/interceptor/Arguments;", true);
+                "(Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;)Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;", true);
+        // mv.visitTypeInsn(CHECKCAST, argsClassInternalName); // this is implicit
         mv.visitVarInsn(ASTORE, varCurrentArgsIndex);// var "currentArgs"
 
         // default:
@@ -609,9 +610,34 @@ public final class WovenClassGenerator {
 
         mv.visitFrame(Opcodes.F_CHOP, 2, null, 0, null);
 
-        // !\\ THIS IS THE DELEGATION CALL //!\\
+        // if (currentArgs != null) {
+        // arg0 = currentArgs.arg0;
+        // arg1 = currentArgs.arg1;
+        // ...
+        // }
+        if (paramCount > 0) {
+            mv.visitVarInsn(ALOAD, varCurrentArgsIndex);
+            Label makeCall = new Label();
+            mv.visitJumpInsn(IFNULL, makeCall);
+            assert argsClassInternalName != null;
+            // prepare value
+            mv.visitVarInsn(ALOAD, varCurrentArgsIndex);
+            mv.visitTypeInsn(CHECKCAST, argsClassInternalName);
+            for (int i = 0; i < paramCount; i++) {
+                Parameter parameter = parameters[i];
+                Class<?> paramType = parameter.getType();
+                if (i + 1 < paramCount) { // if not last
+                    mv.visitInsn(DUP); // don't pay for checkcast N times.
+                }
+                mv.visitFieldInsn(GETFIELD, argsClassInternalName, parameter.getName(), Type.getDescriptor(paramType));
+                mv.visitVarInsn(getStoreCode(paramType), paramIndices[i]);
+            }
 
-        // ? returnVal = this.delegate.method(parameters);
+            mv.visitLabel(makeCall);
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        }
+
+        // !\\ THIS IS THE DELEGATION CALL //!\\
 
         mv.visitVarInsn(ALOAD, 0); // "this"
         mv.visitFieldInsn(GETFIELD, selfClassInternalName, "delegate", wovenClassDescriptor);
@@ -771,7 +797,7 @@ public final class WovenClassGenerator {
                     TypeUtils.getDescriptorForJavaType(param.getParameterizedType()), l4, l36, paramIndices[i]);
         }
         mv.visitLocalVariable("adv", "Lio/lambdacube/aspecio/aspect/interceptor/Advice;", null, l5, l36, varAdvIndex);
-        mv.visitLocalVariable("currentArgs", "Lio/lambdacube/aspecio/aspect/interceptor/Arguments;", null, l6, l36, varCurrentArgsIndex);
+        mv.visitLocalVariable("currentArgs", "Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;", null, l6, l36, varCurrentArgsIndex);
         mv.visitLocalVariable("initialAction", "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;", null, l7, l36,
                 varInitialActionIndex);
         mv.visitLocalVariable("argumentHook", "Lio/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook;", null, l12, l0,
@@ -843,7 +869,7 @@ public final class WovenClassGenerator {
                 locals[idx++] = getFrameType(parameters[i].getType());
             }
             locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Advice";
-            locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Arguments";
+            locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments";
             locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/BeforeAction";
             locals[idx++] = getFrameType(returnType);
 
@@ -865,7 +891,7 @@ public final class WovenClassGenerator {
                 locals[idx++] = getFrameType(parameters[i].getType());
             }
             locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Advice";
-            locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Arguments";
+            locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments";
             locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/BeforeAction";
 
             mv.visitFrame(Opcodes.F_FULL, locals.length, locals, 1, new Object[] { "java/lang/Throwable" });
@@ -882,7 +908,7 @@ public final class WovenClassGenerator {
             locals[idx++] = getFrameType(parameters[i].getType());
         }
         locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Advice";
-        locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Arguments";
+        locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments";
         locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/BeforeAction";
         mv.visitFrame(Opcodes.F_FULL, locals.length, locals, 1, new Object[] { "java/lang/Throwable" });
     }
@@ -895,7 +921,7 @@ public final class WovenClassGenerator {
             locals[idx++] = getFrameType(parameters[i].getType());
         }
         locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Advice";
-        locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Arguments";
+        locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments";
         locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/BeforeAction";
         // locals[idx++] = Opcodes.TOP;
         // locals[idx++] = Opcodes.TOP;

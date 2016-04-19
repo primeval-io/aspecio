@@ -1,5 +1,7 @@
 package io.lambdacube.aspecio.aspect.interceptor;
 
+import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
+
 public interface AdviceAdapter extends Advice, Advice.SkipCall, Advice.ArgumentHook,
         Advice.CallReturn, Advice.Catch, Advice.Finally {
     

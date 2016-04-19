@@ -20,10 +20,10 @@ import org.junit.Test;
 
 import io.lambdacube.aspecio.aspect.interceptor.Advice;
 import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
-import io.lambdacube.aspecio.aspect.interceptor.Arguments;
 import io.lambdacube.aspecio.aspect.interceptor.BeforeAction;
 import io.lambdacube.aspecio.aspect.interceptor.CallContext;
 import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
+import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
 import io.lambdacube.aspecio.internal.weaving.testset.annotated.AnnotatedService;
 import io.lambdacube.aspecio.internal.weaving.testset.api.BadValueException;
 import io.lambdacube.aspecio.internal.weaving.testset.api.GenericInterface;
@@ -66,10 +66,10 @@ public final class AspectWeaverTest {
         Woven wovenService = wovenClassHolder.weavingFactory.apply(simpleService);
 
         wovenService.setInterceptor(new Interceptor() {
-
             @Override
             public Advice onCall(CallContext callContext) {
                 if (callContext.method.getName().equals("increase")) {
+                    String firstArg = callContext.parameters.get(0).getName();
                     return new AdviceAdapter() {
                         @Override
                         public BeforeAction initialAction() {
@@ -77,29 +77,24 @@ public final class AspectWeaverTest {
                         }
 
                         public BeforeAction visitArguments(Arguments arguments) {
-                            System.out.println("Got 'em args: " + arguments);
+                            if (arguments.intArg(firstArg) < 0) {
+                                return BeforeAction.UPDATE_ARGUMENTS_AND_PROCEED;
+                            }
                             return BeforeAction.PROCEED;
                         };
 
-                        public int afterPhases() {
-                            return CallReturn.PHASE + Catch.PHASE;
+                        public Arguments updateArguments(Arguments arguments) {
+                            return arguments.updater().setIntArg(firstArg, Math.abs(arguments.intArg(firstArg))).update();
                         };
 
-                        public void onSuccessfulReturn() {
-                            System.out.println("yay!");
+                        public int afterPhases() {
+                            return CallReturn.PHASE;
                         };
 
                         public int onIntReturn(int result) {
-                            return result / 2;
+                            return result * 3;
                         };
 
-                        public Throwable reThrow(Throwable t) {
-                            return new IllegalArgumentException(t);
-                        };
-
-                        public void runFinally() {
-                            System.out.println("whateva");
-                        };
                     };
                 } else
                     return Advice.DEFAULT;
@@ -110,9 +105,8 @@ public final class AspectWeaverTest {
 
         SimpleInterface wovenItf = (SimpleInterface) wovenService;
 
-        System.out.println(simpleService.increase(10));
-        System.out.println(wovenItf.increase(10));
-        // System.out.println(wovenItf.increase(-42));
+        assertThat(simpleService.increase(10)).isEqualTo(20);
+        assertThat(wovenItf.increase(10)).isEqualTo(60);
 
         assertThat(wovenItf.hello()).isEqualTo(simpleService.hello());
 
@@ -143,6 +137,14 @@ public final class AspectWeaverTest {
 
         assertThat(wovenMethod.invoke(wovenService)).isEqualTo(method.invoke(annotatedService));
         assertThat(wovenMethod.getAnnotations()).containsExactly(method.getAnnotations());
+    }
+
+    @Test
+    public void shouldWeaveTwice() {
+        AspectWeaver.weave(SimpleService.class, new Class[] { SimpleInterface.class });
+
+        AspectWeaver.weave(SimpleService.class, new Class[] { SimpleInterface.class });
+
     }
 
     @Test

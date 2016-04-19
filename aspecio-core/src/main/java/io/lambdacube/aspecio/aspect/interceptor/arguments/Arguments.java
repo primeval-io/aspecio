@@ -1,33 +1,10 @@
-package io.lambdacube.aspecio.aspect.interceptor;
+package io.lambdacube.aspecio.aspect.interceptor.arguments;
 
 import java.lang.reflect.Parameter;
 import java.util.Collections;
 import java.util.List;
 
-public interface Arguments {
-
-    interface Builder {
-
-        <T> void setObjectArg(String argName, T newValue);
-
-        void setIntArg(String argName, int newValue);
-
-        void setShortArg(String argName, short newValue);
-
-        void setLongArg(String argName, long newValue);
-
-        void setByteArg(String argName, byte newValue);
-
-        void setBooleanArg(String argName, boolean newValue);
-
-        void setFloatArg(String argName, float newValue);
-
-        void setDoubleArg(String argName, double newValue);
-
-        void setCharArg(String argName, char newValue);
-
-        Arguments build();
-    }
+public interface Arguments extends ArgLike {
 
     public static final Arguments EMPTY_ARGUMENTS = new Arguments() {
 
@@ -35,6 +12,10 @@ public interface Arguments {
 
         public List<Parameter> parameters() {
             return Collections.emptyList();
+        };
+
+        public ArgumentsUpdater updater() {
+            return ArgumentsUpdater.EMPTY_ARGUMENTS_UPDATER;
         };
 
         public <T> T objectArg(String argName) {
@@ -71,27 +52,8 @@ public interface Arguments {
 
         public char charArg(String argName) {
             throw NO_ARG_EXCEPTION;
-        };
+        }
     };
 
-    List<Parameter> parameters();
-
-    <T> T objectArg(String argName);
-
-    int intArg(String argName);
-
-    short shortArg(String argName);
-
-    long longArg(String argName);
-
-    byte byteArg(String argName);
-
-    boolean booleanArg(String argName);
-
-    float floatArg(String argName);
-
-    double doubleArg(String argName);
-
-    char charArg(String argName);
-
+    ArgumentsUpdater updater();
 }

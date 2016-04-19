@@ -3,25 +3,23 @@ package io.lambdacube.aspecio.internal.weaving.theory;
 import java.io.PrintStream;
 import java.lang.reflect.Parameter;
 import java.util.List;
-import java.util.Objects;
 
 import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
 import io.lambdacube.aspecio.aspect.interceptor.arguments.ArgumentsUpdater;
 
-public final class M1Args implements Arguments {
+public final class M1ArgsUpdater implements ArgumentsUpdater {
 
     public final List<Parameter> parameters;
 
-    public final PrintStream ps;
+    public PrintStream ps;
 
-    public final int i;
+    public int i;
 
-    public final byte b;
+    public byte b;
 
-    public final String s;
+    public String s;
 
-    public M1Args(List<Parameter> parameters, PrintStream ps, int i, byte b, String s) {
-        super();
+    public M1ArgsUpdater(List<Parameter> parameters, PrintStream ps, int i, byte b, String s) {
         this.parameters = parameters;
         this.ps = ps;
         this.i = i;
@@ -30,49 +28,8 @@ public final class M1Args implements Arguments {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Byte.hashCode(b);
-        result = prime * result + Integer.hashCode(i);
-        result = prime * result + Objects.hashCode(ps);
-        result = prime * result + Objects.hashCode(s);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        M1Args other = (M1Args) obj;
-        long a, b;
-        a = 5l;
-        b = 5l;
-
-        return a == b && this.i == other.i && this.b == other.b && Objects.equals(this.ps, other.ps) && Objects.equals(this.s, other.s);
-
-    }
-
-    @Override
-    public String toString() {
-        return M1Args.class.getSimpleName() + " [" + "ps=" + ps + ", " + "i=" + i + ", " + "b=" + b + ", " + "s=" + s + "]";
-    }
-
-    @Override
     public List<Parameter> parameters() {
         return parameters;
-    }
-
-    @Override
-    public ArgumentsUpdater updater() {
-        return new M1ArgsUpdater(parameters, ps, i, b, s);
     }
 
     @SuppressWarnings("unchecked")
@@ -133,6 +90,69 @@ public final class M1Args implements Arguments {
     @Override
     public char charArg(String argName) {
         throw new IllegalArgumentException("Bad type");
+    }
+
+    @Override
+    public Arguments update() {
+        return new M1Args(parameters, ps, i, b, s);
+    }
+
+    @Override
+    public <T> ArgumentsUpdater setObjectArg(String argName, T newValue) {
+        if (argName.equals("ps")) {
+            ps = (PrintStream) newValue;
+            return this;
+        } else if (argName.equals("s")) {
+            s = (String) newValue;
+            return this;
+        } else {
+            throw new IllegalArgumentException("No object parameter named " + argName);
+        }
+    }
+
+    @Override
+    public ArgumentsUpdater setIntArg(String argName, int newValue) {
+        if (argName.equals("i")) {
+            i = newValue;
+            return this;
+        } else {
+            throw new IllegalArgumentException("No object parameter named " + argName);
+        }
+    }
+
+    @Override
+    public ArgumentsUpdater setShortArg(String argName, short newValue) {
+        return this;
+    }
+
+    @Override
+    public ArgumentsUpdater setLongArg(String argName, long newValue) {
+        return this;
+    }
+
+    @Override
+    public ArgumentsUpdater setByteArg(String argName, byte newValue) {
+        return this;
+    }
+
+    @Override
+    public ArgumentsUpdater setBooleanArg(String argName, boolean newValue) {
+        return this;
+    }
+
+    @Override
+    public ArgumentsUpdater setFloatArg(String argName, float newValue) {
+        return this;
+    }
+
+    @Override
+    public ArgumentsUpdater setDoubleArg(String argName, double newValue) {
+        return this;
+    }
+
+    @Override
+    public ArgumentsUpdater setCharArg(String argName, char newValue) {
+        return this;
     }
 
 }

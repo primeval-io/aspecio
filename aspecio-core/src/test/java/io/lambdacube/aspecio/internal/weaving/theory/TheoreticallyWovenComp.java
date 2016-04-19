@@ -8,9 +8,9 @@ import io.lambdacube.aspecio.aspect.interceptor.Advice;
 import io.lambdacube.aspecio.aspect.interceptor.Advice.ArgumentHook;
 import io.lambdacube.aspecio.aspect.interceptor.Advice.CallReturn;
 import io.lambdacube.aspecio.aspect.interceptor.Advice.SkipCall;
-import io.lambdacube.aspecio.aspect.interceptor.Arguments;
 import io.lambdacube.aspecio.aspect.interceptor.BeforeAction;
 import io.lambdacube.aspecio.aspect.interceptor.CallContext;
+import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
 import io.lambdacube.aspecio.internal.weaving.Woven;
 import io.lambdacube.aspecio.internal.weaving.WovenUtils;
 
@@ -64,7 +64,12 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
             break;
         }
         try {
-            String returnVal = delegate.hello();
+            String returnVal;
+            if (currentArgs == null) {
+                returnVal = delegate.hello();
+            } else {
+                returnVal = delegate.hello();
+            }
 
             if ((adv.hasPhase(Advice.CallReturn.PHASE))) {
                 returnVal = ((CallReturn) adv).onObjectReturn(returnVal);
@@ -87,7 +92,7 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
     public void test(PrintStream ps, int i, byte b, String s) {
         Advice adv = interceptor.onCall(cc1);
 
-        Arguments currentArgs = null;
+        M1Args currentArgs = null;
 
         BeforeAction initialAction = adv.initialAction();
         switch (initialAction) {
@@ -98,7 +103,7 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
         case REQUEST_ARGUMENTS: {
             Advice.ArgumentHook argumentHook = (ArgumentHook) adv;
             if (currentArgs == null) {
-                currentArgs = new M1Args(cc1.parameters, ps, i, b, s); 
+                currentArgs = new M1Args(cc1.parameters, ps, i, b, s);
             }
             BeforeAction nextAction = argumentHook.visitArguments(currentArgs);
             switch (nextAction) {
@@ -106,7 +111,7 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
                 ((SkipCall) adv).skipCallAndReturnVoid();
                 return;
             case UPDATE_ARGUMENTS_AND_PROCEED:
-                currentArgs = argumentHook.updateArguments(currentArgs);
+                currentArgs = (M1Args) argumentHook.updateArguments(currentArgs);
                 break;
             default:
                 break;
@@ -116,6 +121,13 @@ public final class TheoreticallyWovenComp extends Woven implements Hello, Goodby
             break;
         }
         try {
+            if (currentArgs != null) {
+                ps = currentArgs.ps;
+                i = currentArgs.i;
+                b = currentArgs.b;
+                s = currentArgs.s;
+            }
+            
             delegate.test(ps, i, b, s);
 
             if ((adv.hasPhase(Advice.CallReturn.PHASE))) {

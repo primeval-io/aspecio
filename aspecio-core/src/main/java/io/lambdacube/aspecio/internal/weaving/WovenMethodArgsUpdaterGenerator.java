@@ -17,16 +17,16 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
-public final class WovenMethodArgsGenerator implements Opcodes {
+public final class WovenMethodArgsUpdaterGenerator implements Opcodes {
 
-    public static final String SUFFIX_START = "$argsFor$";
+    public static final String SUFFIX_START = "$argsUpFor$";
 
     public static String getName(Class<?> wovenParentClass, Method method) {
         String suffix = SUFFIX_START + method.getName();
         return wovenParentClass.getName() + suffix;
     }
 
-    public static byte[] generateMethodArgs(Class<?> wovenParentClass, Method method) throws Exception {
+    public static byte[] generateMethodArgsUpdater(Class<?> wovenParentClass, Method method) throws Exception {
 
         ClassWriter cw = new ClassWriter(0);
 
@@ -37,14 +37,14 @@ public final class WovenMethodArgsGenerator implements Opcodes {
         String selfClassInternalName = wovenClassInternalName + suffix;
         String selfClassDescriptor = makeSelfClassDescriptor(wovenClassDescriptor, suffix);
 
-        String updaterClassInternalName = wovenClassInternalName + WovenMethodArgsUpdaterGenerator.SUFFIX_START + method.getName();
+        String argsClassInternalName = wovenClassInternalName + WovenMethodArgsGenerator.SUFFIX_START + method.getName();
 
         String constDesc = Type.getMethodDescriptor(Type.VOID_TYPE,
                 Stream.concat(Stream.of(List.class), Stream.of(method.getParameterTypes())).map(Type::getType)
                         .toArray(Type[]::new));
 
         cw.visit(52, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, selfClassInternalName, null, "java/lang/Object",
-                new String[] {  "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments" });
+                new String[] {  "io/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater" });
         Parameter[] parameters = method.getParameters();
 
         generateFields(method, cw, parameters);
@@ -53,25 +53,27 @@ public final class WovenMethodArgsGenerator implements Opcodes {
         generateEqualsMethod(cw, selfClassInternalName, selfClassDescriptor, parameters);
         generateToStringMethod(cw, selfClassInternalName, selfClassDescriptor, parameters);
 
-        generateUpdaterMethod(cw, selfClassInternalName, selfClassDescriptor, updaterClassInternalName, constDesc, parameters);
+
+        generateUpdateMethod(cw, selfClassInternalName, selfClassDescriptor, argsClassInternalName, constDesc, parameters);
 
         generateParametersGetter(cw, selfClassInternalName, selfClassDescriptor);
+
+        generateArgumentSetters(cw, selfClassInternalName, selfClassDescriptor, parameters);
         generateArgumentGetters(cw, selfClassInternalName, selfClassDescriptor, parameters);
         cw.visitEnd();
 
         return cw.toByteArray();
     }
 
-    private static void generateUpdaterMethod(ClassWriter cw, String selfClassInternalName, String selfClassDescriptor,
-            String updaterClassInternalName,
+    private static void generateUpdateMethod(ClassWriter cw, String selfClassInternalName, String selfClassDescriptor,
+            String argsClassInternalName,
             String constDesc, Parameter[] parameters) {
         MethodVisitor mv;
-
-        mv = cw.visitMethod(ACC_PUBLIC, "updater", "()Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+        mv = cw.visitMethod(ACC_PUBLIC, "update", "()Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;", null, null);
         mv.visitCode();
         Label l0 = new Label();
         mv.visitLabel(l0);
-        mv.visitTypeInsn(NEW, updaterClassInternalName);
+        mv.visitTypeInsn(NEW, argsClassInternalName);
         mv.visitInsn(DUP);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitFieldInsn(GETFIELD, selfClassInternalName, "parameters", "Ljava/util/List;");
@@ -80,7 +82,7 @@ public final class WovenMethodArgsGenerator implements Opcodes {
             mv.visitVarInsn(ALOAD, 0);
             mv.visitFieldInsn(GETFIELD, selfClassInternalName, parameter.getName(), Type.getDescriptor(parameter.getType()));
         }
-        mv.visitMethodInsn(INVOKESPECIAL, updaterClassInternalName, "<init>", constDesc, false);
+        mv.visitMethodInsn(INVOKESPECIAL, argsClassInternalName, "<init>", constDesc, false);
         mv.visitInsn(ARETURN);
         Label l1 = new Label();
         mv.visitLabel(l1);
@@ -89,16 +91,17 @@ public final class WovenMethodArgsGenerator implements Opcodes {
         mv.visitEnd();
     }
 
+
     private static void generateFields(Method method, ClassWriter cw, Parameter[] parameters) {
         FieldVisitor fv;
-        cw.visitSource(method.getName() + "Args@@aspecio", null);
+        cw.visitSource(method.getName() + "ArgsUpdater@@aspecio", null);
 
         fv = cw.visitField(ACC_PUBLIC + ACC_FINAL, "parameters", "Ljava/util/List;", "Ljava/util/List<Ljava/lang/reflect/Parameter;>;",
                 null);
         fv.visitEnd();
 
         for (Parameter p : parameters) {
-            fv = cw.visitField(ACC_PUBLIC + ACC_FINAL, p.getName(), Type.getDescriptor(p.getType()), null, null);
+            fv = cw.visitField(ACC_PUBLIC, p.getName(), Type.getDescriptor(p.getType()), null, null);
             fv.visitEnd();
         }
     }
@@ -106,7 +109,6 @@ public final class WovenMethodArgsGenerator implements Opcodes {
     private static void generateConstructor(Method method, ClassWriter cw, String selfClassInternalName, String selfClassDescriptor,
             String constDesc, Parameter[] parameters) {
         MethodVisitor mv;
-
         mv = cw.visitMethod(ACC_PUBLIC, "<init>", constDesc, null, null);
         mv.visitParameter("parameters", 0);
         int paramCount = parameters.length;
@@ -346,6 +348,103 @@ public final class WovenMethodArgsGenerator implements Opcodes {
         mv.visitLabel(l1);
         mv.visitLocalVariable("this", selfClassDescriptor, null, l0, l1, 0);
         mv.visitMaxs(1, 1);
+        mv.visitEnd();
+    }
+
+    private static void generateArgumentSetters(ClassWriter cw, String selfClassInternalName, String selfClassDescriptor,
+            Parameter[] parameters) {
+        MethodVisitor mv;
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "setObjectArg",
+                    "(Ljava/lang/String;Ljava/lang/Object;)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;",
+                    "<T:Ljava/lang/Object;>(Ljava/lang/String;TT;)V", null);
+            generateArgSetterCode(Object.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "setIntArg",
+                    "(Ljava/lang/String;I)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+            generateArgSetterCode(int.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "setShortArg",
+                    "(Ljava/lang/String;S)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+            generateArgSetterCode(short.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "setLongArg",
+                    "(Ljava/lang/String;J)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+            generateArgSetterCode(long.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "setByteArg",
+                    "(Ljava/lang/String;B)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+            generateArgSetterCode(byte.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "setBooleanArg",
+                    "(Ljava/lang/String;Z)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+            generateArgSetterCode(boolean.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "setFloatArg",
+                    "(Ljava/lang/String;F)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+            generateArgSetterCode(float.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "setDoubleArg",
+                    "(Ljava/lang/String;D)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+            generateArgSetterCode(double.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "setCharArg",
+                    "(Ljava/lang/String;C)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+            generateArgSetterCode(char.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
+        }
+    }
+
+    private static void generateArgSetterCode(Class<?> argType, MethodVisitor mv, String selfClassInternalName, String selfClassDescriptor,
+            Parameter[] parameters) {
+        Parameter[] matchingParams = Stream.of(parameters).filter(c -> argType.isAssignableFrom(c.getType())).toArray(Parameter[]::new);
+        mv.visitParameter("argName", 0);
+        mv.visitParameter("newValue", 0);
+        mv.visitCode();
+        Label first = new Label();
+        Label nextLabel = first;
+        for (int i = 0; i < matchingParams.length; i++) {
+            Parameter parameter = matchingParams[i];
+            mv.visitLabel(nextLabel);
+            if (i > 0) {
+                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+            }
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitLdcInsn(parameter.getName());
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+            nextLabel = new Label();
+            mv.visitJumpInsn(IFEQ, nextLabel);
+            Label l2 = new Label();
+            mv.visitLabel(l2);
+            Class<?> paramType = parameter.getType();
+            mv.visitVarInsn(ALOAD, 0); // this
+            mv.visitVarInsn(getLoadCode(argType), 2);
+            if (Object.class == argType) {
+                mv.visitTypeInsn(CHECKCAST, Type.getInternalName(paramType));
+            }
+            mv.visitFieldInsn(PUTFIELD, selfClassInternalName, parameter.getName(), Type.getDescriptor(paramType));
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitInsn(ARETURN);
+        }
+        // final else
+        mv.visitLabel(nextLabel);
+        if (matchingParams.length > 0) {
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        }
+        genExceptionThrowForUnknownParam(argType.getSimpleName(), mv);
+        Label last = new Label();
+        mv.visitLabel(last);
+        mv.visitLocalVariable("this", selfClassDescriptor, null, first, last, 0);
+        mv.visitLocalVariable("argName", "Ljava/lang/String;", null, first, last, 1);
+        mv.visitLocalVariable("newValue", Type.getDescriptor(argType), argType == Object.class ? "TT;" : null, first, last, 2);
+        mv.visitMaxs(5, 2 + getTypeSize(argType));
         mv.visitEnd();
     }
 
