@@ -24,6 +24,7 @@ import io.lambdacube.aspecio.aspect.interceptor.BeforeAction;
 import io.lambdacube.aspecio.aspect.interceptor.CallContext;
 import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
 import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
+import io.lambdacube.aspecio.internal.weaving.shared.Woven;
 import io.lambdacube.aspecio.internal.weaving.testset.annotated.AnnotatedService;
 import io.lambdacube.aspecio.internal.weaving.testset.api.BadValueException;
 import io.lambdacube.aspecio.internal.weaving.testset.api.GenericInterface;

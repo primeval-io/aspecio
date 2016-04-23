@@ -11,8 +11,8 @@ import io.lambdacube.aspecio.aspect.interceptor.Advice.SkipCall;
 import io.lambdacube.aspecio.aspect.interceptor.BeforeAction;
 import io.lambdacube.aspecio.aspect.interceptor.CallContext;
 import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
-import io.lambdacube.aspecio.internal.weaving.Woven;
-import io.lambdacube.aspecio.internal.weaving.WovenUtils;
+import io.lambdacube.aspecio.internal.weaving.shared.Woven;
+import io.lambdacube.aspecio.internal.weaving.shared.WovenUtils;
 
 public final class TheoreticallyWovenComp extends Woven implements Hello, Goodbye, Stuff {
 

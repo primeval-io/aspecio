@@ -33,8 +33,8 @@ import io.lambdacube.aspecio.internal.AspecioUtils;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
 import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 import io.lambdacube.aspecio.internal.weaving.AspectWeaver;
-import io.lambdacube.aspecio.internal.weaving.Woven;
 import io.lambdacube.aspecio.internal.weaving.WovenClassHolder;
+import io.lambdacube.aspecio.internal.weaving.shared.Woven;
 
 public final class ServiceWeavingManager implements AllServiceListener {
     private static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(ServiceWeavingManager.class);
@@ -264,5 +264,9 @@ public final class ServiceWeavingManager implements AllServiceListener {
 
     public void removeListener(WovenServiceListener wovenServiceListener) {
         wovenServiceListeners.remove(wovenServiceListener);
+    }
+    
+    public List<WovenService> getWovenServicesForAspect(String aspectName) {
+        return wovenServicesByAspect.get(aspectName);
     }
 }

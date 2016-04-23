@@ -75,6 +75,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
+import io.lambdacube.aspecio.internal.weaving.shared.Woven;
+
 public final class WovenClassGenerator {
 
     public static final String WOVEN_TARGET_CLASS_SUFFIX = "$Woven$";
@@ -159,7 +161,7 @@ public final class WovenClassGenerator {
                 addTypeSpecial(mv, type);
                 mv.visitInsn(AASTORE);
             }
-            mv.visitMethodInsn(INVOKESTATIC, "io/lambdacube/aspecio/internal/weaving/WovenUtils",
+            mv.visitMethodInsn(INVOKESTATIC, "io/lambdacube/aspecio/internal/weaving/shared/WovenUtils",
                     "getMethodUnchecked", "(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;", false);
             mv.visitFieldInsn(PUTSTATIC, selfClassInternalName, "meth" + i, "Ljava/lang/reflect/Method;");
             Label l1 = new Label();
@@ -536,7 +538,7 @@ public final class WovenClassGenerator {
             mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments", "EMPTY_ARGUMENTS",
                     "Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;");
         } else {
-            argsClassInternalName = wovenClassInternalName + "$argsFor$" + method.getName();
+            argsClassInternalName = wovenClassInternalName + "$argsFor$" + method.getName() + methId;
             mv.visitTypeInsn(NEW, argsClassInternalName);
             mv.visitInsn(DUP);
             mv.visitFieldInsn(GETSTATIC, selfClassInternalName, "cc" + methId, "Lio/lambdacube/aspecio/aspect/interceptor/CallContext;");

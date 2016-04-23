@@ -306,7 +306,9 @@ public final class AspectInterceptorManager implements ServiceListener {
     }
 
     private void fireEvent(EventKind eventKind, String aspectName, AspectInterceptor aspectInterceptor) {
-        aspectInterceptorListeners.forEach(l -> l.onAspectChange(eventKind, aspectName, aspectInterceptor));
+        for (AspectInterceptorListener l : aspectInterceptorListeners) {
+            l.onAspectChange(eventKind, aspectName, aspectInterceptor);    
+        }
     }
 
     public void addListener(AspectInterceptorListener aspectInterceptorListener) {

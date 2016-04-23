@@ -21,30 +21,30 @@ public final class WovenMethodArgsGenerator implements Opcodes {
 
     public static final String SUFFIX_START = "$argsFor$";
 
-    public static String getName(Class<?> wovenParentClass, Method method) {
-        String suffix = SUFFIX_START + method.getName();
+    public static String getName(Class<?> wovenParentClass, Method method, int methodId) {
+        String suffix = SUFFIX_START + method.getName() + methodId;
         return wovenParentClass.getName() + suffix;
     }
 
-    public static byte[] generateMethodArgs(Class<?> wovenParentClass, Method method) throws Exception {
+    public static byte[] generateMethodArgs(Class<?> wovenParentClass, Method method, int methodId) throws Exception {
 
         ClassWriter cw = new ClassWriter(0);
 
         String wovenClassDescriptor = Type.getDescriptor(wovenParentClass);
         String wovenClassInternalName = Type.getInternalName(wovenParentClass);
 
-        String suffix = SUFFIX_START + method.getName();
+        String suffix = SUFFIX_START + method.getName() + methodId;
         String selfClassInternalName = wovenClassInternalName + suffix;
         String selfClassDescriptor = makeSelfClassDescriptor(wovenClassDescriptor, suffix);
 
-        String updaterClassInternalName = wovenClassInternalName + WovenMethodArgsUpdaterGenerator.SUFFIX_START + method.getName();
+        String updaterClassInternalName = wovenClassInternalName + WovenMethodArgsUpdaterGenerator.SUFFIX_START + method.getName() + methodId;
 
         String constDesc = Type.getMethodDescriptor(Type.VOID_TYPE,
                 Stream.concat(Stream.of(List.class), Stream.of(method.getParameterTypes())).map(Type::getType)
                         .toArray(Type[]::new));
 
         cw.visit(52, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, selfClassInternalName, null, "java/lang/Object",
-                new String[] {  "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments" });
+                new String[] { "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments" });
         Parameter[] parameters = method.getParameters();
 
         generateFields(method, cw, parameters);

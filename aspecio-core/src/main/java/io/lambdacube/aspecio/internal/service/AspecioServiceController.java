@@ -1,5 +1,6 @@
 package io.lambdacube.aspecio.internal.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,6 +39,15 @@ public final class AspecioServiceController implements AspectInterceptorListener
 
     @Override
     public void onAspectChange(AspectInterceptorListener.EventKind eventKind, String aspectName, AspectInterceptor aspectInterceptor) {
+        List<WovenService> wovenServicesForAspect = serviceWeavingManager.getWovenServicesForAspect(aspectName);
+        if (wovenServicesForAspect == null) {
+            return;
+        }
+        for (WovenService wovenService : wovenServicesForAspect) {
+            boolean required = wovenService.requiredAspects.contains(aspectName);
+            handleServiceUpdate(wovenService, required, !required, false);
+        }
+
     }
 
     @Override

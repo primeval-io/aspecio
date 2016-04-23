@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Hashtable;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -27,14 +28,19 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.tracker.ServiceTracker;
 
+import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.aspecio.examples.DemoConsumer;
 import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
 import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
 import io.lambdacube.aspecio.examples.greetings.Goodbye;
 import io.lambdacube.aspecio.examples.greetings.Hello;
+import io.lambdacube.aspecio.it.testset.api.Randomizer;
+import io.lambdacube.aspecio.it.testset.aspect.NoopAspect;
+import io.lambdacube.aspecio.it.testset.component.RandomizerImpl;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -65,7 +71,7 @@ public class AspecioIntegrationTest {
     }
 
     @Test
-    public void someTest() throws Exception {
+    public void testExampleApplication() throws Exception {
         ServiceTracker<Hello, Hello> helloTracker = new ServiceTracker<>(bundleContext, Hello.class, null);
         helloTracker.open();
 
@@ -89,7 +95,7 @@ public class AspecioIntegrationTest {
         ServiceReference<?> commonSr = helloSr;
 
         // Hidden property added to woven services
-        Object wovenProperty = commonSr.getProperty(".service.aspect.woven");
+        Object wovenProperty = commonSr.getProperty(AspecioConstants._SERVICE_ASPECT_WOVEN);
         assertThat(wovenProperty).isNotNull().isInstanceOf(String[].class);
         assertThat((String[]) wovenProperty).containsExactly(CountingAspect.class.getName(), MetricAspect.All.class.getName());
 
@@ -114,9 +120,54 @@ public class AspecioIntegrationTest {
 
         countingAspect.printCounts();
 
-        System.out.println(longResult.getValue());
-        
+        assertThat(longResult.getValue()).isEqualTo(42L);
+
         caTracker.close();
+    }
+
+    @Test
+    public void testAspectDynamicity() {
+
+        ServiceTracker<Randomizer, Randomizer> rmdnTracker = new ServiceTracker<>(bundleContext, Randomizer.class, null);
+        rmdnTracker.open();
+
+        String fakeAspect = "tested.aspect";
+        Hashtable<String, Object> serviceProps = new Hashtable<>();
+        serviceProps.put(AspecioConstants.SERVICE_ASPECT_WEAVE, fakeAspect);
+        RandomizerImpl randomizerImpl = new RandomizerImpl();
+        ServiceRegistration<Randomizer> serviceReg = bundleContext.registerService(Randomizer.class, randomizerImpl, serviceProps);
+
+        // Check that the service is not available, because our fakeAspect is not provided.
+        assertThat(rmdnTracker.size()).isEqualTo(0);
+
+        NoopAspect noopAspect = new NoopAspect();
+        Hashtable<String, Object> aspectProps = new Hashtable<>();
+        aspectProps.put(AspecioConstants.SERVICE_ASPECT, fakeAspect);
+        ServiceRegistration<Object> aspectReg = bundleContext.registerService(Object.class, noopAspect, aspectProps);
+
+        // Check that the service is available, because our fakeAspect is provided.
+        assertThat(rmdnTracker.size()).isEqualTo(1);
+        assertThat((String[]) rmdnTracker.getServiceReference().getProperty(AspecioConstants._SERVICE_ASPECT_WOVEN))
+                .containsExactly(fakeAspect);
+
+        aspectReg.unregister();
+        // Check that the service is available, because our fakeAspect is gone.
+        assertThat(rmdnTracker.size()).isEqualTo(0);
+
+        // Register the aspect again
+        aspectReg = bundleContext.registerService(Object.class, noopAspect, aspectProps);
+        assertThat(rmdnTracker.size()).isEqualTo(1);
+
+        // Let the service go
+        serviceReg.unregister();
+        assertThat(rmdnTracker.size()).isEqualTo(0);
+
+        // Register the service again, it should be immediately available
+        serviceReg = bundleContext.registerService(Randomizer.class, randomizerImpl, serviceProps);
+        assertThat(rmdnTracker.size()).isEqualTo(1);
+
+        rmdnTracker.close();
+
     }
 
     private String extractFromPrintStream(Consumer<PrintStream> psConsumer) throws UnsupportedEncodingException, IOException {

@@ -12,7 +12,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
-import io.lambdacube.aspecio.internal.weaving.Woven;
+import io.lambdacube.aspecio.internal.weaving.shared.Woven;
 
 public final class AspecioServiceObject {
     private final ServiceScope serviceScope;

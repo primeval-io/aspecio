@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.weaving;
+package io.lambdacube.aspecio.internal.weaving.shared;
 
 import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
 
