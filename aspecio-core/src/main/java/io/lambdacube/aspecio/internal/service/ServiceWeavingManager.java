@@ -21,18 +21,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
 
+import com.github.gfx.util.WeakIdentityHashMap;
+
 import org.osgi.framework.AllServiceListener;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.wiring.BundleRevision;
+import org.osgi.framework.wiring.BundleWiring;
 
 import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.aspecio.internal.AspecioUtils;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
 import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 import io.lambdacube.aspecio.internal.weaving.AspectWeaver;
+import io.lambdacube.aspecio.internal.weaving.BridgingClassLoader;
+import io.lambdacube.aspecio.internal.weaving.DynamicClassLoader;
 import io.lambdacube.aspecio.internal.weaving.WovenClassHolder;
 import io.lambdacube.aspecio.internal.weaving.shared.Woven;
 
@@ -44,8 +52,12 @@ public final class ServiceWeavingManager implements AllServiceListener {
 
     private final Map<ServiceReference<?>, WovenService> wovenServiceByServiceRef = Collections.synchronizedSortedMap(new TreeMap<>());
     private final Map<String, List<WovenService>> wovenServicesByAspect = new ConcurrentHashMap<>();
-    public final List<WovenServiceListener> wovenServiceListeners = new CopyOnWriteArrayList<>();
+    private final List<WovenServiceListener> wovenServiceListeners = new CopyOnWriteArrayList<>();
 
+    // Everything in here is weak, using identity equality, so it nicely cleans-up by itself as bundles are cleaned-up,
+    // if there are no stale-references on our bundles or services of course...
+    private final Map<Bundle, Map<BundleRevision, DynamicClassLoader>> classLoaders = Collections.synchronizedMap(new WeakIdentityHashMap<>());
+    
     private final BundleContext bundleContext;
 
     private volatile boolean closed = false;
@@ -169,10 +181,6 @@ public final class ServiceWeavingManager implements AllServiceListener {
 
         serviceProperties.put(Constants.SERVICE_RANKING, serviceRanking);
 
-        // This property is set to recognize the registration as a proxy, so it's not proxied again
-        // TODO add on publish
-        // serviceProperties.put(_SERVICE_ASPECT_WOVEN, requiredAspectsToWeave.toArray(new String[0]));
-
         AspecioServiceObject aspecioServiceObject = new AspecioServiceObject(serviceScope, reference,
                 originalService -> weave(interfaces, originalService));
 
@@ -250,8 +258,27 @@ public final class ServiceWeavingManager implements AllServiceListener {
     }
 
     private Woven weave(List<Class<?>> interfaces, Object delegateToWeave) {
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(delegateToWeave.getClass(), interfaces.toArray(new Class<?>[0]));
+        DynamicClassLoader dynamicClassLoader = getDynamicClassLoader(delegateToWeave);
+
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, delegateToWeave.getClass(),
+                interfaces.toArray(new Class<?>[0]));
         return wovenClassHolder.weavingFactory.apply(delegateToWeave);
+    }
+
+    private DynamicClassLoader getDynamicClassLoader(Object delegateToWeave) {
+        Bundle bundle = FrameworkUtil.getBundle(delegateToWeave.getClass());
+        BundleRevision bundleRev = bundle.adapt(BundleRevision.class);
+
+        Map<BundleRevision, DynamicClassLoader> clByRev = classLoaders.computeIfAbsent(bundle,
+                k -> Collections.synchronizedMap(new WeakIdentityHashMap<>()));
+
+        DynamicClassLoader dynamicClassLoader = clByRev.computeIfAbsent(bundleRev,
+                k -> {
+                    ClassLoader classLoader = k.getBundle().adapt(BundleWiring.class).getClassLoader();
+                    return new DynamicClassLoader(new BridgingClassLoader(classLoader,
+                            AspectWeaver.class.getClassLoader()));
+                });
+        return dynamicClassLoader;
     }
 
     private void fireEvent(WovenServiceEvent event, WovenService wovenService) {
@@ -265,8 +292,9 @@ public final class ServiceWeavingManager implements AllServiceListener {
     public void removeListener(WovenServiceListener wovenServiceListener) {
         wovenServiceListeners.remove(wovenServiceListener);
     }
-    
+
     public List<WovenService> getWovenServicesForAspect(String aspectName) {
         return wovenServicesByAspect.get(aspectName);
     }
+
 }

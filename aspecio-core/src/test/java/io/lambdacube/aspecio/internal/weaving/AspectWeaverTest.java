@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.assertj.core.util.Lists;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import io.lambdacube.aspecio.aspect.interceptor.Advice;
@@ -36,12 +37,19 @@ import io.lambdacube.aspecio.internal.weaving.testset.simpleservice.SimpleServic
 import io.lambdacube.aspecio.internal.weaving.testset.simplest.SimplestService;
 
 public final class AspectWeaverTest {
+    
+    private static DynamicClassLoader dynamicClassLoader;
+
+    @BeforeClass
+    public static void setUp() {
+        dynamicClassLoader = new DynamicClassLoader(AspectWeaverTest.class.getClassLoader());
+    }
 
     @Test
     public void shouldWeaveSimplestClass() {
         SimplestService simplestService = new SimplestService();
 
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(SimplestService.class, new Class[] { SimplestInterface.class });
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, SimplestService.class, new Class[] { SimplestInterface.class });
         assertThat(SimplestInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
         Object wovenService = wovenClassHolder.weavingFactory.apply(simplestService);
@@ -61,7 +69,7 @@ public final class AspectWeaverTest {
     public void shouldWeaveSimpleClass() throws IOException, BadValueException {
         SimpleService simpleService = new SimpleService();
 
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(SimpleService.class, new Class[] { SimpleInterface.class });
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, SimpleService.class, new Class[] { SimpleInterface.class });
         assertThat(SimpleInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
         Woven wovenService = wovenClassHolder.weavingFactory.apply(simpleService);
@@ -126,7 +134,7 @@ public final class AspectWeaverTest {
     @Test
     public void shouldWeaveAnnotations()
             throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(AnnotatedService.class, new Class[0]);
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, AnnotatedService.class, new Class[0]);
 
         assertThat(wovenClassHolder.wovenClass.getAnnotations()).containsExactly(AnnotatedService.class.getAnnotations());
 
@@ -142,15 +150,15 @@ public final class AspectWeaverTest {
 
     @Test
     public void shouldWeaveTwice() {
-        AspectWeaver.weave(SimpleService.class, new Class[] { SimpleInterface.class });
+        AspectWeaver.weave(dynamicClassLoader, SimpleService.class, new Class[] { SimpleInterface.class });
 
-        AspectWeaver.weave(SimpleService.class, new Class[] { SimpleInterface.class });
+        AspectWeaver.weave(dynamicClassLoader, SimpleService.class, new Class[] { SimpleInterface.class });
 
     }
 
     @Test
     public void shouldWeaveGenericServices() {
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(GenericService.class, new Class<?>[] { GenericInterface.class });
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, GenericService.class, new Class<?>[] { GenericInterface.class });
 
         assertThat(GenericInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
@@ -172,7 +180,7 @@ public final class AspectWeaverTest {
 
     @Test
     public void shouldWeaveMethodParameters() throws Exception {
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(GenericParamsService.class, new Class<?>[0]);
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, GenericParamsService.class, new Class<?>[0]);
 
         String[] wovenTypeParameters = Stream.of(wovenClassHolder.wovenClass.getTypeParameters()).map(TypeVariable::getName)
                 .toArray(String[]::new);

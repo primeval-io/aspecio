@@ -49,6 +49,12 @@
 			<version>5.1</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.github.gfx.util</groupId>
+			<artifactId>weak-identity-hash-map</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+
 		<!-- TEST -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -84,7 +90,7 @@
 							io.lambdacube.bnd.component.annotation.properties.DSAPPlugin
 						</_plugin>
 						<_include>-src/main/osgi/osgi.bnd</_include>
-						<Embed-Dependency>asm;scope=compile;inline=false</Embed-Dependency>
+						<Embed-Dependency>asm;scope=compile;inline=false,weak-identity-hash-map;scope=compile;inline=false</Embed-Dependency>
 					</instructions>
 				</configuration>
 				<dependencies>

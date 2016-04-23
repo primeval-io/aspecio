@@ -36,6 +36,7 @@ import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.aspecio.examples.DemoConsumer;
 import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
 import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
+import io.lambdacube.aspecio.examples.async.SuperSlowService;
 import io.lambdacube.aspecio.examples.greetings.Goodbye;
 import io.lambdacube.aspecio.examples.greetings.Hello;
 import io.lambdacube.aspecio.it.testset.api.Randomizer;
@@ -107,6 +108,13 @@ public class AspecioIntegrationTest {
 
         hello.hello();
 
+        ServiceTracker<SuperSlowService, SuperSlowService> slowTracker = new ServiceTracker<>(bundleContext, SuperSlowService.class, null);
+        slowTracker.open();
+
+        // Check that there is one shared classloader for woven aspects of objects of a same given bundlerevision
+        assertThat(slowTracker.getService().getClass().getClassLoader()).isSameAs(hello.getClass().getClassLoader());
+
+        slowTracker.close();
         helloTracker.close();
         goodbyeTracker.close();
 

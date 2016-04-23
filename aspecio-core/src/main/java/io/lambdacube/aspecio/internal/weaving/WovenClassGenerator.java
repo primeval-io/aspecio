@@ -80,6 +80,10 @@ import io.lambdacube.aspecio.internal.weaving.shared.Woven;
 public final class WovenClassGenerator {
 
     public static final String WOVEN_TARGET_CLASS_SUFFIX = "$Woven$";
+    
+    public static String getName(Class<?> clazzToWeave) {
+        return clazzToWeave.getName()  + WOVEN_TARGET_CLASS_SUFFIX;
+    }
 
     public static byte[] weave(Class<?> clazzToWeave, Class<?>[] interfaces, Method[] methods) throws Exception {
 
