@@ -5,7 +5,7 @@ import java.util.stream.IntStream;
 
 import org.osgi.service.component.annotations.Component;
 
-import io.lambdacube.aspecio.aspect.Weave;
+import io.lambdacube.aspecio.aspect.annotations.Weave;
 import io.lambdacube.aspecio.examples.aspect.metric.Timed;
 import io.lambdacube.aspecio.examples.misc.Stuff;
 

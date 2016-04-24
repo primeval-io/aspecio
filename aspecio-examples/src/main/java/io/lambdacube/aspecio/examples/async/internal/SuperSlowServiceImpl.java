@@ -12,7 +12,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.Promise;
 
-import io.lambdacube.aspecio.aspect.Weave;
+import io.lambdacube.aspecio.aspect.annotations.Weave;
 import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
 import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
 import io.lambdacube.aspecio.examples.aspect.metric.Timed;

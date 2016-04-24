@@ -10,7 +10,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 
-import io.lambdacube.aspecio.aspect.Aspect;
+import io.lambdacube.aspecio.aspect.annotations.Aspect;
 import io.lambdacube.aspecio.aspect.interceptor.Advice;
 import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
 import io.lambdacube.aspecio.aspect.interceptor.CallContext;

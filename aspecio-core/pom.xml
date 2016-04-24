@@ -29,6 +29,12 @@
 			<version>6.0.0</version>
 		</dependency>
 
+	<!-- Required for @Version annotations -->
+		<dependency>
+			<groupId>biz.aQute.bnd</groupId>
+			<artifactId>biz.aQute.bndlib</artifactId>
+			<version>3.1.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>io.lambdacube.osgi</groupId>

@@ -7,7 +7,7 @@ import com.google.common.base.Stopwatch;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.util.promise.Promise;
 
-import io.lambdacube.aspecio.aspect.Aspect;
+import io.lambdacube.aspecio.aspect.annotations.Aspect;
 import io.lambdacube.aspecio.aspect.interceptor.Advice;
 import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
 import io.lambdacube.aspecio.aspect.interceptor.CallContext;

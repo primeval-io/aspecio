@@ -2,7 +2,7 @@ package io.lambdacube.aspecio.examples.greetings.internal;
 
 import org.osgi.service.component.annotations.Component;
 
-import io.lambdacube.aspecio.aspect.Weave;
+import io.lambdacube.aspecio.aspect.annotations.Weave;
 import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
 import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
 import io.lambdacube.aspecio.examples.greetings.Goodbye;
