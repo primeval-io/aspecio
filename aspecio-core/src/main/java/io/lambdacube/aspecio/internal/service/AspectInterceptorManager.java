@@ -2,9 +2,12 @@ package io.lambdacube.aspecio.internal.service;
 
 import static io.lambdacube.aspecio.internal.AspecioUtils.asStringProperties;
 import static io.lambdacube.aspecio.internal.AspecioUtils.asStringProperty;
+import static io.lambdacube.aspecio.internal.AspecioUtils.copySet;
 import static io.lambdacube.aspecio.internal.AspecioUtils.firstOrNull;
 import static io.lambdacube.aspecio.internal.AspecioUtils.getIntValue;
+import static io.lambdacube.aspecio.internal.AspecioUtils.getLongValue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,6 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -30,6 +34,8 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 
 import io.lambdacube.aspecio.AspecioConstants;
+import io.lambdacube.aspecio.AspectDescription;
+import io.lambdacube.aspecio.InterceptorDescription;
 import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
 import io.lambdacube.aspecio.aspect.interceptor.Interceptors;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
@@ -113,7 +119,8 @@ public final class AspectInterceptorManager implements ServiceListener {
 
     public synchronized void onServiceRegistration(ServiceReference<?> reference) {
         if (aspectServiceByServiceRef.containsKey(reference)) {
-            // This might happen if a service arrives between the listener registration and the initial getServiceReferences call
+            // This might happen if a service arrives between the listener registration and the initial
+            // getServiceReferences call
             return;
         }
 
@@ -251,7 +258,7 @@ public final class AspectInterceptorManager implements ServiceListener {
 
             @Override
             public int compare(AspectInterceptor o1, AspectInterceptor o2) {
-                int res  = o1.aspect.compareTo(o2.aspect);
+                int res = o1.aspect.compareTo(o2.aspect);
                 if (res != 0) {
                     return res;
                 }
@@ -307,7 +314,7 @@ public final class AspectInterceptorManager implements ServiceListener {
 
     private void fireEvent(EventKind eventKind, String aspectName, AspectInterceptor aspectInterceptor) {
         for (AspectInterceptorListener l : aspectInterceptorListeners) {
-            l.onAspectChange(eventKind, aspectName, aspectInterceptor);    
+            l.onAspectChange(eventKind, aspectName, aspectInterceptor);
         }
     }
 
@@ -322,5 +329,42 @@ public final class AspectInterceptorManager implements ServiceListener {
     private AspectInterceptor getAspectInterceptor(String aspectName) {
         return firstOrNull(aspectServicesByAspectName.get(aspectName));
     }
+
+    public synchronized Set<String> getRegisteredAspects() {
+        return copySet(aspectServicesByAspectName.keySet());
+    }
+
+    public synchronized Optional<AspectDescription> getAspectDescription(String aspectName) {
+        SortedSet<AspectInterceptor> ais = aspectServicesByAspectName.get(aspectName);
+        if (ais == null || ais.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Iterator<AspectInterceptor> iterator = ais.iterator();
+
+        AspectInterceptor interceptor = iterator.next();
+        InterceptorDescription id = makeInterceptorDescription(interceptor);
+        List<InterceptorDescription> backupIds = new ArrayList<>(ais.size() - 1);
+
+        while (iterator.hasNext()) {
+            interceptor = iterator.next();
+            InterceptorDescription backupId = makeInterceptorDescription(interceptor);
+            backupIds.add(backupId);
+        }
+
+        AspectDescription ad = new AspectDescription(aspectName, id, backupIds);
+
+        return Optional.of(ad);
+    }
+
+    private InterceptorDescription makeInterceptorDescription(AspectInterceptor ai) {
+        long serviceId = getLongValue(ai.serviceRef.getProperty(Constants.SERVICE_ID));
+        long bundleId = getLongValue(ai.serviceRef.getProperty(Constants.SERVICE_BUNDLEID));
+
+        return new InterceptorDescription(serviceId, bundleId, ai.serviceRanking, ai.interceptor.getClass(),
+                copySet(ai.extraProperties));
+    }
+
+
 
 }

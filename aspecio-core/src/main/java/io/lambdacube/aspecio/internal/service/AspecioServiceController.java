@@ -1,11 +1,17 @@
 package io.lambdacube.aspecio.internal.service;
 
+import static io.lambdacube.aspecio.internal.AspecioUtils.copySet;
+import static io.lambdacube.aspecio.internal.AspecioUtils.getLongValue;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
+import io.lambdacube.aspecio.InterceptedServiceDescription;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
 import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 
@@ -136,6 +142,18 @@ public final class AspecioServiceController implements AspectInterceptorListener
             return;
         }
         managed.unregister();
+    }
+
+    public synchronized List<InterceptedServiceDescription> getInterceptedServices() {
+        List<InterceptedServiceDescription> isds = new ArrayList<>(managedServices.size());
+        for (ManagedWovenService mws : managedServices.values()) {
+            long bundleId = getLongValue(mws.wovenService.originalReference.getProperty(Constants.SERVICE_BUNDLEID));
+            isds.add(new InterceptedServiceDescription(mws.wovenService.originalServiceId, bundleId, new ArrayList<>(mws.wovenService.objectClass),
+                    mws.registration != null, copySet(mws.aspectContext.satisfiedAspects),
+                    copySet(mws.aspectContext.unsatisfiedRequiredAspects), copySet(mws.wovenService.requiredAspects),
+                    copySet(mws.wovenService.optionalAspects)));
+        }
+        return isds;
     }
 
 }

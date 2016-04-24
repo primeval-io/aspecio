@@ -1,8 +1,9 @@
-package io.lambdacube.aspecio;
+package io.lambdacube.aspecio.aspect;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
+import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.component.annotation.ComponentProperty;
 import io.lambdacube.component.annotation.ComponentPropertyGroup;
 

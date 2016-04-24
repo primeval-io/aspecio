@@ -1,8 +1,5 @@
 package io.lambdacube.aspecio.examples.aspect.metric.internal;
 
-import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Stopwatch;
@@ -20,21 +17,10 @@ import io.lambdacube.aspecio.examples.aspect.metric.Timed;
 
 @Component
 @Aspect(provides = MetricAspect.AnnotatedOnly.class, extraProperties = "measured")
-public final class AnnotatedMetricInterceptorImpl implements AnnotationInterceptor {
-
-    private static final Set<Class<? extends Annotation>> ANNOTATIONS = Collections.singleton(Timed.class);
+public final class AnnotatedMetricInterceptorImpl implements AnnotationInterceptor<Timed> {
 
     @Override
-    public <A extends Annotation> Advice onCall(A annotation, CallContext callContext) {
-        return time((Timed) annotation, callContext);
-    }
-
-    @Override
-    public Set<Class<? extends Annotation>> intercept() {
-        return ANNOTATIONS;
-    }
-
-    private Advice time(Timed annotation, CallContext callContext) {
+    public Advice onCall(Timed annotation, CallContext callContext) {
         Stopwatch started = Stopwatch.createStarted();
         String methodName = callContext.target.getName() + "::" + callContext.method.getName();
 
@@ -61,6 +47,12 @@ public final class AnnotatedMetricInterceptorImpl implements AnnotationIntercept
                 System.out.println("Sync call to " + methodName + " took " + started.elapsed(TimeUnit.MICROSECONDS) + " µs");
             }
         };
+
+    }
+
+    @Override
+    public Class<Timed> intercept() {
+        return Timed.class;
     }
 
     @Override

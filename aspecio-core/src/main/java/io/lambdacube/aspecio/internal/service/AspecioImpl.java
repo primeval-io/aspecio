@@ -2,7 +2,10 @@ package io.lambdacube.aspecio.internal.service;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
@@ -11,11 +14,14 @@ import org.osgi.framework.hooks.service.EventListenerHook;
 import org.osgi.framework.hooks.service.FindHook;
 import org.osgi.framework.hooks.service.ListenerHook.ListenerInfo;
 
+import io.lambdacube.aspecio.Aspecio;
 import io.lambdacube.aspecio.AspecioConstants;
+import io.lambdacube.aspecio.AspectDescription;
+import io.lambdacube.aspecio.InterceptedServiceDescription;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
 import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 
-public final class AspecioImpl implements FindHook, EventListenerHook {
+public final class AspecioImpl implements Aspecio, FindHook, EventListenerHook {
 
     private static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(AspecioImpl.class);
 
@@ -25,9 +31,13 @@ public final class AspecioImpl implements FindHook, EventListenerHook {
     private final AspectInterceptorManager aspectInterceptorManager;
     private final AspecioServiceController aspecioServiceController;
 
+    private final boolean filterServices;
+
     public AspecioImpl(BundleContext bundleContext) {
         this.bundleId = bundleContext.getBundle().getBundleId();
-        
+
+        filterServices = shouldFilterServices(bundleContext);
+
         aspectInterceptorManager = new AspectInterceptorManager(bundleContext);
         serviceWeavingManager = new ServiceWeavingManager(bundleContext);
         aspecioServiceController = new AspecioServiceController(aspectInterceptorManager, serviceWeavingManager);
@@ -46,6 +56,10 @@ public final class AspecioImpl implements FindHook, EventListenerHook {
 
     @Override
     public void event(ServiceEvent event, Map<BundleContext, Collection<ListenerInfo>> listeners) {
+        if (!filterServices) {
+            return;
+        }
+
         // Is it an event we want to filter out?
         if (event.getServiceReference().getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE) == null
                 && event.getServiceReference().getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL) == null) {
@@ -65,6 +79,10 @@ public final class AspecioImpl implements FindHook, EventListenerHook {
 
     @Override
     public void find(BundleContext context, String name, String filter, boolean allServices, Collection<ServiceReference<?>> references) {
+        if (!filterServices) {
+            return;
+        }
+
         long consumingBundleId = context.getBundle().getBundleId();
         if (consumingBundleId == bundleId || consumingBundleId == 0) {
             return;
@@ -78,6 +96,31 @@ public final class AspecioImpl implements FindHook, EventListenerHook {
                 continue;
             }
             iterator.remove();
+        }
+    }
+
+    @Override
+    public Set<String> getRegisteredAspects() {
+        return aspectInterceptorManager.getRegisteredAspects();
+    }
+
+    @Override
+    public Optional<AspectDescription> getAspectDescription(String aspectName) {
+        return aspectInterceptorManager.getAspectDescription(aspectName);
+    }
+
+    @Override
+    public List<InterceptedServiceDescription> getInterceptedServices() {
+        return aspecioServiceController.getInterceptedServices();
+    }
+    
+
+    private boolean shouldFilterServices(BundleContext bundleContext) {
+        String filterProp = bundleContext.getProperty(AspecioConstants.ASPECIO_FILTER_SERVICES);
+        if (filterProp == null) {
+            return true; // default to true
+        } else {
+            return Boolean.valueOf(filterProp.toLowerCase());
         }
     }
 

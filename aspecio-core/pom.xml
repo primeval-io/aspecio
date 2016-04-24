@@ -77,6 +77,37 @@
 
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>full</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.10.3</version>
+						<executions>
+							<execution>
+								<id>generate-javadoc</id>
+								<phase>package</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<inherited>false</inherited>
+							</execution>
+						</executions>
+						<configuration>
+							<quiet>true</quiet>
+							<excludePackageNames>io.lambdacube.aspecio.internal,
+								io.lambdacube.aspecio.internal.*</excludePackageNames>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>

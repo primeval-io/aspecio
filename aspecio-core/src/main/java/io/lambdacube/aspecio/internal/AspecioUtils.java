@@ -1,5 +1,8 @@
 package io.lambdacube.aspecio.internal;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.Callable;
 
@@ -70,5 +73,11 @@ public final class AspecioUtils {
         return set.first();
     }
     
+    
+    public static <T> Set<T> copySet(Collection<T> source) {
+        Set<T> copy = new LinkedHashSet<>(source.size());
+        copy.addAll(source);
+        return copy;
+    }
     
 }

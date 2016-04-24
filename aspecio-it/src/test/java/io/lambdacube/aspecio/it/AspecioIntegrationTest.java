@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -32,7 +34,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.tracker.ServiceTracker;
 
+import io.lambdacube.aspecio.Aspecio;
 import io.lambdacube.aspecio.AspecioConstants;
+import io.lambdacube.aspecio.AspectDescription;
 import io.lambdacube.aspecio.examples.DemoConsumer;
 import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
 import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
@@ -52,6 +56,9 @@ public class AspecioIntegrationTest {
 
     @Inject
     private DemoConsumer demoConsumer;
+
+    @Inject
+    private Aspecio aspecio;
 
     public static Option exampleApplication() {
         return composite(dsAndFriends(),
@@ -73,6 +80,20 @@ public class AspecioIntegrationTest {
 
     @Test
     public void testExampleApplication() throws Exception {
+
+        // Check if all aspects are accounted for
+        Set<String> aspects = aspecio.getRegisteredAspects();
+        assertThat(aspects).contains(MetricAspect.All.class.getName(), MetricAspect.AnnotatedOnly.class.getName(),
+                CountingAspect.class.getName());
+
+        Optional<AspectDescription> aspectDescription = aspecio.getAspectDescription(MetricAspect.All.class.getName());
+        assertThat(aspectDescription).isPresent();
+        assertThat(aspectDescription.get().aspectName).isEqualTo(MetricAspect.All.class.getName());
+        
+        
+        
+
+        // Test app.
         ServiceTracker<Hello, Hello> helloTracker = new ServiceTracker<>(bundleContext, Hello.class, null);
         helloTracker.open();
 

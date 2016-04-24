@@ -7,10 +7,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.hooks.service.EventListenerHook;
 import org.osgi.framework.hooks.service.FindHook;
 
+import io.lambdacube.aspecio.Aspecio;
 import io.lambdacube.aspecio.internal.service.AspecioImpl;
+import io.lambdacube.aspecio.internal.service.command.AspecioGogoCommand;
 
 public final class AspecioActivator implements BundleActivator {
 
+    
     private AspecioImpl aspecio;
 
     @Override
@@ -18,10 +21,15 @@ public final class AspecioActivator implements BundleActivator {
         aspecio = new AspecioImpl(context);
         aspecio.activate();
 
+    
+        context.registerService(new String[] { Aspecio.class.getName(), FindHook.class.getName(), EventListenerHook.class.getName() }, aspecio, null);
+        
         Hashtable<String, Object> props = new Hashtable<>();
-        props.put("osgi.command.scope", "aspect");
-        props.put("osgi.command.function", new String[] { "list" });
-        context.registerService(new String[] { FindHook.class.getName(), EventListenerHook.class.getName() }, aspecio, props);
+        props.put("osgi.command.scope", AspecioGogoCommand.ASPECIO_GOGO_COMMAND_SCOPE);
+        props.put("osgi.command.function", AspecioGogoCommand.ASPECIO_GOGO_COMMANDS);
+        
+        AspecioGogoCommand gogoCommand = new AspecioGogoCommand(context, aspecio);
+        context.registerService(Object.class, gogoCommand, props);
     }
 
     @Override
