@@ -31,12 +31,9 @@ public final class AspecioImpl implements Aspecio, FindHook, EventListenerHook {
     private final AspectInterceptorManager aspectInterceptorManager;
     private final AspecioServiceController aspecioServiceController;
 
-    private final boolean filterServices;
 
     public AspecioImpl(BundleContext bundleContext) {
         this.bundleId = bundleContext.getBundle().getBundleId();
-
-        filterServices = shouldFilterServices(bundleContext);
 
         aspectInterceptorManager = new AspectInterceptorManager(bundleContext);
         serviceWeavingManager = new ServiceWeavingManager(bundleContext);
@@ -56,10 +53,6 @@ public final class AspecioImpl implements Aspecio, FindHook, EventListenerHook {
 
     @Override
     public void event(ServiceEvent event, Map<BundleContext, Collection<ListenerInfo>> listeners) {
-        if (!filterServices) {
-            return;
-        }
-
         // Is it an event we want to filter out?
         if (event.getServiceReference().getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE) == null
                 && event.getServiceReference().getProperty(AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL) == null) {
@@ -79,10 +72,6 @@ public final class AspecioImpl implements Aspecio, FindHook, EventListenerHook {
 
     @Override
     public void find(BundleContext context, String name, String filter, boolean allServices, Collection<ServiceReference<?>> references) {
-        if (!filterServices) {
-            return;
-        }
-
         long consumingBundleId = context.getBundle().getBundleId();
         if (consumingBundleId == bundleId || consumingBundleId == 0) {
             return;
@@ -115,13 +104,6 @@ public final class AspecioImpl implements Aspecio, FindHook, EventListenerHook {
     }
     
 
-    private boolean shouldFilterServices(BundleContext bundleContext) {
-        String filterProp = bundleContext.getProperty(AspecioConstants.ASPECIO_FILTER_SERVICES);
-        if (filterProp == null) {
-            return true; // default to true
-        } else {
-            return Boolean.valueOf(filterProp.toLowerCase());
-        }
-    }
+  
 
 }

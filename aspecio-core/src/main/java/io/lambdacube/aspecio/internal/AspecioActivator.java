@@ -8,12 +8,12 @@ import org.osgi.framework.hooks.service.EventListenerHook;
 import org.osgi.framework.hooks.service.FindHook;
 
 import io.lambdacube.aspecio.Aspecio;
+import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.aspecio.internal.service.AspecioImpl;
 import io.lambdacube.aspecio.internal.service.command.AspecioGogoCommand;
 
 public final class AspecioActivator implements BundleActivator {
 
-    
     private AspecioImpl aspecio;
 
     @Override
@@ -21,13 +21,18 @@ public final class AspecioActivator implements BundleActivator {
         aspecio = new AspecioImpl(context);
         aspecio.activate();
 
-    
-        context.registerService(new String[] { Aspecio.class.getName(), FindHook.class.getName(), EventListenerHook.class.getName() }, aspecio, null);
-        
+        boolean filterServices = shouldFilterServices(context);
+
+        if (filterServices) {
+            context.registerService(new String[] { Aspecio.class.getName(), FindHook.class.getName(), EventListenerHook.class.getName() },
+                    aspecio, null);
+        } else {
+            context.registerService(Aspecio.class, aspecio, null);
+        }
         Hashtable<String, Object> props = new Hashtable<>();
         props.put("osgi.command.scope", AspecioGogoCommand.ASPECIO_GOGO_COMMAND_SCOPE);
         props.put("osgi.command.function", AspecioGogoCommand.ASPECIO_GOGO_COMMANDS);
-        
+
         AspecioGogoCommand gogoCommand = new AspecioGogoCommand(context, aspecio);
         context.registerService(Object.class, gogoCommand, props);
     }
@@ -36,6 +41,15 @@ public final class AspecioActivator implements BundleActivator {
     public void stop(BundleContext context) {
         if (aspecio != null) {
             aspecio.deactivate();
+        }
+    }
+
+    private boolean shouldFilterServices(BundleContext bundleContext) {
+        String filterProp = bundleContext.getProperty(AspecioConstants.ASPECIO_FILTER_SERVICES);
+        if (filterProp == null) {
+            return true; // default to true
+        } else {
+            return Boolean.valueOf(filterProp.toLowerCase());
         }
     }
 
