@@ -2,6 +2,9 @@ package io.lambdacube.aspecio.aspect.interceptor;
 
 import java.util.List;
 
+/**
+ * Utilities for {@link Advice}.
+ */
 public final class Advices {
 
     private Advices() {

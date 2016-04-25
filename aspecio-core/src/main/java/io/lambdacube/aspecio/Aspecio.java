@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 
 import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
 
@@ -47,12 +48,49 @@ import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
  */
 public interface Aspecio {
 
+    /**
+     * <p>
+     * Get the set of Aspects currently registered as seen by Aspecio.
+     * </p>
+     * <p>
+     * The returned set is a view and changing it will not change the state of Aspecio.
+     * </p>
+     * 
+     * @return The set containing the registered Aspect names.
+     */
     Set<String> getRegisteredAspects();
 
+    /**
+     * <p>
+     * Get the {@link AspectDescription} for Aspect named {@literal aspecName}, or {@link Optional#empty()} if there is
+     * no such Aspect.
+     * </p>
+     * 
+     * @param aspectName
+     *            The name of the aspect (case sensitive)
+     * @return An Optional containing the matching {@link AspectDescription}, or {@link Optional#empty()}
+     */
     Optional<AspectDescription> getAspectDescription(String aspectName);
-    
+
+    /**
+     * <p>
+     * Get the list of {@link InterceptedServiceDescription}, as seen by Aspecio.
+     * </p>
+     * 
+     * @return The list of {@link InterceptedServiceDescription}, or an empty list if there are no intercepted services.
+     */
     List<InterceptedServiceDescription> getInterceptedServices();
-    
+
+    /**
+     * <p>
+     * Get the list of {@link InterceptedServiceDescription}, as seen by Aspecio, filtered by objectClass.
+     * </p>
+     * 
+     * @param objectClassContains
+     *            A filter that must be part of the {@link Constants#OBJECTCLASS} OSGi property of the intercepted
+     *            service to be selected.
+     * @return The list of {@link InterceptedServiceDescription}, or an empty list if there are no intercepted services.
+     */
     default List<InterceptedServiceDescription> getInterceptedServices(String objectClassContains) {
         List<InterceptedServiceDescription> interceptedServices = getInterceptedServices();
         Iterator<InterceptedServiceDescription> iterator = interceptedServices.iterator();

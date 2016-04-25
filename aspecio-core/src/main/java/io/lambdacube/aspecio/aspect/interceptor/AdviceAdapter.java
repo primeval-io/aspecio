@@ -2,9 +2,26 @@ package io.lambdacube.aspecio.aspect.interceptor;
 
 import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
 
+/**
+ * <p>
+ * An helper interface that implements all Advice phases traits.
+ * </p>
+ * <p>
+ * {@link AdviceAdapter} defines all of {@link Advice} and its traits {@link Advice.ArgumentHook},
+ * {@link Advice.SkipCall}, {@link Advice.CallReturn}, {@link Advice.Catch} and {@link Advice.Finally} with default
+ * <i>do nothing</i> methods.
+ * </p>
+ * <p>
+ * By defining {@link AdviceAdapter#initialAction()} and {@link AdviceAdapter#afterPhases()} properly, Aspecio will only
+ * call the traits a developer might be interested in for that particular Aspect behavior, and thus make using
+ * {@link AdviceAdapter} as cheap as a more carefully crafted {@link Advice}.
+ * </p>
+ * 
+ * @see Advice
+ */
 public interface AdviceAdapter extends Advice, Advice.SkipCall, Advice.ArgumentHook,
         Advice.CallReturn, Advice.Catch, Advice.Finally {
-    
+
     // @formatter:off
     default BeforeAction visitArguments(Arguments arguments) { return BeforeAction.PROCEED; }
 

@@ -2,6 +2,9 @@ package io.lambdacube.aspecio;
 
 import java.util.Set;
 
+/**
+ * A class describing an interceptor as seen by Aspecio.
+ */
 public final class InterceptorDescription {
 
     public final long serviceId;

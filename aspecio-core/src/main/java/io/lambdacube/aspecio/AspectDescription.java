@@ -2,6 +2,9 @@ package io.lambdacube.aspecio;
 
 import java.util.List;
 
+/**
+ * A class describing an Aspect and the interceptors providing it.
+ */
 public final class AspectDescription {
 
     /**

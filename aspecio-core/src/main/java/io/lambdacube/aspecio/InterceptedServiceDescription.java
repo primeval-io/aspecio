@@ -3,6 +3,9 @@ package io.lambdacube.aspecio;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A class describing a service candidate to interception by Aspecio, along with the Aspects it define and its status.
+ */
 public final class InterceptedServiceDescription {
 
     public final long serviceId;

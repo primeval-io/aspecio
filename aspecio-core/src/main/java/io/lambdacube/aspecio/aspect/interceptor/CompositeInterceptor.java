@@ -3,6 +3,9 @@ package io.lambdacube.aspecio.aspect.interceptor;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
+/**
+ * An Interceptor composed of several Interceptors. The components are called by iteration in a flat-way.
+ */
 public final class CompositeInterceptor implements Interceptor {
 
     private final Interceptor[] interceptors;

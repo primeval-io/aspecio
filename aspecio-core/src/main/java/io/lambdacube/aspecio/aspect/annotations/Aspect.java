@@ -11,7 +11,7 @@ import io.lambdacube.component.annotation.ComponentPropertyGroup;
 
 /**
  * Use this property annotation, along with Bnd' Declarative Services properties annotation plugin, to define Aspects.
- * Your component must implement Interceptor to be recognized as an Aspect.
+ * Your component class must be assignable to Interceptor to be recognized as an Aspect.
  */
 @ComponentPropertyGroup
 @Retention(RetentionPolicy.RUNTIME)

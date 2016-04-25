@@ -2,6 +2,9 @@ package io.lambdacube.aspecio.aspect.interceptor;
 
 import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
 
+/**
+ * An Advice composed of several Advices. The components are called by iteration in a flat-way.
+ */
 public final class CompositeAdvice implements AdviceAdapter {
 
     private final Advice[] advices;

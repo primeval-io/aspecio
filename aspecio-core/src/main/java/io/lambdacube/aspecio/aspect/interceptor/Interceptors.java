@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Utilities for {@link Interceptor}.
+ */
 public final class Interceptors {
 
     private Interceptors() {
