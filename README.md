@@ -242,6 +242,47 @@ public final class MySecurityAspectImpl implements Interceptor {
 The proxy service object registered by Aspecio will have the OSGi service Boolean property `"secured"` set to `Boolean.TRUE`. Now consuming code can check for that property to know if a service is secure, on only select secured services using a target filter. The consuming code doesn't need to know whether a service was secured manually or using an aspect, and this enables just that.
 
 
+## Debugging Aspecio
+
+Aspecio provides a service aptly named `Aspecio` that can show you what Aspecio sees at any time:
+* which aspects are present ;
+* what services are woven.
+
+Aspecio provides two Gogo commands to get the same information in the Gogo shell, `aspect:aspects` and `aspect:woven`.
+
+Here's a sample output of the two commands:
+
+```
+g! aspects
+* io.lambdacube.aspecio.examples.aspect.metric.MetricAspect$All
+  [ --- active --- ] Service id 25, class io.lambdacube.aspecio.examples.aspect.metric.internal.AllMetricInterceptorImpl, extra properties: [measured]
+                     Provided by: io.lambdacube.aspecio.examples 0.9.0.SNAPSHOT [10]
+* io.lambdacube.aspecio.examples.aspect.counting.CountingAspect
+  [ --- active --- ] Service id 24, class io.lambdacube.aspecio.examples.aspect.counting.internal.CountingAspectImpl, extra properties: []
+                     Provided by: io.lambdacube.aspecio.examples 0.9.0.SNAPSHOT [10]
+* io.lambdacube.aspecio.examples.aspect.metric.MetricAspect$AnnotatedOnly
+  [ --- active --- ] Service id 26, class io.lambdacube.aspecio.examples.aspect.metric.internal.AnnotatedMetricInterceptorImpl, extra properties: [measured]
+                     Provided by: io.lambdacube.aspecio.examples 0.9.0.SNAPSHOT [10]
+g! woven
+[0] Service id: 27, objectClass: [io.lambdacube.aspecio.examples.async.SuperSlowService]
+    Required aspects: [io.lambdacube.aspecio.examples.aspect.metric.MetricAspect$AnnotatedOnly], Optional aspects: [io.lambdacube.aspecio.examples.aspect.counting.CountingAspect]
+    Provided by: io.lambdacube.aspecio.examples 0.9.0.SNAPSHOT [10]
+    Satisfied: true
+    Active aspects: [io.lambdacube.aspecio.examples.aspect.metric.MetricAspect$AnnotatedOnly, io.lambdacube.aspecio.examples.aspect.counting.CountingAspect]
+[1] Service id: 29, objectClass: [io.lambdacube.aspecio.examples.greetings.Hello, io.lambdacube.aspecio.examples.greetings.Goodbye]
+    Required aspects: [io.lambdacube.aspecio.examples.aspect.counting.CountingAspect], Optional aspects: [io.lambdacube.aspecio.examples.aspect.metric.MetricAspect$All]
+    Provided by: io.lambdacube.aspecio.examples 0.9.0.SNAPSHOT [10]
+    Satisfied: true
+    Active aspects: [io.lambdacube.aspecio.examples.aspect.counting.CountingAspect, io.lambdacube.aspecio.examples.aspect.metric.MetricAspect$All]
+[2] Service id: 32, objectClass: [io.lambdacube.aspecio.examples.misc.Stuff]
+    Required aspects: [io.lambdacube.aspecio.examples.aspect.metric.Timed], Optional aspects: []
+    Provided by: io.lambdacube.aspecio.examples 0.9.0.SNAPSHOT [10]
+    Satisfied: false
+    Missing required aspects: [io.lambdacube.aspecio.examples.aspect.metric.Timed]
+g!        
+
+```
+
 
 ## Maven coordinates
 
@@ -257,3 +298,4 @@ Author: Simon Chemouil.
 Ask questions directly on Twitter `@simach`
 
 Open bugs on Github issues.
+
