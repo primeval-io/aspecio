@@ -14,7 +14,7 @@ This documentation is a work-in-progress. Aspecio is ready for a first release, 
 
 ### Why Aspects?
 
-In general, aspects allow you to intercept code and alter its execution. There are a number of downsides of using aspects:
+In general, aspects allow you to intercept code and alter its execution. There are a number of downsides to using aspects:
 * Scattering behavior across the code base ;
 * Making the execution model opaque by having aspects intercept any random piece of code, including internal code that might have implicit invariants that aspects break ;
 * Not knowing **which** aspects are being _woven_ on a piece of code at a given time ;
