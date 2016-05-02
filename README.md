@@ -7,7 +7,9 @@ Aspecio is a Java/OSGi R6 'micro-framework' that brings a mix of component-orien
 
 This documentation is a work-in-progress. Aspecio is ready for a first release, but do not hesitate to contact me for questions. I will update the documentation accordingly.
 
+## Documentation
 
+Aside from this page, [Aspecio's Javadoc](http://lambdacube.github.io/aspecio/javadoc/) is complete and provides a good overview. 
 
 ## Overview
 
@@ -126,9 +128,9 @@ Interceptors define the method `Advice onCall(CallContext callContext)` that wil
 
 ### Advanced interception: Advices in Aspecio
 
-TODO advice automata
+TODO advice state automaton to describe how Aspecio processes advices.
 
-Javadoc is more or less complete on Advices.
+[Javadoc](http://lambdacube.github.io/aspecio/javadoc/) is complete on Advices.
 
 ### Composing Aspects
 
