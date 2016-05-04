@@ -1,8 +1,10 @@
-package io.lambdacube.aspecio.aspect.interceptor;
+package io.lambdacube.aspecio.aspect.interceptor.composite;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
 
 /**
  * Utilities for {@link Interceptor}.

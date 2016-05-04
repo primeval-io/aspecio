@@ -1,7 +1,11 @@
-package io.lambdacube.aspecio.aspect.interceptor;
+package io.lambdacube.aspecio.aspect.interceptor.composite;
 
 import java.util.Iterator;
 import java.util.stream.Stream;
+
+import io.lambdacube.aspecio.aspect.interceptor.Advice;
+import io.lambdacube.aspecio.aspect.interceptor.CallContext;
+import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
 
 /**
  * An Interceptor composed of several Interceptors. The components are called by iteration in a flat-way.

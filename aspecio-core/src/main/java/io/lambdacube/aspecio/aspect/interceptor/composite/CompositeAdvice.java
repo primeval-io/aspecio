@@ -1,5 +1,8 @@
-package io.lambdacube.aspecio.aspect.interceptor;
+package io.lambdacube.aspecio.aspect.interceptor.composite;
 
+import io.lambdacube.aspecio.aspect.interceptor.Advice;
+import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
+import io.lambdacube.aspecio.aspect.interceptor.BeforeAction;
 import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
 
 /**

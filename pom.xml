@@ -24,17 +24,50 @@
 						<source>${java.version}</source>
 						<target>${java.version}</target>
 						<compilerArgument>-parameters</compilerArgument>
-            <testCompilerArgument>-parameters</testCompilerArgument>
+						<testCompilerArgument>-parameters</testCompilerArgument>
 					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
 
-	<modules>
-		<module>aspecio-core</module>
-		<module>aspecio-examples</module>
-		<module>aspecio-it</module>
-	</modules>
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<modules>
+				<module>aspecio-core</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+
+			<modules>
+				<module>aspecio-core</module>
+				<module>aspecio-examples</module>
+				<module>aspecio-it</module>
+			</modules>
+		</profile>
+	</profiles>
 </project>
 

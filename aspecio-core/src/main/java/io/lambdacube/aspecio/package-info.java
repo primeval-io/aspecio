@@ -1,8 +1,8 @@
 /**
  * This package provides a view what Aspecio is seeing.
  */
-@Version("0.9")
+@Version("1.0")
 package io.lambdacube.aspecio;
 
-import aQute.bnd.annotation.Version;
+import org.osgi.annotation.versioning.Version;
 

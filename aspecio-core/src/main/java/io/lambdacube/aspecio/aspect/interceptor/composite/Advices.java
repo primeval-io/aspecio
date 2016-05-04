@@ -1,6 +1,8 @@
-package io.lambdacube.aspecio.aspect.interceptor;
+package io.lambdacube.aspecio.aspect.interceptor.composite;
 
 import java.util.List;
+
+import io.lambdacube.aspecio.aspect.interceptor.Advice;
 
 /**
  * Utilities for {@link Advice}.

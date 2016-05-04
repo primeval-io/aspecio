@@ -37,7 +37,7 @@ import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.aspecio.AspectDescription;
 import io.lambdacube.aspecio.InterceptorDescription;
 import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
-import io.lambdacube.aspecio.aspect.interceptor.Interceptors;
+import io.lambdacube.aspecio.aspect.interceptor.composite.Interceptors;
 import io.lambdacube.aspecio.internal.logging.AspecioLogger;
 import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
 import io.lambdacube.aspecio.internal.service.AspectInterceptorListener.EventKind;
