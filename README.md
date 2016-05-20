@@ -288,8 +288,13 @@ g!
 
 ## Maven coordinates
 
-Soon on Maven Central :-)
-
+```xml
+<dependency>
+	<groupId>io.lambdacube.aspecio</groupId>
+	<artifactId>aspecio-core</artifactId>
+	<version>1.0</version>
+</dependency>
+```
 
 ## Credits / Contact
 
