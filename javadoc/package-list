@@ -2,3 +2,4 @@ io.lambdacube.aspecio
 io.lambdacube.aspecio.aspect.annotations
 io.lambdacube.aspecio.aspect.interceptor
 io.lambdacube.aspecio.aspect.interceptor.arguments
+io.lambdacube.aspecio.aspect.interceptor.composite
