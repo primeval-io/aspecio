@@ -3,8 +3,38 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.lambdacube.aspecio</groupId>
 	<artifactId>aspecio</artifactId>
-	<version>0.9-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>pom</packaging>
+	
+	<name>Aspecio Project</name>
+  
+  <description>OSGi Service Aspects</description>
+  <url>http://lambdacube.github.io/aspecio</url>
+
+  <organization>
+    <name>Lambdacube</name>
+    <url>http://www.lambdacube.io</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>magnet</id>
+      <name>Simon Chemouil</name>
+      <organization>Lambdacube</organization>
+    </developer>
+  </developers>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>https://github.com/lambdacube/aspecio</url>
+  </scm>
 
 	<properties>
 		<bnd.version>3.0.0</bnd.version>

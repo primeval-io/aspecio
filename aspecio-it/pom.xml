@@ -4,11 +4,14 @@
 	<parent>
 		<groupId>io.lambdacube.aspecio</groupId>
 		<artifactId>aspecio</artifactId>
-		<version>0.9-SNAPSHOT</version>
+		<version>1.0</version>
 	</parent>
 
 	<artifactId>aspecio-it</artifactId>
 	<packaging>jar</packaging>
+
+	<name>Aspecio Integration Tests</name>
+	<description>Integration tests for Aspecio</description>
 
 	<dependencies>
 		<!-- OSGi -->
@@ -35,12 +38,12 @@
 			<artifactId>aspecio-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
-      <groupId>io.lambdacube.aspecio</groupId>
-      <artifactId>aspecio-examples</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+			<groupId>io.lambdacube.aspecio</groupId>
+			<artifactId>aspecio-examples</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 
 
@@ -162,13 +165,6 @@
 
 	<build>
 		<plugins>
-			<!-- <plugin> <groupId>org.apache.felix</groupId> <artifactId>maven-bundle-plugin</artifactId> 
-				<extensions>true</extensions> <version>${bnd.version}</version> <configuration> 
-				<instructions> <_plugin> io.lambdacube.bnd.component.annotation.properties.DSAPPlugin 
-				</_plugin> <_include>-src/main/osgi/osgi.bnd</_include> </instructions> </configuration> 
-				<dependencies> <dependency> <groupId>io.lambdacube.bnd</groupId> <artifactId>bnd-dsap-plugin</artifactId> 
-				<version>1.0-SNAPSHOT</version> </dependency> </dependencies> </plugin> -->
-			<!-- generate dependencies versions -->
 			<plugin>
 				<groupId>org.apache.servicemix.tooling</groupId>
 				<artifactId>depends-maven-plugin</artifactId>
@@ -196,10 +192,6 @@
 				<version>2.19.1</version>
 				<executions>
 					<execution>
-						<configuration>
-							<!-- <basedir>${project.build.directory}/longd-test-app/</basedir> 
-								<workingDirectory>${project.build.directory}/longd-test-app/</workingDirectory> -->
-						</configuration>
 						<goals>
 							<goal>integration-test</goal>
 							<goal>verify</goal>
