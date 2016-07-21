@@ -292,7 +292,7 @@ g!
 <dependency>
 	<groupId>io.lambdacube.aspecio</groupId>
 	<artifactId>aspecio-core</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 </dependency>
 ```
 
