@@ -45,7 +45,7 @@ public final class AspectWeaver {
         Method[] methods = clazzToWeave.getMethods();
 
         // group methods by name and parameters (unique dispatch)
-        Map<MethodIdentifier, List<Method>> uniqueMethods = Stream.of(methods).filter(m -> m.getDeclaringClass() != Object.class)
+        Map<MethodIdentifier, List<Method>> uniqueMethods = Stream.of(methods).filter(m -> !m.isDefault() && m.getDeclaringClass() != Object.class)
                 .collect(Collectors.groupingBy(m -> new MethodIdentifier(m.getName(), m.getParameterTypes())));
 
         return uniqueMethods.values().stream()

@@ -36,11 +36,16 @@ import io.lambdacube.aspecio.internal.weaving.testset.api.SimpleInterface;
 import io.lambdacube.aspecio.internal.weaving.testset.api.SimplestInterface;
 import io.lambdacube.aspecio.internal.weaving.testset.api.generic.GenericParamsService;
 import io.lambdacube.aspecio.internal.weaving.testset.api.generic.GenericService;
+import io.lambdacube.aspecio.internal.weaving.testset.bounds.BoundsImpl;
+import io.lambdacube.aspecio.internal.weaving.testset.bounds.BoundsItf;
+import io.lambdacube.aspecio.internal.weaving.testset.defaults.DefaultImpl;
+import io.lambdacube.aspecio.internal.weaving.testset.defaults.DefaultItf;
+import io.lambdacube.aspecio.internal.weaving.testset.defaults.DefaultOverridingImpl;
 import io.lambdacube.aspecio.internal.weaving.testset.simpleservice.SimpleService;
 import io.lambdacube.aspecio.internal.weaving.testset.simplest.SimplestService;
 
 public final class AspectWeaverTest {
-    
+
     private static DynamicClassLoader dynamicClassLoader;
 
     @BeforeClass
@@ -52,7 +57,8 @@ public final class AspectWeaverTest {
     public void shouldWeaveSimplestClass() {
         SimplestService simplestService = new SimplestService();
 
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, SimplestService.class, new Class[] { SimplestInterface.class });
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, SimplestService.class,
+                new Class[] { SimplestInterface.class });
         assertThat(SimplestInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
         Object wovenService = wovenClassHolder.weavingFactory.apply(simplestService);
@@ -67,12 +73,13 @@ public final class AspectWeaverTest {
             System.clearProperty(SimplestService.PROP_NAME);
         }
     }
-    
+
     @Test
     public void shouldWeaveAbstractedSimplestClass() {
         AbstractedSimplestService simplestService = new AbstractedSimplestService();
 
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, AbstractedSimplestService.class, new Class[] { SimplestInterface.class });
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, AbstractedSimplestService.class,
+                new Class[] { SimplestInterface.class });
         assertThat(SimplestInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
         Object wovenService = wovenClassHolder.weavingFactory.apply(simplestService);
@@ -87,12 +94,13 @@ public final class AspectWeaverTest {
             System.clearProperty(AbstractSimplestService.PROP_NAME);
         }
     }
-    
+
     @Test
     public void shouldWeaveAbstractedOverridingSimplestClass() {
         AbstractedOverridingSimplestService simplestService = new AbstractedOverridingSimplestService();
 
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, AbstractedOverridingSimplestService.class, new Class[] { SimplestInterface.class });
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, AbstractedOverridingSimplestService.class,
+                new Class[] { SimplestInterface.class });
         assertThat(SimplestInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
         Object wovenService = wovenClassHolder.weavingFactory.apply(simplestService);
@@ -109,10 +117,44 @@ public final class AspectWeaverTest {
     }
 
     @Test
+    public void shouldWeaveDefaultClass() {
+        DefaultImpl simplestService = new DefaultImpl();
+
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, DefaultImpl.class,
+                new Class[] { DefaultItf.class });
+        assertThat(DefaultItf.class).isAssignableFrom(wovenClassHolder.wovenClass);
+
+        Object wovenService = wovenClassHolder.weavingFactory.apply(simplestService);
+        assertThat(wovenService).isInstanceOf(DefaultItf.class);
+
+        DefaultItf wovenItf = (DefaultItf) wovenService;
+        Class<?> myDefault = wovenItf.myDefault();
+        assertThat(myDefault).isSameAs(wovenService.getClass());
+
+    }
+
+    @Test
+    public void shouldWeaveOverridedDefaultClass() {
+        DefaultOverridingImpl simplestService = new DefaultOverridingImpl();
+
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, DefaultOverridingImpl.class,
+                new Class[] { DefaultItf.class });
+        assertThat(DefaultItf.class).isAssignableFrom(wovenClassHolder.wovenClass);
+
+        Woven wovenService = wovenClassHolder.weavingFactory.apply(simplestService);
+        assertThat(wovenService).isInstanceOf(DefaultItf.class);
+
+        DefaultItf wovenItf = (DefaultItf) wovenService;
+        Class<?> myDefault = wovenItf.myDefault();
+        assertThat(myDefault).isSameAs(DefaultOverridingImpl.class);
+    }
+
+    @Test
     public void shouldWeaveSimpleClass() throws IOException, BadValueException {
         SimpleService simpleService = new SimpleService();
 
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, SimpleService.class, new Class[] { SimpleInterface.class });
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, SimpleService.class,
+                new Class[] { SimpleInterface.class });
         assertThat(SimpleInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
         Woven wovenService = wovenClassHolder.weavingFactory.apply(simpleService);
@@ -201,7 +243,8 @@ public final class AspectWeaverTest {
 
     @Test
     public void shouldWeaveGenericServices() {
-        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, GenericService.class, new Class<?>[] { GenericInterface.class });
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, GenericService.class,
+                new Class<?>[] { GenericInterface.class });
 
         assertThat(GenericInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
 
@@ -219,6 +262,45 @@ public final class AspectWeaverTest {
         assertThat(someB).isEqualTo(genericService.makeB());
         wovenService.doSome();
         assertThat(mutableObjects).containsExactly(someB);
+    }
+
+    @Test
+    public void shouldWeaveBoundedClass() throws Exception {
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, BoundsImpl.class, new Class<?>[] { BoundsItf.class });
+
+        assertThat(BoundsItf.class).isAssignableFrom(wovenClassHolder.wovenClass);
+
+        assertThat(wovenClassHolder.wovenClass.getGenericInterfaces())
+                .containsExactly(BoundsImpl.class.getGenericInterfaces());
+
+        ArrayList<MethodIdentifier> methodsToCompare = Lists.newArrayList(new MethodIdentifier("someList1"),
+                new MethodIdentifier("someList2"), new MethodIdentifier("someList3"), new MethodIdentifier("someList4"),
+                new MethodIdentifier("singleton", Number.class), new MethodIdentifier("foo", Number.class));
+        for (MethodIdentifier methodId : methodsToCompare) {
+            Method method = BoundsImpl.class.getMethod(methodId.name, methodId.parameterTypes);
+            Method wovenMethod = wovenClassHolder.wovenClass.getMethod(methodId.name, methodId.parameterTypes);
+
+            assertThat(wovenMethod.getAnnotations()).containsExactly(method.getAnnotations());
+
+            String[] methodParameterNames = Stream.of(method.getParameters()).map(Parameter::getName).toArray(String[]::new);
+            String[] wovenMethodParameterNames = Stream.of(wovenMethod.getParameters()).map(Parameter::getName).toArray(String[]::new);
+
+            assertThat(wovenMethodParameterNames).containsExactly(methodParameterNames);
+            assertThat(wovenMethod.getParameterTypes()).containsExactly(method.getParameterTypes());
+            assertThat(wovenMethod.getGenericParameterTypes()).usingElementComparator(TestUtils.TYPE_COMPARATOR)
+                    .containsExactly(method.getGenericParameterTypes());
+            assertThat(wovenMethod.getParameterAnnotations()).containsExactly(method.getParameterAnnotations());
+            assertThat(wovenMethod.getReturnType()).isEqualTo(method.getReturnType());
+            assertThat(wovenMethod.getGenericReturnType()).usingComparator(TestUtils.TYPE_COMPARATOR)
+                    .isEqualTo(method.getGenericReturnType());
+            assertThat(wovenMethod.getExceptionTypes()).isEqualTo(method.getExceptionTypes());
+            String[] wovenGenericExceptionTypes = Stream.of(wovenMethod.getGenericExceptionTypes()).map(java.lang.reflect.Type::getTypeName)
+                    .toArray(String[]::new);
+            String[] genericExceptionTypes = Stream.of(method.getGenericExceptionTypes()).map(java.lang.reflect.Type::getTypeName)
+                    .toArray(String[]::new);
+            assertThat(wovenGenericExceptionTypes).isEqualTo(genericExceptionTypes);
+        }
+
     }
 
     @Test

@@ -21,8 +21,11 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.asm.Opcodes;
@@ -32,7 +35,7 @@ public final class TypeUtils {
 
     public static final Set<Class<?>> IRETURN_TYPES = new HashSet<>(
             Arrays.asList(new Class<?>[] { int.class, char.class, byte.class, short.class, boolean.class }));
-    
+
     private TypeUtils() {
     }
 
@@ -74,10 +77,33 @@ public final class TypeUtils {
     public static String getMethodSignature(Method method) {
         boolean isGeneric = false;
         java.lang.reflect.Type genericReturnType = method.getGenericReturnType();
-        isGeneric = genericReturnType instanceof ParameterizedType;
+        boolean hasParameterizedReturnType = genericReturnType instanceof ParameterizedType;
+        boolean hasTypeVarReturnType = genericReturnType instanceof TypeVariable<?>;
+        isGeneric = hasParameterizedReturnType || hasTypeVarReturnType;
+        Map<String,TypeVariable<?> > methodTypeVars = new LinkedHashMap<>();
+        if (hasTypeVarReturnType) {
+            TypeVariable<?> rType = (TypeVariable<?>) genericReturnType;
+            methodTypeVars.put(rType.getName(), rType);
+        }
+        if (!hasTypeVarReturnType && hasParameterizedReturnType) {
+            ParameterizedType returnType = (ParameterizedType) genericReturnType;
+            java.lang.reflect.Type[] actualTypeArguments = returnType.getActualTypeArguments();
+            for (int i = 0; i < actualTypeArguments.length; i++) {
+                java.lang.reflect.Type typeArg = actualTypeArguments[i];
+                if (typeArg instanceof TypeVariable<?>) {
+                    TypeVariable<?> typeVariable = (TypeVariable<?>) typeArg;
+                    methodTypeVars.computeIfAbsent(typeVariable.getName(), k -> typeVariable);
+                }
+            }
+        }
         for (java.lang.reflect.Type t : method.getGenericParameterTypes()) {
             if (!isGeneric) {
-                isGeneric = t instanceof ParameterizedType | t instanceof TypeVariable<?>;
+                boolean isTypeVar = t instanceof TypeVariable<?>;
+                isGeneric = t instanceof ParameterizedType | isTypeVar;
+                if (isTypeVar) {
+                    TypeVariable<?> typeVariable = (TypeVariable<?>) t;
+                    methodTypeVars.computeIfAbsent(typeVariable.getName(), k -> typeVariable);
+                }
             }
         }
         java.lang.reflect.Type[] genericExceptionTypes = method.getGenericExceptionTypes();
@@ -92,6 +118,14 @@ public final class TypeUtils {
         }
 
         StringBuilder buf = new StringBuilder();
+        
+        if (!methodTypeVars.isEmpty()) {
+            buf.append('<');
+            for (TypeVariable<?> typeVar : methodTypeVars.values()) {
+                buf.append(getDescriptorForJavaType(typeVar, true));
+            }
+            buf.append('>');
+        }
 
         buf.append('(');
         for (java.lang.reflect.Type t : method.getGenericParameterTypes()) {
@@ -129,7 +163,7 @@ public final class TypeUtils {
             buf.append('<');
             java.lang.reflect.Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
             for (int i = 0; i < actualTypeArguments.length; i++) {
-                buf.append(getDescriptorForJavaType(actualTypeArguments[i]));
+                buf.append(getDescriptorForJavaType(actualTypeArguments[i], false));
             }
             buf.append(">;");
             return buf.toString();
@@ -152,11 +186,28 @@ public final class TypeUtils {
                 buf.append(getDescriptorForJavaType(t));
             }
             return buf.toString();
+        } else if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            java.lang.reflect.Type[] lowerBounds = wildcardType.getLowerBounds();
+            java.lang.reflect.Type[] upperBounds = wildcardType.getUpperBounds();
+            if (lowerBounds.length > 1) {
+                throw new IllegalArgumentException("Must have at most one lower bound.");
+            }
+            java.lang.reflect.Type lowerBound = lowerBounds.length == 1 ? lowerBounds[0] : null;
+            java.lang.reflect.Type upperBound = lowerBounds.length == 1 ? Object.class : upperBounds[0];
+
+            if (lowerBound != null) {
+                return "-" + getDescriptorForJavaType(lowerBound, false);
+            } else if (upperBound == Object.class) {
+                return "*";
+            } else {
+                return "+" + getDescriptorForJavaType(upperBound, false);
+            }
+
         }
         throw new UnsupportedOperationException("unsupported reflection type: " + type.getClass());
 
     }
-    
 
     public static Class<?> getBoxed(Class<?> type) {
         if (type == int.class) {
@@ -183,7 +234,7 @@ public final class TypeUtils {
             return type;
         }
     }
-    
+
     public static int getTypeSize(Class<?> type) {
         if (type == void.class) {
             return 0;
@@ -192,7 +243,7 @@ public final class TypeUtils {
         }
         return 1;
     }
-    
+
     static int getReturnCode(Class<?> returnType) {
         if (returnType == void.class) {
             return RETURN;
