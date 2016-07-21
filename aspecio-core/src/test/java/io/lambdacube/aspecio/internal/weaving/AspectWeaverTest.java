@@ -26,6 +26,9 @@ import io.lambdacube.aspecio.aspect.interceptor.CallContext;
 import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
 import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
 import io.lambdacube.aspecio.internal.weaving.shared.Woven;
+import io.lambdacube.aspecio.internal.weaving.testset.abstracts.AbstractSimplestService;
+import io.lambdacube.aspecio.internal.weaving.testset.abstracts.AbstractedOverridingSimplestService;
+import io.lambdacube.aspecio.internal.weaving.testset.abstracts.AbstractedSimplestService;
 import io.lambdacube.aspecio.internal.weaving.testset.annotated.AnnotatedService;
 import io.lambdacube.aspecio.internal.weaving.testset.api.BadValueException;
 import io.lambdacube.aspecio.internal.weaving.testset.api.GenericInterface;
@@ -62,6 +65,46 @@ public final class AspectWeaverTest {
             assertThat(System.getProperty(SimplestService.PROP_NAME)).isEqualTo("true");
         } finally {
             System.clearProperty(SimplestService.PROP_NAME);
+        }
+    }
+    
+    @Test
+    public void shouldWeaveAbstractedSimplestClass() {
+        AbstractedSimplestService simplestService = new AbstractedSimplestService();
+
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, AbstractedSimplestService.class, new Class[] { SimplestInterface.class });
+        assertThat(SimplestInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
+
+        Object wovenService = wovenClassHolder.weavingFactory.apply(simplestService);
+        assertThat(wovenService).isInstanceOf(SimplestInterface.class);
+
+        SimplestInterface wovenItf = (SimplestInterface) wovenService;
+        try {
+            System.clearProperty(AbstractSimplestService.PROP_NAME);
+            wovenItf.foo();
+            assertThat(System.getProperty(AbstractSimplestService.PROP_NAME)).isEqualTo("true");
+        } finally {
+            System.clearProperty(AbstractSimplestService.PROP_NAME);
+        }
+    }
+    
+    @Test
+    public void shouldWeaveAbstractedOverridingSimplestClass() {
+        AbstractedOverridingSimplestService simplestService = new AbstractedOverridingSimplestService();
+
+        WovenClassHolder wovenClassHolder = AspectWeaver.weave(dynamicClassLoader, AbstractedOverridingSimplestService.class, new Class[] { SimplestInterface.class });
+        assertThat(SimplestInterface.class).isAssignableFrom(wovenClassHolder.wovenClass);
+
+        Object wovenService = wovenClassHolder.weavingFactory.apply(simplestService);
+        assertThat(wovenService).isInstanceOf(SimplestInterface.class);
+
+        SimplestInterface wovenItf = (SimplestInterface) wovenService;
+        try {
+            System.clearProperty(AbstractedOverridingSimplestService.PROP_NAME);
+            wovenItf.foo();
+            assertThat(System.getProperty(AbstractedOverridingSimplestService.PROP_NAME)).isEqualTo("true");
+        } finally {
+            System.clearProperty(AbstractedOverridingSimplestService.PROP_NAME);
         }
     }
 
