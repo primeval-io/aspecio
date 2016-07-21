@@ -3,7 +3,6 @@ package io.lambdacube.aspecio.internal.weaving;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
@@ -20,7 +19,6 @@ public class TestUtils {
             }
         }
     };
-    
 
     public static final boolean typeEquals(Type o1, Type o2) {
         if (Objects.equals(o1, o2)) {
@@ -33,9 +31,17 @@ public class TestUtils {
             TypeVariable<?> t1 = (TypeVariable<?>) o1;
             TypeVariable<?> t2 = (TypeVariable<?>) o2;
 
-            if (Objects.equals(t1.getName(), t2.getName()) && Arrays.equals(t1.getBounds(), t2.getBounds())) {
-                return true;
+            Type[] bounds1 = t1.getBounds();
+            Type[] bounds2 = t2.getBounds();
+            if (!Objects.equals(t1.getName(), t2.getName()) || bounds1.length != bounds2.length) {
+                return false;
             }
+            for (int i = 0; i < bounds1.length; i++) {
+                if (!typeEquals(bounds1[i], bounds2[i])) {
+                    return false;
+                }
+            }
+            return true;
 
         } else if (o1 instanceof ParameterizedType) {
             ParameterizedType t1 = (ParameterizedType) o1;

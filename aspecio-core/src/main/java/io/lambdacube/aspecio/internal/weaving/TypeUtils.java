@@ -80,12 +80,12 @@ public final class TypeUtils {
         boolean hasParameterizedReturnType = genericReturnType instanceof ParameterizedType;
         boolean hasTypeVarReturnType = genericReturnType instanceof TypeVariable<?>;
         isGeneric = hasParameterizedReturnType || hasTypeVarReturnType;
-        Map<String,TypeVariable<?> > methodTypeVars = new LinkedHashMap<>();
+        Map<String, TypeVariable<?>> methodTypeVars = new LinkedHashMap<>();
         if (hasTypeVarReturnType) {
             TypeVariable<?> rType = (TypeVariable<?>) genericReturnType;
             methodTypeVars.put(rType.getName(), rType);
         }
-        if (!hasTypeVarReturnType && hasParameterizedReturnType) {
+        if (hasParameterizedReturnType) {
             ParameterizedType returnType = (ParameterizedType) genericReturnType;
             java.lang.reflect.Type[] actualTypeArguments = returnType.getActualTypeArguments();
             for (int i = 0; i < actualTypeArguments.length; i++) {
@@ -97,13 +97,13 @@ public final class TypeUtils {
             }
         }
         for (java.lang.reflect.Type t : method.getGenericParameterTypes()) {
+            boolean isTypeVar = t instanceof TypeVariable<?>;
             if (!isGeneric) {
-                boolean isTypeVar = t instanceof TypeVariable<?>;
                 isGeneric = t instanceof ParameterizedType | isTypeVar;
-                if (isTypeVar) {
-                    TypeVariable<?> typeVariable = (TypeVariable<?>) t;
-                    methodTypeVars.computeIfAbsent(typeVariable.getName(), k -> typeVariable);
-                }
+            }
+            if (isTypeVar) {
+                TypeVariable<?> typeVariable = (TypeVariable<?>) t;
+                methodTypeVars.computeIfAbsent(typeVariable.getName(), k -> typeVariable);
             }
         }
         java.lang.reflect.Type[] genericExceptionTypes = method.getGenericExceptionTypes();
@@ -118,7 +118,7 @@ public final class TypeUtils {
         }
 
         StringBuilder buf = new StringBuilder();
-        
+
         if (!methodTypeVars.isEmpty()) {
             buf.append('<');
             for (TypeVariable<?> typeVar : methodTypeVars.values()) {

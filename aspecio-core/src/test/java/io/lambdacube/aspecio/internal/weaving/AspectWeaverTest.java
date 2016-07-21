@@ -13,6 +13,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.assertj.core.util.Lists;
@@ -275,7 +276,8 @@ public final class AspectWeaverTest {
 
         ArrayList<MethodIdentifier> methodsToCompare = Lists.newArrayList(new MethodIdentifier("someList1"),
                 new MethodIdentifier("someList2"), new MethodIdentifier("someList3"), new MethodIdentifier("someList4"),
-                new MethodIdentifier("singleton", Number.class), new MethodIdentifier("foo", Number.class));
+                new MethodIdentifier("singleton", Number.class), new MethodIdentifier("foo", Number.class),
+                new MethodIdentifier("makeFoo", Supplier.class));
         for (MethodIdentifier methodId : methodsToCompare) {
             Method method = BoundsImpl.class.getMethod(methodId.name, methodId.parameterTypes);
             Method wovenMethod = wovenClassHolder.wovenClass.getMethod(methodId.name, methodId.parameterTypes);
