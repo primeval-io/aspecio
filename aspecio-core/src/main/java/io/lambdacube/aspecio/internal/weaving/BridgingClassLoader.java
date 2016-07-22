@@ -10,21 +10,33 @@ public final class BridgingClassLoader extends ClassLoader {
         ASPECIO_PACKAGES.add("io.lambdacube.aspecio.aspect.interceptor.arguments");
         ASPECIO_PACKAGES.add("io.lambdacube.aspecio.internal.weaving.shared");
     }
-    
-    private final ClassLoader aspecioClassLoader;
 
-    public BridgingClassLoader(ClassLoader parent, ClassLoader aspecioClassLoader) {
-        super(parent);
+    private final ClassLoader aspecioClassLoader;
+    private final ClassLoader[] classLoaders;
+
+    public BridgingClassLoader(ClassLoader[] classLoaders, ClassLoader aspecioClassLoader) {
+        this.classLoaders = classLoaders;
         this.aspecioClassLoader = aspecioClassLoader;
     }
 
     @Override
-    protected Class<?> findClass(String className) throws ClassNotFoundException {
+    protected Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException {
         int lastDot = className.lastIndexOf('.');
         String packageName = className.substring(0, lastDot);
         if (ASPECIO_PACKAGES.contains(packageName)) {
             return aspecioClassLoader.loadClass(className);
         }
-        return super.findClass(className);
+
+        for (int i = 0; i < classLoaders.length; i++) {
+            try {
+                return classLoaders[i].loadClass(className);
+            } catch (ClassNotFoundException cnfe) {
+                // continue
+            }
+        }
+
+        throw new ClassNotFoundException(className);
     }
+
+   
 }

@@ -36,16 +36,20 @@ public final class DynamicClassLoader extends ClassLoader {
             }
         }
     }
-
+    
     @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        // We remove, since classes are loaded only once.
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+     // We remove, since classes are loaded only once.
         Supplier<byte[]> bytecodeSupplier = classesToWeave.remove(name);
         if (bytecodeSupplier != null) {
             byte[] bytecode = bytecodeSupplier.get();
-            return defineClass(name, bytecode, 0, bytecode.length);
+            Class<?> defineClass = defineClass(name, bytecode, 0, bytecode.length);
+            if (resolve) {
+                resolveClass(defineClass);
+            }
+            return defineClass;
         } else {
-            return super.findClass(name);
+            return super.loadClass(name, resolve);
         }
     }
 }

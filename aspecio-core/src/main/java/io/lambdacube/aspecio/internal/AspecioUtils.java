@@ -6,7 +6,12 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.Callable;
 
+import io.lambdacube.aspecio.internal.logging.AspecioLogger;
+import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
+
 public final class AspecioUtils {
+
+    private static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(AspecioUtils.class);
 
     private AspecioUtils() {
     }
@@ -16,8 +21,10 @@ public final class AspecioUtils {
         try {
             return block.call();
         } catch (RuntimeException | Error e) {
+            LOGGER.error("Error while running code", e);
             throw e;
         } catch (Exception e) {
+            LOGGER.error("Exception while running code", e);
             throw new RuntimeException(e);
         }
     }
@@ -72,12 +79,11 @@ public final class AspecioUtils {
         }
         return set.first();
     }
-    
-    
+
     public static <T> Set<T> copySet(Collection<T> source) {
         Set<T> copy = new LinkedHashSet<>(source.size());
         copy.addAll(source);
         return copy;
     }
-    
+
 }

@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 import com.github.gfx.util.WeakIdentityHashMap;
 
 import org.osgi.framework.AllServiceListener;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
@@ -32,7 +31,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.wiring.BundleRevision;
-import org.osgi.framework.wiring.BundleWiring;
 
 import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.aspecio.internal.AspecioUtils;
@@ -56,8 +54,8 @@ public final class ServiceWeavingManager implements AllServiceListener {
 
     // Everything in here is weak, using identity equality, so it nicely cleans-up by itself as bundles are cleaned-up,
     // if there are no stale-references on our bundles or services of course...
-    private final Map<Bundle, Map<BundleRevision, DynamicClassLoader>> classLoaders = Collections.synchronizedMap(new WeakIdentityHashMap<>());
-    
+    private final Map<BundleRevision, BundleRevPath> revisionMap = Collections.synchronizedMap(new WeakIdentityHashMap<>());
+
     private final BundleContext bundleContext;
 
     private volatile boolean closed = false;
@@ -122,7 +120,8 @@ public final class ServiceWeavingManager implements AllServiceListener {
 
     private synchronized void onServiceRegistration(ServiceReference<?> reference) {
         if (wovenServiceByServiceRef.containsKey(reference)) {
-            // This might happen if a service arrives between the listener registration and the initial getAllServiceReferences call
+            // This might happen if a service arrives between the listener registration and the initial
+            // getAllServiceReferences call
             return;
         }
 
@@ -266,19 +265,32 @@ public final class ServiceWeavingManager implements AllServiceListener {
     }
 
     private DynamicClassLoader getDynamicClassLoader(Object delegateToWeave) {
-        Bundle bundle = FrameworkUtil.getBundle(delegateToWeave.getClass());
-        BundleRevision bundleRev = bundle.adapt(BundleRevision.class);
+        return getDynamicClassLoader(delegateToWeave.getClass());
+    }
 
-        Map<BundleRevision, DynamicClassLoader> clByRev = classLoaders.computeIfAbsent(bundle,
-                k -> Collections.synchronizedMap(new WeakIdentityHashMap<>()));
+    private DynamicClassLoader getDynamicClassLoader(Class<?> clazz) {
+        // Find all bundles required to instanciate the class
+        // and bridge their classloaders in case the abstract class or interface
+        // lives in non-imported packages...
+        Class<?> currClazz = clazz;
+        List<BundleRevision> bundleRevs = new ArrayList<>();
+        Map<BundleRevision, BundleRevPath> revisions = revisionMap;
+        BundleRevPath bundleRevPath = null;
+        do {
+            BundleRevision bundleRev = FrameworkUtil.getBundle(currClazz).adapt(BundleRevision.class);
+            if (!bundleRevs.contains(bundleRev)) {
+                bundleRevs.add(bundleRev);
+                bundleRevPath = revisions.computeIfAbsent(bundleRev, k -> new BundleRevPath());
+                revisions = bundleRevPath.computeSubMapIfAbsent(() -> Collections.synchronizedMap(new WeakIdentityHashMap<>()));
+            }
+            currClazz = currClazz.getSuperclass();
+        } while (currClazz != null && currClazz != Object.class);
 
-        DynamicClassLoader dynamicClassLoader = clByRev.computeIfAbsent(bundleRev,
-                k -> {
-                    ClassLoader classLoader = k.getBundle().adapt(BundleWiring.class).getClassLoader();
-                    return new DynamicClassLoader(new BridgingClassLoader(classLoader,
-                            AspectWeaver.class.getClassLoader()));
-                });
-        return dynamicClassLoader;
+        return bundleRevPath.computeClassLoaderIfAbsent(() -> {
+            // the bundles set is now prioritised ...
+            ClassLoader[] classLoaders = bundleRevs.stream().map(b -> b.getWiring().getClassLoader()).toArray(ClassLoader[]::new);
+            return new DynamicClassLoader(new BridgingClassLoader(classLoaders, AspectWeaver.class.getClassLoader()));
+        });
     }
 
     private void fireEvent(WovenServiceEvent event, WovenService wovenService) {
