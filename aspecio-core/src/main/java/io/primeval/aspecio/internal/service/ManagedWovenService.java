@@ -1,13 +1,13 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.osgi.framework.ServiceRegistration;
 
-import io.lambdacube.aspecio.AspecioConstants;
-import io.lambdacube.aspecio.internal.logging.AspecioLogger;
-import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
+import io.primeval.aspecio.AspecioConstants;
+import io.primeval.aspecio.internal.logging.AspecioLogger;
+import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
 
 
 // Owned by AspecioServiceController (i.e, sync is done there)

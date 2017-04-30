@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.examples.aspect.metric;
+package io.primeval.aspecio.examples.aspect.metric;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

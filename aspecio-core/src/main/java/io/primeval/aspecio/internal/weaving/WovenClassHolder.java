@@ -1,8 +1,8 @@
-package io.lambdacube.aspecio.internal.weaving;
+package io.primeval.aspecio.internal.weaving;
 
 import java.util.function.Function;
 
-import io.lambdacube.aspecio.internal.weaving.shared.Woven;
+import io.primeval.aspecio.internal.weaving.shared.Woven;
 
 public final class WovenClassHolder {
 

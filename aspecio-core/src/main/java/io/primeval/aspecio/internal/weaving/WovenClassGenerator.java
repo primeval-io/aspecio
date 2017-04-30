@@ -1,11 +1,11 @@
-package io.lambdacube.aspecio.internal.weaving;
+package io.primeval.aspecio.internal.weaving;
 
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getBoxed;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getFrameType;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getLoadCode;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getReturnCode;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getStoreCode;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getTypeSize;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getBoxed;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getFrameType;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getLoadCode;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getReturnCode;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getStoreCode;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getTypeSize;
 import static org.objectweb.asm.Opcodes.AASTORE;
 import static org.objectweb.asm.Opcodes.ACC_ABSTRACT;
 import static org.objectweb.asm.Opcodes.ACC_FINAL;
@@ -75,7 +75,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
-import io.lambdacube.aspecio.internal.weaving.shared.Woven;
+import io.primeval.aspecio.internal.weaving.shared.Woven;
 
 public final class WovenClassGenerator {
 
@@ -107,19 +107,19 @@ public final class WovenClassGenerator {
         cw.visit(52, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, selfClassInternalName, typeSignature,
                 superClassInternalName, itfs);
 
-        cw.visitInnerClass("io/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook",
-                "io/lambdacube/aspecio/aspect/interceptor/Advice", "ArgumentHook", ACC_PUBLIC + ACC_STATIC + ACC_ABSTRACT + ACC_INTERFACE);
+        cw.visitInnerClass("io/primeval/aspecio/aspect/interceptor/Advice$ArgumentHook",
+                "io/primeval/aspecio/aspect/interceptor/Advice", "ArgumentHook", ACC_PUBLIC + ACC_STATIC + ACC_ABSTRACT + ACC_INTERFACE);
 
-        cw.visitInnerClass("io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "io/lambdacube/aspecio/aspect/interceptor/Advice",
+        cw.visitInnerClass("io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "io/primeval/aspecio/aspect/interceptor/Advice",
                 "CallReturn", ACC_PUBLIC + ACC_STATIC + ACC_ABSTRACT + ACC_INTERFACE);
 
-        cw.visitInnerClass("io/lambdacube/aspecio/aspect/interceptor/Advice$Catch", "io/lambdacube/aspecio/aspect/interceptor/Advice",
+        cw.visitInnerClass("io/primeval/aspecio/aspect/interceptor/Advice$Catch", "io/primeval/aspecio/aspect/interceptor/Advice",
                 "Catch", ACC_PUBLIC + ACC_STATIC + ACC_ABSTRACT + ACC_INTERFACE);
 
-        cw.visitInnerClass("io/lambdacube/aspecio/aspect/interceptor/Advice$Finally", "io/lambdacube/aspecio/aspect/interceptor/Advice",
+        cw.visitInnerClass("io/primeval/aspecio/aspect/interceptor/Advice$Finally", "io/primeval/aspecio/aspect/interceptor/Advice",
                 "Finally", ACC_PUBLIC + ACC_STATIC + ACC_ABSTRACT + ACC_INTERFACE);
 
-        cw.visitInnerClass("io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "io/lambdacube/aspecio/aspect/interceptor/Advice",
+        cw.visitInnerClass("io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "io/primeval/aspecio/aspect/interceptor/Advice",
                 "SkipCall", ACC_PUBLIC + ACC_STATIC + ACC_ABSTRACT + ACC_INTERFACE);
 
         for (int i = 0; i < methods.length; i++) {
@@ -128,7 +128,7 @@ public final class WovenClassGenerator {
                 fv.visitEnd();
             }
             {
-                fv = cw.visitField(ACC_PRIVATE + ACC_FINAL + ACC_STATIC, "cc" + i, "Lio/lambdacube/aspecio/aspect/interceptor/CallContext;",
+                fv = cw.visitField(ACC_PRIVATE + ACC_FINAL + ACC_STATIC, "cc" + i, "Lio/primeval/aspecio/aspect/interceptor/CallContext;",
                         null, null);
                 fv.visitEnd();
             }
@@ -142,7 +142,7 @@ public final class WovenClassGenerator {
         // Switch table for BeforeAction
         {
             fv = cw.visitField(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC,
-                    "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "[I", null, null);
+                    "$SWITCH_TABLE$io$primeval$aspecio$aspect$interceptor$BeforeAction", "[I", null, null);
             fv.visitEnd();
         }
 
@@ -165,21 +165,21 @@ public final class WovenClassGenerator {
                 addTypeSpecial(mv, type);
                 mv.visitInsn(AASTORE);
             }
-            mv.visitMethodInsn(INVOKESTATIC, "io/lambdacube/aspecio/internal/weaving/shared/WovenUtils",
+            mv.visitMethodInsn(INVOKESTATIC, "io/primeval/aspecio/internal/weaving/shared/WovenUtils",
                     "getMethodUnchecked", "(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;", false);
             mv.visitFieldInsn(PUTSTATIC, selfClassInternalName, "meth" + i, "Ljava/lang/reflect/Method;");
             Label l1 = new Label();
             mv.visitLabel(l1);
-            mv.visitTypeInsn(NEW, "io/lambdacube/aspecio/aspect/interceptor/CallContext");
+            mv.visitTypeInsn(NEW, "io/primeval/aspecio/aspect/interceptor/CallContext");
             mv.visitInsn(DUP);
             mv.visitLdcInsn(Type.getType(wovenClassDescriptor));
             mv.visitFieldInsn(GETSTATIC, selfClassInternalName, "meth" + i, "Ljava/lang/reflect/Method;");
             mv.visitInsn(DUP);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "getParameters", "()[Ljava/lang/reflect/Parameter;", false);
             mv.visitMethodInsn(INVOKESTATIC, "java/util/Arrays", "asList", "([Ljava/lang/Object;)Ljava/util/List;", false);
-            mv.visitMethodInsn(INVOKESPECIAL, "io/lambdacube/aspecio/aspect/interceptor/CallContext", "<init>",
+            mv.visitMethodInsn(INVOKESPECIAL, "io/primeval/aspecio/aspect/interceptor/CallContext", "<init>",
                     "(Ljava/lang/Class;Ljava/lang/reflect/Method;Ljava/util/List;)V", false);
-            mv.visitFieldInsn(PUTSTATIC, selfClassInternalName, "cc" + i, "Lio/lambdacube/aspecio/aspect/interceptor/CallContext;");
+            mv.visitFieldInsn(PUTSTATIC, selfClassInternalName, "cc" + i, "Lio/primeval/aspecio/aspect/interceptor/CallContext;");
         }
         mv.visitInsn(RETURN);
         mv.visitMaxs(-1, -1);
@@ -238,7 +238,7 @@ public final class WovenClassGenerator {
 
     private static void addBeforeActionSwitchTable(ClassWriter cw, String selfClassInternalName) {
         MethodVisitor mv;
-        mv = cw.visitMethod(ACC_STATIC + ACC_SYNTHETIC, "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "()[I",
+        mv = cw.visitMethod(ACC_STATIC + ACC_SYNTHETIC, "$SWITCH_TABLE$io$primeval$aspecio$aspect$interceptor$BeforeAction", "()[I",
                 null, null);
         mv.visitCode();
         Label l0 = new Label();
@@ -260,7 +260,7 @@ public final class WovenClassGenerator {
         Label l12 = new Label();
         mv.visitLabel(l12);
         mv.visitFieldInsn(GETSTATIC, selfClassInternalName,
-                "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "[I");
+                "$SWITCH_TABLE$io$primeval$aspecio$aspect$interceptor$BeforeAction", "[I");
         mv.visitInsn(DUP);
         Label l13 = new Label();
         mv.visitJumpInsn(IFNULL, l13);
@@ -268,16 +268,16 @@ public final class WovenClassGenerator {
         mv.visitLabel(l13);
         mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] { "[I" });
         mv.visitInsn(POP);
-        mv.visitMethodInsn(INVOKESTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "values",
-                "()[Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;", false);
+        mv.visitMethodInsn(INVOKESTATIC, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "values",
+                "()[Lio/primeval/aspecio/aspect/interceptor/BeforeAction;", false);
         mv.visitInsn(ARRAYLENGTH);
         mv.visitIntInsn(NEWARRAY, T_INT);
         mv.visitVarInsn(ASTORE, 0);
         mv.visitLabel(l0);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "PROCEED",
-                "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
+        mv.visitFieldInsn(GETSTATIC, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "PROCEED",
+                "Lio/primeval/aspecio/aspect/interceptor/BeforeAction;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
         mv.visitInsn(ICONST_4);
         mv.visitInsn(IASTORE);
         mv.visitLabel(l1);
@@ -288,9 +288,9 @@ public final class WovenClassGenerator {
         mv.visitLabel(l3);
         mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "REQUEST_ARGUMENTS",
-                "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
+        mv.visitFieldInsn(GETSTATIC, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "REQUEST_ARGUMENTS",
+                "Lio/primeval/aspecio/aspect/interceptor/BeforeAction;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
         mv.visitInsn(ICONST_2);
         mv.visitInsn(IASTORE);
         mv.visitLabel(l4);
@@ -301,9 +301,9 @@ public final class WovenClassGenerator {
         mv.visitLabel(l6);
         mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "SKIP_AND_RETURN",
-                "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
+        mv.visitFieldInsn(GETSTATIC, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "SKIP_AND_RETURN",
+                "Lio/primeval/aspecio/aspect/interceptor/BeforeAction;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
         mv.visitInsn(ICONST_1);
         mv.visitInsn(IASTORE);
         mv.visitLabel(l7);
@@ -314,9 +314,9 @@ public final class WovenClassGenerator {
         mv.visitLabel(l9);
         mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "UPDATE_ARGUMENTS_AND_PROCEED",
-                "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
+        mv.visitFieldInsn(GETSTATIC, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "UPDATE_ARGUMENTS_AND_PROCEED",
+                "Lio/primeval/aspecio/aspect/interceptor/BeforeAction;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
         mv.visitInsn(ICONST_3);
         mv.visitInsn(IASTORE);
         mv.visitLabel(l10);
@@ -330,7 +330,7 @@ public final class WovenClassGenerator {
         mv.visitVarInsn(ALOAD, 0);
         mv.visitInsn(DUP);
         mv.visitFieldInsn(PUTSTATIC, selfClassInternalName,
-                "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction", "[I");
+                "$SWITCH_TABLE$io$primeval$aspecio$aspect$interceptor$BeforeAction", "[I");
         mv.visitInsn(ARETURN);
         mv.visitMaxs(3, 1);
         mv.visitEnd();
@@ -445,12 +445,12 @@ public final class WovenClassGenerator {
             nextVarIndex += getTypeSize(param.getType());
         }
 
-        int varAdvIndex = nextVarIndex; // Lio/lambdacube/aspecio/aspect/interceptor/Advice;
-        int varCurrentArgsIndex = nextVarIndex + 1; // Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;
-        int varInitialActionIndex = nextVarIndex + 2; // Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;
+        int varAdvIndex = nextVarIndex; // Lio/primeval/aspecio/aspect/interceptor/Advice;
+        int varCurrentArgsIndex = nextVarIndex + 1; // Lio/primeval/aspecio/aspect/interceptor/arguments/Arguments;
+        int varInitialActionIndex = nextVarIndex + 2; // Lio/primeval/aspecio/aspect/interceptor/BeforeAction;
 
-        int varArgumentHookIndex = nextVarIndex + 3; // Lio/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook;
-        int varNextActionIndex = nextVarIndex + 4; // Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;
+        int varArgumentHookIndex = nextVarIndex + 3; // Lio/primeval/aspecio/aspect/interceptor/Advice$ArgumentHook;
+        int varNextActionIndex = nextVarIndex + 4; // Lio/primeval/aspecio/aspect/interceptor/BeforeAction;
 
         // here var "argumentHook" is descoped, we can reuse the index
         int varReturnValIndex = nextVarIndex + 3; // <returnType>
@@ -473,10 +473,10 @@ public final class WovenClassGenerator {
         mv.visitLabel(l4);
         // Advice adv = interceptor.onCall(cc#methId);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETFIELD, selfClassInternalName, "interceptor", "Lio/lambdacube/aspecio/aspect/interceptor/Interceptor;");
-        mv.visitFieldInsn(GETSTATIC, selfClassInternalName, "cc" + methId, "Lio/lambdacube/aspecio/aspect/interceptor/CallContext;");
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Interceptor", "onCall",
-                "(Lio/lambdacube/aspecio/aspect/interceptor/CallContext;)Lio/lambdacube/aspecio/aspect/interceptor/Advice;", true);
+        mv.visitFieldInsn(GETFIELD, selfClassInternalName, "interceptor", "Lio/primeval/aspecio/aspect/interceptor/Interceptor;");
+        mv.visitFieldInsn(GETSTATIC, selfClassInternalName, "cc" + methId, "Lio/primeval/aspecio/aspect/interceptor/CallContext;");
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Interceptor", "onCall",
+                "(Lio/primeval/aspecio/aspect/interceptor/CallContext;)Lio/primeval/aspecio/aspect/interceptor/Advice;", true);
         mv.visitVarInsn(ASTORE, varAdvIndex); // var "adv"
         Label l5 = new Label();
         mv.visitLabel(l5);
@@ -488,19 +488,19 @@ public final class WovenClassGenerator {
         Label l6 = new Label();
         mv.visitLabel(l6);
         mv.visitVarInsn(ALOAD, varAdvIndex); // var "adv"
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice", "initialAction",
-                "()Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;", true);
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice", "initialAction",
+                "()Lio/primeval/aspecio/aspect/interceptor/BeforeAction;", true);
         mv.visitVarInsn(ASTORE, varInitialActionIndex); // var "initialAction"
         Label l7 = new Label();
         mv.visitLabel(l7);
         // switch (initialAction) {
 
-        mv.visitMethodInsn(INVOKESTATIC, selfClassInternalName, "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction",
+        mv.visitMethodInsn(INVOKESTATIC, selfClassInternalName, "$SWITCH_TABLE$io$primeval$aspecio$aspect$interceptor$BeforeAction",
                 "()[I", false);
         Label l8 = new Label();
         mv.visitLabel(l8);
         mv.visitVarInsn(ALOAD, varInitialActionIndex); // var "initialAction"
-        mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
         mv.visitInsn(IALOAD);
 
         // case SKIP_AND_RETURN: {
@@ -512,11 +512,11 @@ public final class WovenClassGenerator {
         mv.visitTableSwitchInsn(1, 2, l0, new Label[] { l9, l10 });
         mv.visitLabel(l9);
         mv.visitFrame(
-                Opcodes.F_APPEND, 3, new Object[] { "io/lambdacube/aspecio/aspect/interceptor/Advice",
-                        "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments", "io/lambdacube/aspecio/aspect/interceptor/BeforeAction" },
+                Opcodes.F_APPEND, 3, new Object[] { "io/primeval/aspecio/aspect/interceptor/Advice",
+                        "io/primeval/aspecio/aspect/interceptor/arguments/Arguments", "io/primeval/aspecio/aspect/interceptor/BeforeAction" },
                 0, null);
         mv.visitVarInsn(ALOAD, varAdvIndex); // var "adv"
-        mv.visitTypeInsn(CHECKCAST, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall");
+        mv.visitTypeInsn(CHECKCAST, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall");
 
         skipAndReturnCall(mv, returnType);
 
@@ -528,7 +528,7 @@ public final class WovenClassGenerator {
         mv.visitLabel(l10);
         mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         mv.visitVarInsn(ALOAD, varAdvIndex); // var adv
-        mv.visitTypeInsn(CHECKCAST, "io/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook");
+        mv.visitTypeInsn(CHECKCAST, "io/primeval/aspecio/aspect/interceptor/Advice$ArgumentHook");
         mv.visitVarInsn(ASTORE, varArgumentHookIndex); // var "argumentHook"
         Label l12 = new Label();
         mv.visitLabel(l12);
@@ -539,14 +539,14 @@ public final class WovenClassGenerator {
         mv.visitLabel(l14);
         String argsClassInternalName = null;
         if (method.getParameterCount() == 0) {
-            mv.visitFieldInsn(GETSTATIC, "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments", "EMPTY_ARGUMENTS",
-                    "Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;");
+            mv.visitFieldInsn(GETSTATIC, "io/primeval/aspecio/aspect/interceptor/arguments/Arguments", "EMPTY_ARGUMENTS",
+                    "Lio/primeval/aspecio/aspect/interceptor/arguments/Arguments;");
         } else {
             argsClassInternalName = wovenClassInternalName + "$argsFor$" + method.getName() + methId;
             mv.visitTypeInsn(NEW, argsClassInternalName);
             mv.visitInsn(DUP);
-            mv.visitFieldInsn(GETSTATIC, selfClassInternalName, "cc" + methId, "Lio/lambdacube/aspecio/aspect/interceptor/CallContext;");
-            mv.visitFieldInsn(GETFIELD, "io/lambdacube/aspecio/aspect/interceptor/CallContext", "parameters", "Ljava/util/List;");
+            mv.visitFieldInsn(GETSTATIC, selfClassInternalName, "cc" + methId, "Lio/primeval/aspecio/aspect/interceptor/CallContext;");
+            mv.visitFieldInsn(GETFIELD, "io/primeval/aspecio/aspect/interceptor/CallContext", "parameters", "Ljava/util/List;");
             for (int i = 0; i < paramCount; i++) {
                 mv.visitVarInsn(getLoadCode(parameters[i].getType()), paramIndices[i]); // delegate parameters.
             }
@@ -561,31 +561,31 @@ public final class WovenClassGenerator {
         // switch (nextAction) {
 
         mv.visitLabel(l13);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] { "io/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook" }, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] { "io/primeval/aspecio/aspect/interceptor/Advice$ArgumentHook" }, 0, null);
         mv.visitVarInsn(ALOAD, varArgumentHookIndex); // var "argumentHook"
         mv.visitVarInsn(ALOAD, varCurrentArgsIndex); // var "currentArgs"
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook", "visitArguments",
-                "(Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;)Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;", true);
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$ArgumentHook", "visitArguments",
+                "(Lio/primeval/aspecio/aspect/interceptor/arguments/Arguments;)Lio/primeval/aspecio/aspect/interceptor/BeforeAction;", true);
         mv.visitVarInsn(ASTORE, varNextActionIndex); // var "nextAction"
 
         // case SKIP_AND_RETURN:
         // return ((SkipCall) adv).skipCallAndReturnXXX();
         Label l15 = new Label();
         mv.visitLabel(l15);
-        mv.visitMethodInsn(INVOKESTATIC, selfClassInternalName, "$SWITCH_TABLE$io$lambdacube$aspecio$aspect$interceptor$BeforeAction",
+        mv.visitMethodInsn(INVOKESTATIC, selfClassInternalName, "$SWITCH_TABLE$io$primeval$aspecio$aspect$interceptor$BeforeAction",
                 "()[I", false);
         Label l16 = new Label();
         mv.visitLabel(l16);
         mv.visitVarInsn(ALOAD, varNextActionIndex); // var "nextAction"
-        mv.visitMethodInsn(INVOKEVIRTUAL, "io/lambdacube/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "io/primeval/aspecio/aspect/interceptor/BeforeAction", "ordinal", "()I", false);
         mv.visitInsn(IALOAD);
         Label l17 = new Label();
         Label l18 = new Label();
         mv.visitTableSwitchInsn(1, 3, l0, new Label[] { l17, l0, l18 });
         mv.visitLabel(l17);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] { "io/lambdacube/aspecio/aspect/interceptor/BeforeAction" }, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] { "io/primeval/aspecio/aspect/interceptor/BeforeAction" }, 0, null);
         mv.visitVarInsn(ALOAD, varAdvIndex); // var "adv"
-        mv.visitTypeInsn(CHECKCAST, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall");
+        mv.visitTypeInsn(CHECKCAST, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall");
 
         skipAndReturnCall(mv, returnType);
 
@@ -596,8 +596,8 @@ public final class WovenClassGenerator {
         mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         mv.visitVarInsn(ALOAD, varArgumentHookIndex); // var "argumentHook"
         mv.visitVarInsn(ALOAD, varCurrentArgsIndex); // var "currentArgs"
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook", "updateArguments",
-                "(Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;)Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;", true);
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$ArgumentHook", "updateArguments",
+                "(Lio/primeval/aspecio/aspect/interceptor/arguments/Arguments;)Lio/primeval/aspecio/aspect/interceptor/arguments/Arguments;", true);
         // mv.visitTypeInsn(CHECKCAST, argsClassInternalName); // this is implicit
         mv.visitVarInsn(ASTORE, varCurrentArgsIndex);// var "currentArgs"
 
@@ -666,13 +666,13 @@ public final class WovenClassGenerator {
         mv.visitLabel(l21);
         mv.visitVarInsn(ALOAD, varAdvIndex); // var "adv"
         mv.visitInsn(ICONST_1); // CallReturn Phase (hardcompiled).
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice", "hasPhase", "(I)Z", true);
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice", "hasPhase", "(I)Z", true);
         Label l22 = new Label();
         mv.visitJumpInsn(IFEQ, l22);
         Label l23 = new Label();
         mv.visitLabel(l23);
         mv.visitVarInsn(ALOAD, varAdvIndex); // var "adv"
-        mv.visitTypeInsn(CHECKCAST, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn");
+        mv.visitTypeInsn(CHECKCAST, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn");
 
         if (returnType != void.class) {
             mv.visitVarInsn(getLoadCode(returnType), varReturnValIndex); // var "returnVal"
@@ -702,7 +702,7 @@ public final class WovenClassGenerator {
         mv.visitLabel(l1);
         mv.visitVarInsn(ALOAD, varAdvIndex); // variable "adv"
         mv.visitInsn(ICONST_4); // Finally PHASE (hard compiled) = 4
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice", "hasPhase", "(I)Z", true);
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice", "hasPhase", "(I)Z", true);
 
         // <if block>
         Label l25 = new Label();
@@ -710,9 +710,9 @@ public final class WovenClassGenerator {
         Label l26 = new Label();
         mv.visitLabel(l26);
         mv.visitVarInsn(ALOAD, varAdvIndex); // variable "adv"
-        mv.visitTypeInsn(CHECKCAST, "io/lambdacube/aspecio/aspect/interceptor/Advice$Finally");
+        mv.visitTypeInsn(CHECKCAST, "io/primeval/aspecio/aspect/interceptor/Advice$Finally");
 
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$Finally", "runFinally", "()V", true);
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$Finally", "runFinally", "()V", true);
         mv.visitLabel(l25);
         // </if block>
 
@@ -742,15 +742,15 @@ public final class WovenClassGenerator {
         mv.visitLabel(l28);
         mv.visitVarInsn(ALOAD, varAdvIndex); // variable "adv"
         mv.visitInsn(ICONST_2); // Catch phase (hard compiled = 2)
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice", "hasPhase", "(I)Z", true);
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice", "hasPhase", "(I)Z", true);
         Label l29 = new Label();
         mv.visitJumpInsn(IFEQ, l29);
         Label l30 = new Label();
         mv.visitLabel(l30);
         mv.visitVarInsn(ALOAD, varAdvIndex); // variable "adv"
-        mv.visitTypeInsn(CHECKCAST, "io/lambdacube/aspecio/aspect/interceptor/Advice$Catch");
+        mv.visitTypeInsn(CHECKCAST, "io/primeval/aspecio/aspect/interceptor/Advice$Catch");
         mv.visitVarInsn(ALOAD, varThrowableIndex); // variable "throwable"
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$Catch", "reThrow",
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$Catch", "reThrow",
                 "(Ljava/lang/Throwable;)Ljava/lang/Throwable;", true);
         mv.visitVarInsn(ASTORE, varThrowableIndex); // variable
                                                     // "throwable"
@@ -777,14 +777,14 @@ public final class WovenClassGenerator {
         mv.visitLabel(l32);
         mv.visitVarInsn(ALOAD, varAdvIndex); // variable "adv"
         mv.visitInsn(ICONST_4);
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice", "hasPhase", "(I)Z", true);
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice", "hasPhase", "(I)Z", true);
         Label l33 = new Label();
         mv.visitJumpInsn(IFEQ, l33);
         Label l34 = new Label();
         mv.visitLabel(l34);
         mv.visitVarInsn(ALOAD, varAdvIndex); // variable "adv"
-        mv.visitTypeInsn(CHECKCAST, "io/lambdacube/aspecio/aspect/interceptor/Advice$Finally");
-        mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$Finally", "runFinally", "()V", true);
+        mv.visitTypeInsn(CHECKCAST, "io/primeval/aspecio/aspect/interceptor/Advice$Finally");
+        mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$Finally", "runFinally", "()V", true);
         mv.visitLabel(l33);
 
         lastVisitFrame(selfClassInternalName, parameters, mv);
@@ -802,13 +802,13 @@ public final class WovenClassGenerator {
             mv.visitLocalVariable(param.getName(), Type.getDescriptor(type),
                     TypeUtils.getDescriptorForJavaType(param.getParameterizedType()), l4, l36, paramIndices[i]);
         }
-        mv.visitLocalVariable("adv", "Lio/lambdacube/aspecio/aspect/interceptor/Advice;", null, l5, l36, varAdvIndex);
-        mv.visitLocalVariable("currentArgs", "Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;", null, l6, l36, varCurrentArgsIndex);
-        mv.visitLocalVariable("initialAction", "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;", null, l7, l36,
+        mv.visitLocalVariable("adv", "Lio/primeval/aspecio/aspect/interceptor/Advice;", null, l5, l36, varAdvIndex);
+        mv.visitLocalVariable("currentArgs", "Lio/primeval/aspecio/aspect/interceptor/arguments/Arguments;", null, l6, l36, varCurrentArgsIndex);
+        mv.visitLocalVariable("initialAction", "Lio/primeval/aspecio/aspect/interceptor/BeforeAction;", null, l7, l36,
                 varInitialActionIndex);
-        mv.visitLocalVariable("argumentHook", "Lio/lambdacube/aspecio/aspect/interceptor/Advice$ArgumentHook;", null, l12, l0,
+        mv.visitLocalVariable("argumentHook", "Lio/primeval/aspecio/aspect/interceptor/Advice$ArgumentHook;", null, l12, l0,
                 varArgumentHookIndex);
-        mv.visitLocalVariable("nextAction", "Lio/lambdacube/aspecio/aspect/interceptor/BeforeAction;", null, l15, l0, varNextActionIndex);
+        mv.visitLocalVariable("nextAction", "Lio/primeval/aspecio/aspect/interceptor/BeforeAction;", null, l15, l0, varNextActionIndex);
         mv.visitLocalVariable("returnVal", "Ljava/lang/String;", null, l21, l2, varReturnValIndex);
         mv.visitLocalVariable("throwable", "Ljava/lang/Throwable;", null, l28, l3, varThrowableIndex);
         mv.visitMaxs(-1, -1);
@@ -818,43 +818,43 @@ public final class WovenClassGenerator {
 
     private static void callOnReturnAndStoreReturnIfPossible(MethodVisitor mv, Class<?> returnType, int varReturnValIndex) {
         if (returnType == void.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "onVoidReturn",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "onVoidReturn",
                     "()V", true);
             // we don't have a returnVal on void cases :)
         } else if (returnType == int.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "onIntReturn",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "onIntReturn",
                     "(I)I", true);
             mv.visitVarInsn(ISTORE, varReturnValIndex); // var "returnVal"
         } else if (returnType == short.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "onShortReturn",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "onShortReturn",
                     "(S)S", true);
             mv.visitVarInsn(ISTORE, varReturnValIndex); // var "returnVal"
         } else if (returnType == double.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "onDoubleReturn",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "onDoubleReturn",
                     "(D)D", true);
             mv.visitVarInsn(DSTORE, varReturnValIndex); // var "returnVal"
         } else if (returnType == float.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "onFloatReturn",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "onFloatReturn",
                     "(F)F", true);
             mv.visitVarInsn(FSTORE, varReturnValIndex); // var "returnVal"
         } else if (returnType == char.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "onCharReturn",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "onCharReturn",
                     "(C)C", true);
             mv.visitVarInsn(ISTORE, varReturnValIndex); // var "returnVal"
         } else if (returnType == long.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "onLongReturn",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "onLongReturn",
                     "(J)J", true);
             mv.visitVarInsn(LSTORE, varReturnValIndex); // var "returnVal"
         } else if (returnType == byte.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "onByteReturn",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "onByteReturn",
                     "(B)B", true);
             mv.visitVarInsn(ISTORE, varReturnValIndex); // var "returnVal"
         } else if (returnType == boolean.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "onBooleanReturn",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "onBooleanReturn",
                     "(Z)Z", true);
             mv.visitVarInsn(ISTORE, varReturnValIndex); // var "returnVal"
         } else {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$CallReturn", "onObjectReturn",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$CallReturn", "onObjectReturn",
                     "(Ljava/lang/Object;)Ljava/lang/Object;", true);
             mv.visitTypeInsn(CHECKCAST, Type.getInternalName(returnType));
             mv.visitVarInsn(ASTORE, varReturnValIndex); // var "returnVal"
@@ -874,9 +874,9 @@ public final class WovenClassGenerator {
             for (int i = 0; i < parameters.length; i++) {
                 locals[idx++] = getFrameType(parameters[i].getType());
             }
-            locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Advice";
-            locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments";
-            locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/BeforeAction";
+            locals[idx++] = "io/primeval/aspecio/aspect/interceptor/Advice";
+            locals[idx++] = "io/primeval/aspecio/aspect/interceptor/arguments/Arguments";
+            locals[idx++] = "io/primeval/aspecio/aspect/interceptor/BeforeAction";
             locals[idx++] = getFrameType(returnType);
 
             mv.visitFrame(Opcodes.F_FULL, locals.length, locals, 0, new Object[] {});
@@ -896,9 +896,9 @@ public final class WovenClassGenerator {
             for (int i = 0; i < parameters.length; i++) {
                 locals[idx++] = getFrameType(parameters[i].getType());
             }
-            locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Advice";
-            locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments";
-            locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/BeforeAction";
+            locals[idx++] = "io/primeval/aspecio/aspect/interceptor/Advice";
+            locals[idx++] = "io/primeval/aspecio/aspect/interceptor/arguments/Arguments";
+            locals[idx++] = "io/primeval/aspecio/aspect/interceptor/BeforeAction";
 
             mv.visitFrame(Opcodes.F_FULL, locals.length, locals, 1, new Object[] { "java/lang/Throwable" });
 
@@ -913,9 +913,9 @@ public final class WovenClassGenerator {
         for (int i = 0; i < parameters.length; i++) {
             locals[idx++] = getFrameType(parameters[i].getType());
         }
-        locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Advice";
-        locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments";
-        locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/BeforeAction";
+        locals[idx++] = "io/primeval/aspecio/aspect/interceptor/Advice";
+        locals[idx++] = "io/primeval/aspecio/aspect/interceptor/arguments/Arguments";
+        locals[idx++] = "io/primeval/aspecio/aspect/interceptor/BeforeAction";
         mv.visitFrame(Opcodes.F_FULL, locals.length, locals, 1, new Object[] { "java/lang/Throwable" });
     }
 
@@ -926,9 +926,9 @@ public final class WovenClassGenerator {
         for (int i = 0; i < parameters.length; i++) {
             locals[idx++] = getFrameType(parameters[i].getType());
         }
-        locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/Advice";
-        locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments";
-        locals[idx++] = "io/lambdacube/aspecio/aspect/interceptor/BeforeAction";
+        locals[idx++] = "io/primeval/aspecio/aspect/interceptor/Advice";
+        locals[idx++] = "io/primeval/aspecio/aspect/interceptor/arguments/Arguments";
+        locals[idx++] = "io/primeval/aspecio/aspect/interceptor/BeforeAction";
         // locals[idx++] = Opcodes.TOP;
         // locals[idx++] = Opcodes.TOP;
         locals[idx++] = "java/lang/Throwable";
@@ -937,46 +937,46 @@ public final class WovenClassGenerator {
 
     private static void skipAndReturnCall(MethodVisitor mv, Class<?> returnType) {
         if (returnType == void.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnVoid",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnVoid",
                     "()V", true);
             mv.visitInsn(RETURN);
         } else if (returnType == int.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnInt",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnInt",
                     "()I", true);
             mv.visitInsn(IRETURN);
         } else if (returnType == short.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnShort",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnShort",
                     "()S", true);
             mv.visitInsn(IRETURN);
 
         } else if (returnType == double.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnDouble",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnDouble",
                     "()D", true);
             mv.visitInsn(DRETURN);
         } else if (returnType == float.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnFloat",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnFloat",
                     "()F", true);
             mv.visitInsn(FRETURN);
 
         } else if (returnType == char.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnChar",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnChar",
                     "()C", true);
             mv.visitInsn(IRETURN);
 
         } else if (returnType == long.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnLong",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnLong",
                     "()J", true);
             mv.visitInsn(LRETURN);
         } else if (returnType == byte.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnByte",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnByte",
                     "()B", true);
             mv.visitInsn(IRETURN);
         } else if (returnType == boolean.class) {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnBoolean",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnBoolean",
                     "()Z", true);
             mv.visitInsn(IRETURN);
         } else {
-            mv.visitMethodInsn(INVOKEINTERFACE, "io/lambdacube/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnObject",
+            mv.visitMethodInsn(INVOKEINTERFACE, "io/primeval/aspecio/aspect/interceptor/Advice$SkipCall", "skipCallAndReturnObject",
                     "()Ljava/lang/Object;", true);
             mv.visitTypeInsn(CHECKCAST, Type.getInternalName(returnType));
             mv.visitInsn(ARETURN);

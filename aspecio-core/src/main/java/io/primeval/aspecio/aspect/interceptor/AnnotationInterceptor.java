@@ -1,11 +1,11 @@
-package io.lambdacube.aspecio.aspect.interceptor;
+package io.primeval.aspecio.aspect.interceptor;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.lambdacube.aspecio.aspect.interceptor.composite.Advices;
+import io.primeval.aspecio.aspect.interceptor.composite.Advices;
 
 /**
  * <p>

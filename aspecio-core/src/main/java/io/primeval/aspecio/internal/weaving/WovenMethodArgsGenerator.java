@@ -1,9 +1,9 @@
-package io.lambdacube.aspecio.internal.weaving;
+package io.primeval.aspecio.internal.weaving;
 
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.IRETURN_TYPES;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getLoadCode;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getReturnCode;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getTypeSize;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.IRETURN_TYPES;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getLoadCode;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getReturnCode;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getTypeSize;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -44,7 +44,7 @@ public final class WovenMethodArgsGenerator implements Opcodes {
                         .toArray(Type[]::new));
 
         cw.visit(52, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, selfClassInternalName, null, "java/lang/Object",
-                new String[] { "io/lambdacube/aspecio/aspect/interceptor/arguments/Arguments" });
+                new String[] { "io/primeval/aspecio/aspect/interceptor/arguments/Arguments" });
         Parameter[] parameters = method.getParameters();
 
         generateFields(method, cw, parameters);
@@ -67,7 +67,7 @@ public final class WovenMethodArgsGenerator implements Opcodes {
             String constDesc, Parameter[] parameters) {
         MethodVisitor mv;
 
-        mv = cw.visitMethod(ACC_PUBLIC, "updater", "()Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+        mv = cw.visitMethod(ACC_PUBLIC, "updater", "()Lio/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
         mv.visitCode();
         Label l0 = new Label();
         mv.visitLabel(l0);

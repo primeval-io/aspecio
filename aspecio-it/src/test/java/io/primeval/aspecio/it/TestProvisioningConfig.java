@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.it;
+package io.primeval.aspecio.it;
 
 import static org.ops4j.pax.exam.Constants.START_LEVEL_SYSTEM_BUNDLES;
 import static org.ops4j.pax.exam.CoreOptions.bootDelegationPackage;

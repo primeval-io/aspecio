@@ -1,0 +1,4 @@
+Bundle-SymbolicName: io.primeval.aspecio
+Private-Package: com.github.gfx.util, org.objectweb.asm, org.objectweb.asm.*
+Bundle-Activator: io.primeval.aspecio.internal.AspecioActivator
+Import-Package: org.slf4j;resolution:=optional, *

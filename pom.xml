@@ -1,19 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>io.lambdacube.aspecio</groupId>
+
+	<parent>
+		<groupId>io.primeval</groupId>
+		<artifactId>primeval-parent</artifactId>
+		<version>1</version>
+		<relativePath />
+	</parent>
+
+	<groupId>io.primeval.aspecio</groupId>
 	<artifactId>aspecio</artifactId>
-	<version>1.0.3</version>
 	<packaging>pom</packaging>
 	
 	<name>Aspecio Project</name>
   
   <description>OSGi Service Aspects</description>
-  <url>http://lambdacube.github.io/aspecio</url>
+  <url>http://primeval.io/aspecio</url>
 
   <organization>
-    <name>Lambdacube</name>
-    <url>http://www.lambdacube.io</url>
+    <name>Primeval</name>
+    <url>http://www.primeval.io</url>
   </organization>
 
   <developers>
@@ -33,33 +40,9 @@
   </licenses>
 
   <scm>
-    <url>https://github.com/lambdacube/aspecio</url>
+    <url>https://github.com/primeval-io/aspecio</url>
   </scm>
 
-	<properties>
-		<bnd.version>3.0.0</bnd.version>
-		<java.version>1.8</java.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
-
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.1</version>
-					<configuration>
-						<source>${java.version}</source>
-						<target>${java.version}</target>
-						<compilerArgument>-parameters</compilerArgument>
-						<testCompilerArgument>-parameters</testCompilerArgument>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
 
 	<profiles>
 		<profile>
@@ -99,5 +82,6 @@
 			</modules>
 		</profile>
 	</profiles>
+	<version>2.0.0-SNAPSHOT</version>
 </project>
 

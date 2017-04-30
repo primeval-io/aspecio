@@ -1,11 +1,11 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
-import static io.lambdacube.aspecio.internal.AspecioUtils.asStringProperties;
-import static io.lambdacube.aspecio.internal.AspecioUtils.asStringProperty;
-import static io.lambdacube.aspecio.internal.AspecioUtils.copySet;
-import static io.lambdacube.aspecio.internal.AspecioUtils.firstOrNull;
-import static io.lambdacube.aspecio.internal.AspecioUtils.getIntValue;
-import static io.lambdacube.aspecio.internal.AspecioUtils.getLongValue;
+import static io.primeval.aspecio.internal.AspecioUtils.asStringProperties;
+import static io.primeval.aspecio.internal.AspecioUtils.asStringProperty;
+import static io.primeval.aspecio.internal.AspecioUtils.copySet;
+import static io.primeval.aspecio.internal.AspecioUtils.firstOrNull;
+import static io.primeval.aspecio.internal.AspecioUtils.getIntValue;
+import static io.primeval.aspecio.internal.AspecioUtils.getLongValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,14 +33,14 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 
-import io.lambdacube.aspecio.AspecioConstants;
-import io.lambdacube.aspecio.AspectDescription;
-import io.lambdacube.aspecio.InterceptorDescription;
-import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
-import io.lambdacube.aspecio.aspect.interceptor.composite.Interceptors;
-import io.lambdacube.aspecio.internal.logging.AspecioLogger;
-import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
-import io.lambdacube.aspecio.internal.service.AspectInterceptorListener.EventKind;
+import io.primeval.aspecio.AspecioConstants;
+import io.primeval.aspecio.AspectDescription;
+import io.primeval.aspecio.InterceptorDescription;
+import io.primeval.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.aspecio.aspect.interceptor.composite.Interceptors;
+import io.primeval.aspecio.internal.logging.AspecioLogger;
+import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
+import io.primeval.aspecio.internal.service.AspectInterceptorListener.EventKind;
 
 public final class AspectInterceptorManager implements ServiceListener {
 

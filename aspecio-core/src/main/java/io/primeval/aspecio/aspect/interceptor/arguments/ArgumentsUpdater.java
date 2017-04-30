@@ -1,10 +1,10 @@
-package io.lambdacube.aspecio.aspect.interceptor.arguments;
+package io.primeval.aspecio.aspect.interceptor.arguments;
 
 import java.lang.reflect.Parameter;
 import java.util.Collections;
 import java.util.List;
 
-import io.lambdacube.aspecio.aspect.interceptor.Advice;
+import io.primeval.aspecio.aspect.interceptor.Advice;
 
 /**
  * <p>

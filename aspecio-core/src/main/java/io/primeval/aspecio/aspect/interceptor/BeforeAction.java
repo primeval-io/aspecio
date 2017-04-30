@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.aspect.interceptor;
+package io.primeval.aspecio.aspect.interceptor;
 
 /**
  * An Action in the Before phase.

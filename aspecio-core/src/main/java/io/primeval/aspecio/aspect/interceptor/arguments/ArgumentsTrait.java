@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.aspect.interceptor.arguments;
+package io.primeval.aspecio.aspect.interceptor.arguments;
 
 import java.lang.reflect.Parameter;
 import java.util.List;

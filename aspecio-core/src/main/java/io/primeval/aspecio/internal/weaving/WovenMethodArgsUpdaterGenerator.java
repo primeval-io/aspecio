@@ -1,9 +1,9 @@
-package io.lambdacube.aspecio.internal.weaving;
+package io.primeval.aspecio.internal.weaving;
 
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.IRETURN_TYPES;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getLoadCode;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getReturnCode;
-import static io.lambdacube.aspecio.internal.weaving.TypeUtils.getTypeSize;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.IRETURN_TYPES;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getLoadCode;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getReturnCode;
+import static io.primeval.aspecio.internal.weaving.TypeUtils.getTypeSize;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -44,7 +44,7 @@ public final class WovenMethodArgsUpdaterGenerator implements Opcodes {
                         .toArray(Type[]::new));
 
         cw.visit(52, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, selfClassInternalName, null, "java/lang/Object",
-                new String[] {  "io/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater" });
+                new String[] {  "io/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater" });
         Parameter[] parameters = method.getParameters();
 
         generateFields(method, cw, parameters);
@@ -69,7 +69,7 @@ public final class WovenMethodArgsUpdaterGenerator implements Opcodes {
             String argsClassInternalName,
             String constDesc, Parameter[] parameters) {
         MethodVisitor mv;
-        mv = cw.visitMethod(ACC_PUBLIC, "update", "()Lio/lambdacube/aspecio/aspect/interceptor/arguments/Arguments;", null, null);
+        mv = cw.visitMethod(ACC_PUBLIC, "update", "()Lio/primeval/aspecio/aspect/interceptor/arguments/Arguments;", null, null);
         mv.visitCode();
         Label l0 = new Label();
         mv.visitLabel(l0);
@@ -356,48 +356,48 @@ public final class WovenMethodArgsUpdaterGenerator implements Opcodes {
         MethodVisitor mv;
         {
             mv = cw.visitMethod(ACC_PUBLIC, "setObjectArg",
-                    "(Ljava/lang/String;Ljava/lang/Object;)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;",
+                    "(Ljava/lang/String;Ljava/lang/Object;)Lio/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;",
                     "<T:Ljava/lang/Object;>(Ljava/lang/String;TT;)V", null);
             generateArgSetterCode(Object.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
         }
         {
             mv = cw.visitMethod(ACC_PUBLIC, "setIntArg",
-                    "(Ljava/lang/String;I)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+                    "(Ljava/lang/String;I)Lio/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
             generateArgSetterCode(int.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
         }
         {
             mv = cw.visitMethod(ACC_PUBLIC, "setShortArg",
-                    "(Ljava/lang/String;S)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+                    "(Ljava/lang/String;S)Lio/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
             generateArgSetterCode(short.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
         }
         {
             mv = cw.visitMethod(ACC_PUBLIC, "setLongArg",
-                    "(Ljava/lang/String;J)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+                    "(Ljava/lang/String;J)Lio/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
             generateArgSetterCode(long.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
         }
         {
             mv = cw.visitMethod(ACC_PUBLIC, "setByteArg",
-                    "(Ljava/lang/String;B)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+                    "(Ljava/lang/String;B)Lio/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
             generateArgSetterCode(byte.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
         }
         {
             mv = cw.visitMethod(ACC_PUBLIC, "setBooleanArg",
-                    "(Ljava/lang/String;Z)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+                    "(Ljava/lang/String;Z)Lio/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
             generateArgSetterCode(boolean.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
         }
         {
             mv = cw.visitMethod(ACC_PUBLIC, "setFloatArg",
-                    "(Ljava/lang/String;F)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+                    "(Ljava/lang/String;F)Lio/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
             generateArgSetterCode(float.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
         }
         {
             mv = cw.visitMethod(ACC_PUBLIC, "setDoubleArg",
-                    "(Ljava/lang/String;D)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+                    "(Ljava/lang/String;D)Lio/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
             generateArgSetterCode(double.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
         }
         {
             mv = cw.visitMethod(ACC_PUBLIC, "setCharArg",
-                    "(Ljava/lang/String;C)Lio/lambdacube/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
+                    "(Ljava/lang/String;C)Lio/primeval/aspecio/aspect/interceptor/arguments/ArgumentsUpdater;", null, null);
             generateArgSetterCode(char.class, mv, selfClassInternalName, selfClassDescriptor, parameters);
         }
     }

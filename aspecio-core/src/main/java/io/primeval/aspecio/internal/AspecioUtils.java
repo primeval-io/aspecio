@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal;
+package io.primeval.aspecio.internal;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -6,8 +6,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.Callable;
 
-import io.lambdacube.aspecio.internal.logging.AspecioLogger;
-import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
+import io.primeval.aspecio.internal.logging.AspecioLogger;
+import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
 
 public final class AspecioUtils {
 

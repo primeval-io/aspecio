@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -11,8 +11,8 @@ import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
-import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
-import io.lambdacube.aspecio.internal.weaving.shared.Woven;
+import io.primeval.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.aspecio.internal.weaving.shared.Woven;
 
 public final class AspecioServiceObject {
     private final ServiceScope serviceScope;

@@ -1,6 +1,6 @@
-package io.lambdacube.aspecio.internal.weaving;
+package io.primeval.aspecio.internal.weaving;
 
-import static io.lambdacube.aspecio.internal.AspecioUtils.trust;
+import static io.primeval.aspecio.internal.AspecioUtils.trust;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.lambdacube.aspecio.internal.logging.AspecioLogger;
-import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
-import io.lambdacube.aspecio.internal.service.AspecioImpl;
-import io.lambdacube.aspecio.internal.weaving.shared.Woven;
+import io.primeval.aspecio.internal.logging.AspecioLogger;
+import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
+import io.primeval.aspecio.internal.service.AspecioImpl;
+import io.primeval.aspecio.internal.weaving.shared.Woven;
 
 /**
  * Entry point to weave a class and specify which interfaces to implement

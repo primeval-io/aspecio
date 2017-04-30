@@ -1,6 +1,6 @@
-package io.lambdacube.aspecio.it.testset.component;
+package io.primeval.aspecio.it.testset.component;
 
-import io.lambdacube.aspecio.it.testset.api.Randomizer;
+import io.primeval.aspecio.it.testset.api.Randomizer;
 
 public class RandomizerImpl implements Randomizer {
 

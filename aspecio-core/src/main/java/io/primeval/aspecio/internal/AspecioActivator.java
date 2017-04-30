@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal;
+package io.primeval.aspecio.internal;
 
 import java.util.Hashtable;
 
@@ -7,10 +7,10 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.hooks.service.EventListenerHook;
 import org.osgi.framework.hooks.service.FindHook;
 
-import io.lambdacube.aspecio.Aspecio;
-import io.lambdacube.aspecio.AspecioConstants;
-import io.lambdacube.aspecio.internal.service.AspecioImpl;
-import io.lambdacube.aspecio.internal.service.command.AspecioGogoCommand;
+import io.primeval.aspecio.Aspecio;
+import io.primeval.aspecio.AspecioConstants;
+import io.primeval.aspecio.internal.service.AspecioImpl;
+import io.primeval.aspecio.internal.service.command.AspecioGogoCommand;
 
 public final class AspecioActivator implements BundleActivator {
 

@@ -2,14 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>io.lambdacube.aspecio</groupId>
+		<groupId>io.primeval.aspecio</groupId>
 		<artifactId>aspecio</artifactId>
-		<version>1.0.3</version>
+		<version>2.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>aspecio-core</artifactId>
-  <name>Aspecio</name>
-
-	<packaging>bundle</packaging>
+	<name>Aspecio</name>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -104,8 +102,8 @@
 						</executions>
 						<configuration>
 							<quiet>true</quiet>
-							<excludePackageNames>io.lambdacube.aspecio.internal,
-								io.lambdacube.aspecio.internal.*</excludePackageNames>
+							<excludePackageNames>io.primeval.aspecio.internal,
+								io.primeval.aspecio.internal.*</excludePackageNames>
 						</configuration>
 					</plugin>
 					<plugin>
@@ -129,16 +127,8 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>${bnd.version}</version>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<_include>-src/main/osgi/osgi.bnd</_include>
-						<Embed-Dependency>asm;scope=compile;inline=false,weak-identity-hash-map;scope=compile;inline=false</Embed-Dependency>
-					</instructions>
-				</configuration>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>bnd-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

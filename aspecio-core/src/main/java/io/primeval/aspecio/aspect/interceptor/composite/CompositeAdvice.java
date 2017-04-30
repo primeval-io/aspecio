@@ -1,9 +1,9 @@
-package io.lambdacube.aspecio.aspect.interceptor.composite;
+package io.primeval.aspecio.aspect.interceptor.composite;
 
-import io.lambdacube.aspecio.aspect.interceptor.Advice;
-import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
-import io.lambdacube.aspecio.aspect.interceptor.BeforeAction;
-import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
+import io.primeval.aspecio.aspect.interceptor.Advice;
+import io.primeval.aspecio.aspect.interceptor.AdviceAdapter;
+import io.primeval.aspecio.aspect.interceptor.BeforeAction;
+import io.primeval.aspecio.aspect.interceptor.arguments.Arguments;
 
 /**
  * An Advice composed of several Advices. The components are called by iteration in a flat-way.

@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
 import java.util.Hashtable;
 import java.util.List;

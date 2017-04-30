@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.it.testset.api;
+package io.primeval.aspecio.it.testset.api;
 
 public interface Randomizer {
 

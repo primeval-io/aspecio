@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.examples.async.internal;
+package io.primeval.aspecio.examples.async.internal;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,11 +12,11 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.Promise;
 
-import io.lambdacube.aspecio.aspect.annotations.Weave;
-import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
-import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
-import io.lambdacube.aspecio.examples.aspect.metric.Timed;
-import io.lambdacube.aspecio.examples.async.SuperSlowService;
+import io.primeval.aspecio.aspect.annotations.Weave;
+import io.primeval.aspecio.examples.aspect.counting.CountingAspect;
+import io.primeval.aspecio.examples.aspect.metric.MetricAspect;
+import io.primeval.aspecio.examples.aspect.metric.Timed;
+import io.primeval.aspecio.examples.async.SuperSlowService;
 
 @Component
 @Weave(required = MetricAspect.AnnotatedOnly.class, optional = CountingAspect.class)

@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.logging;
+package io.primeval.aspecio.internal.logging;
 
 import java.util.logging.Level;
 

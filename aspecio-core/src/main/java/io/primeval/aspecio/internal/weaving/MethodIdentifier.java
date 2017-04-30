@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.weaving;
+package io.primeval.aspecio.internal.weaving;
 
 import java.util.Arrays;
 

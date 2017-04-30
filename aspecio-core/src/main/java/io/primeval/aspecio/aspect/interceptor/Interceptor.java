@@ -1,6 +1,6 @@
-package io.lambdacube.aspecio.aspect.interceptor;
+package io.primeval.aspecio.aspect.interceptor;
 
-import io.lambdacube.aspecio.AspecioConstants;
+import io.primeval.aspecio.AspecioConstants;
 
 /**
  * <p>

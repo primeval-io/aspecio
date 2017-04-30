@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
 public enum ServiceScope {
     SINGLETON("singleton"), BUNDLE("bundle"), PROTOTYPE("prototype");

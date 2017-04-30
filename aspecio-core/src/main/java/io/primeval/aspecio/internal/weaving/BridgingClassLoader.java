@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.weaving;
+package io.primeval.aspecio.internal.weaving;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,9 +6,9 @@ import java.util.Set;
 public final class BridgingClassLoader extends ClassLoader {
     private static final Set<String> ASPECIO_PACKAGES = new HashSet<>();
     static {
-        ASPECIO_PACKAGES.add("io.lambdacube.aspecio.aspect.interceptor");
-        ASPECIO_PACKAGES.add("io.lambdacube.aspecio.aspect.interceptor.arguments");
-        ASPECIO_PACKAGES.add("io.lambdacube.aspecio.internal.weaving.shared");
+        ASPECIO_PACKAGES.add("io.primeval.aspecio.aspect.interceptor");
+        ASPECIO_PACKAGES.add("io.primeval.aspecio.aspect.interceptor.arguments");
+        ASPECIO_PACKAGES.add("io.primeval.aspecio.internal.weaving.shared");
     }
 
     private final ClassLoader aspecioClassLoader;

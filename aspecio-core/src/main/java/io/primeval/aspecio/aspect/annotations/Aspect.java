@@ -1,13 +1,13 @@
-package io.lambdacube.aspecio.aspect.annotations;
+package io.primeval.aspecio.aspect.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import io.lambdacube.aspecio.AspecioConstants;
 import io.lambdacube.component.annotation.ComponentProperty;
 import io.lambdacube.component.annotation.ComponentPropertyGroup;
+import io.primeval.aspecio.AspecioConstants;
 
 /**
  * Use this property annotation, along with Bnd' Declarative Services properties annotation plugin, to define Aspects.

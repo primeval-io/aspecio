@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
 public final class WovenServiceEvent {
     enum EventKind {

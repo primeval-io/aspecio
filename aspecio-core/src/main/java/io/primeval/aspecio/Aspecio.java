@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio;
+package io.primeval.aspecio;
 
 import java.util.Iterator;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
-import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.aspecio.aspect.interceptor.Interceptor;
 
 /**
  * <p>

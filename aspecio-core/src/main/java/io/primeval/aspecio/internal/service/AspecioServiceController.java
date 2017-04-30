@@ -1,7 +1,7 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
-import static io.lambdacube.aspecio.internal.AspecioUtils.copySet;
-import static io.lambdacube.aspecio.internal.AspecioUtils.getLongValue;
+import static io.primeval.aspecio.internal.AspecioUtils.copySet;
+import static io.primeval.aspecio.internal.AspecioUtils.getLongValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
-import io.lambdacube.aspecio.InterceptedServiceDescription;
-import io.lambdacube.aspecio.internal.logging.AspecioLogger;
-import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
+import io.primeval.aspecio.InterceptedServiceDescription;
+import io.primeval.aspecio.internal.logging.AspecioLogger;
+import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
 
 public final class AspecioServiceController implements AspectInterceptorListener, WovenServiceListener {
     private static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(AspecioServiceController.class);

@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio;
+package io.primeval.aspecio;
 
 import java.util.List;
 

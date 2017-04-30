@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.examples.async;
+package io.primeval.aspecio.examples.async;
 
 import org.osgi.util.promise.Promise;
 

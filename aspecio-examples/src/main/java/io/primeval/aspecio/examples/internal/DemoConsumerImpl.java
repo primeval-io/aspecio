@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.examples.internal;
+package io.primeval.aspecio.examples.internal;
 
 import java.io.PrintStream;
 
@@ -7,10 +7,10 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.Promise;
 
-import io.lambdacube.aspecio.examples.DemoConsumer;
-import io.lambdacube.aspecio.examples.async.SuperSlowService;
-import io.lambdacube.aspecio.examples.greetings.Goodbye;
-import io.lambdacube.aspecio.examples.greetings.Hello;
+import io.primeval.aspecio.examples.DemoConsumer;
+import io.primeval.aspecio.examples.async.SuperSlowService;
+import io.primeval.aspecio.examples.greetings.Goodbye;
+import io.primeval.aspecio.examples.greetings.Hello;
 
 @Component
 public final class DemoConsumerImpl implements DemoConsumer {

@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.examples.aspect.metric.internal;
+package io.primeval.aspecio.examples.aspect.metric.internal;
 
 import java.util.concurrent.TimeUnit;
 
@@ -7,12 +7,12 @@ import com.google.common.base.Stopwatch;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.util.promise.Promise;
 
-import io.lambdacube.aspecio.aspect.annotations.Aspect;
-import io.lambdacube.aspecio.aspect.interceptor.Advice;
-import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
-import io.lambdacube.aspecio.aspect.interceptor.CallContext;
-import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
-import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
+import io.primeval.aspecio.aspect.annotations.Aspect;
+import io.primeval.aspecio.aspect.interceptor.Advice;
+import io.primeval.aspecio.aspect.interceptor.AdviceAdapter;
+import io.primeval.aspecio.aspect.interceptor.CallContext;
+import io.primeval.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.aspecio.examples.aspect.metric.MetricAspect;
 
 @Component
 @Aspect(provides = MetricAspect.All.class, extraProperties = "measured")

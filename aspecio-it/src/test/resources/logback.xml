@@ -11,8 +11,8 @@
 	</root>
 
 	<!-- Logger configuration -->
-	<logger name="io.lambdacube.aspecio" level="TRACE" />
-	<logger name="io.lambdacube" level="INFO" />
+	<logger name="io.primeval.aspecio" level="TRACE" />
+	<logger name="io.primeval" level="INFO" />
 	<logger name="ch.qos.logback" level="WARN" />
 
 	<!-- Pax-Exam configuration -->

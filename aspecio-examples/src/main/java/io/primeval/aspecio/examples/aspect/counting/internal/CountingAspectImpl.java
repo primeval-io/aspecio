@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.examples.aspect.counting.internal;
+package io.primeval.aspecio.examples.aspect.counting.internal;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -10,12 +10,12 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 
-import io.lambdacube.aspecio.aspect.annotations.Aspect;
-import io.lambdacube.aspecio.aspect.interceptor.Advice;
-import io.lambdacube.aspecio.aspect.interceptor.AdviceAdapter;
-import io.lambdacube.aspecio.aspect.interceptor.CallContext;
-import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
-import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
+import io.primeval.aspecio.aspect.annotations.Aspect;
+import io.primeval.aspecio.aspect.interceptor.Advice;
+import io.primeval.aspecio.aspect.interceptor.AdviceAdapter;
+import io.primeval.aspecio.aspect.interceptor.CallContext;
+import io.primeval.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.aspecio.examples.aspect.counting.CountingAspect;
 
 @Component
 @Aspect(provides = CountingAspect.class)

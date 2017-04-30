@@ -1,13 +1,13 @@
-package io.lambdacube.aspecio.examples.misc.internal;
+package io.primeval.aspecio.examples.misc.internal;
 
 import java.io.PrintStream;
 import java.util.stream.IntStream;
 
 import org.osgi.service.component.annotations.Component;
 
-import io.lambdacube.aspecio.aspect.annotations.Weave;
-import io.lambdacube.aspecio.examples.aspect.metric.Timed;
-import io.lambdacube.aspecio.examples.misc.Stuff;
+import io.primeval.aspecio.aspect.annotations.Weave;
+import io.primeval.aspecio.examples.aspect.metric.Timed;
+import io.primeval.aspecio.examples.misc.Stuff;
 
 @Component
 @Weave(required = Timed.class)

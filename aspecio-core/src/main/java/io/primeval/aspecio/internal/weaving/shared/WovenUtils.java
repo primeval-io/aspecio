@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.weaving.shared;
+package io.primeval.aspecio.internal.weaving.shared;
 
 import java.lang.reflect.Method;
 

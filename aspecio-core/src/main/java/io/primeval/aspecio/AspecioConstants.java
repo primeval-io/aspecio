@@ -1,6 +1,6 @@
-package io.lambdacube.aspecio;
+package io.primeval.aspecio;
 
-import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.aspecio.aspect.interceptor.Interceptor;
 
 /**
  * Public constants in Aspecio.

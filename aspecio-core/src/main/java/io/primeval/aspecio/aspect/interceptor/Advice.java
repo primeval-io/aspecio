@@ -1,8 +1,8 @@
-package io.lambdacube.aspecio.aspect.interceptor;
+package io.primeval.aspecio.aspect.interceptor;
 
 import java.lang.reflect.Method;
 
-import io.lambdacube.aspecio.aspect.interceptor.arguments.Arguments;
+import io.primeval.aspecio.aspect.interceptor.arguments.Arguments;
 
 /**
  * <p>

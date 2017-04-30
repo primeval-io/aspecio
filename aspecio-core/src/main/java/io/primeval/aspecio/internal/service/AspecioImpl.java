@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -14,12 +14,12 @@ import org.osgi.framework.hooks.service.EventListenerHook;
 import org.osgi.framework.hooks.service.FindHook;
 import org.osgi.framework.hooks.service.ListenerHook.ListenerInfo;
 
-import io.lambdacube.aspecio.Aspecio;
-import io.lambdacube.aspecio.AspecioConstants;
-import io.lambdacube.aspecio.AspectDescription;
-import io.lambdacube.aspecio.InterceptedServiceDescription;
-import io.lambdacube.aspecio.internal.logging.AspecioLogger;
-import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
+import io.primeval.aspecio.Aspecio;
+import io.primeval.aspecio.AspecioConstants;
+import io.primeval.aspecio.AspectDescription;
+import io.primeval.aspecio.InterceptedServiceDescription;
+import io.primeval.aspecio.internal.logging.AspecioLogger;
+import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
 
 public final class AspecioImpl implements Aspecio, FindHook, EventListenerHook {
 

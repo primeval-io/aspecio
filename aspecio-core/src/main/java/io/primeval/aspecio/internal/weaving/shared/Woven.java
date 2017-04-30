@@ -1,6 +1,6 @@
-package io.lambdacube.aspecio.internal.weaving.shared;
+package io.primeval.aspecio.internal.weaving.shared;
 
-import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.aspecio.aspect.interceptor.Interceptor;
 
 public abstract class Woven {
 

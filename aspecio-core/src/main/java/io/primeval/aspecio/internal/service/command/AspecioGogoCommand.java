@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.internal.service.command;
+package io.primeval.aspecio.internal.service.command;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,10 +6,10 @@ import java.util.Optional;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import io.lambdacube.aspecio.Aspecio;
-import io.lambdacube.aspecio.AspectDescription;
-import io.lambdacube.aspecio.InterceptedServiceDescription;
-import io.lambdacube.aspecio.InterceptorDescription;
+import io.primeval.aspecio.Aspecio;
+import io.primeval.aspecio.AspectDescription;
+import io.primeval.aspecio.InterceptedServiceDescription;
+import io.primeval.aspecio.InterceptorDescription;
 
 // This sysout print stuff is ugly, but that's how Felix Gogo works
 // by redirecting System.out in the calling thread to the proper shell...

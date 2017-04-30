@@ -1,10 +1,11 @@
-package io.lambdacube.aspecio.it;
+package io.primeval.aspecio.it;
 
-import static io.lambdacube.aspecio.it.TestProvisioningConfig.baseOptions;
-import static io.lambdacube.aspecio.it.TestProvisioningConfig.dsAndFriends;
-import static io.lambdacube.aspecio.it.TestProvisioningConfig.slf4jLogging;
-import static io.lambdacube.aspecio.it.TestProvisioningConfig.testingBundles;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import static io.primeval.aspecio.it.TestProvisioningConfig.baseOptions;
+import static io.primeval.aspecio.it.TestProvisioningConfig.dsAndFriends;
+import static io.primeval.aspecio.it.TestProvisioningConfig.slf4jLogging;
+import static io.primeval.aspecio.it.TestProvisioningConfig.testingBundles;
 import static org.ops4j.pax.exam.Constants.START_LEVEL_TEST_BUNDLE;
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
@@ -34,18 +35,18 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.tracker.ServiceTracker;
 
-import io.lambdacube.aspecio.Aspecio;
-import io.lambdacube.aspecio.AspecioConstants;
-import io.lambdacube.aspecio.AspectDescription;
-import io.lambdacube.aspecio.examples.DemoConsumer;
-import io.lambdacube.aspecio.examples.aspect.counting.CountingAspect;
-import io.lambdacube.aspecio.examples.aspect.metric.MetricAspect;
-import io.lambdacube.aspecio.examples.async.SuperSlowService;
-import io.lambdacube.aspecio.examples.greetings.Goodbye;
-import io.lambdacube.aspecio.examples.greetings.Hello;
-import io.lambdacube.aspecio.it.testset.api.Randomizer;
-import io.lambdacube.aspecio.it.testset.aspect.NoopAspect;
-import io.lambdacube.aspecio.it.testset.component.RandomizerImpl;
+import io.primeval.aspecio.Aspecio;
+import io.primeval.aspecio.AspecioConstants;
+import io.primeval.aspecio.AspectDescription;
+import io.primeval.aspecio.examples.DemoConsumer;
+import io.primeval.aspecio.examples.aspect.counting.CountingAspect;
+import io.primeval.aspecio.examples.aspect.metric.MetricAspect;
+import io.primeval.aspecio.examples.async.SuperSlowService;
+import io.primeval.aspecio.examples.greetings.Goodbye;
+import io.primeval.aspecio.examples.greetings.Hello;
+import io.primeval.aspecio.it.testset.api.Randomizer;
+import io.primeval.aspecio.it.testset.aspect.NoopAspect;
+import io.primeval.aspecio.it.testset.component.RandomizerImpl;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -63,7 +64,7 @@ public class AspecioIntegrationTest {
     public static Option exampleApplication() {
         return composite(dsAndFriends(),
                 mavenBundle("com.google.guava", "guava").versionAsInProject(),
-                mavenBundle("io.lambdacube.aspecio", "aspecio-examples").versionAsInProject());
+                mavenBundle("io.primeval.aspecio", "aspecio-examples").versionAsInProject());
     }
 
     @Configuration
@@ -72,7 +73,7 @@ public class AspecioIntegrationTest {
                 baseOptions(),
                 testingBundles(),
                 slf4jLogging(),
-                mavenBundle("io.lambdacube.aspecio", "aspecio-core").versionAsInProject(),
+                mavenBundle("io.primeval.aspecio", "aspecio-core").versionAsInProject(),
                 exampleApplication(),
                 frameworkStartLevel(START_LEVEL_TEST_BUNDLE)
         };
@@ -125,7 +126,7 @@ public class AspecioIntegrationTest {
         Goodbye goodbye = goodbyeTracker.getService();
 
         assertThat(hello).isSameAs(goodbye);
-        assertThat(hello.getClass().getName()).isEqualTo("io.lambdacube.aspecio.examples.greetings.internal.HelloGoodbyeImpl$Woven$");
+        assertThat(hello.getClass().getName()).isEqualTo("io.primeval.aspecio.examples.greetings.internal.HelloGoodbyeImpl$Woven$");
 
         hello.hello();
 

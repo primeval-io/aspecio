@@ -1,11 +1,11 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
-import static io.lambdacube.aspecio.AspecioConstants.SERVICE_ASPECT_WEAVE;
-import static io.lambdacube.aspecio.AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL;
-import static io.lambdacube.aspecio.AspecioConstants._SERVICE_ASPECT_WOVEN;
-import static io.lambdacube.aspecio.internal.AspecioUtils.asStringProperties;
-import static io.lambdacube.aspecio.internal.AspecioUtils.getIntValue;
-import static io.lambdacube.aspecio.internal.AspecioUtils.getLongValue;
+import static io.primeval.aspecio.AspecioConstants.SERVICE_ASPECT_WEAVE;
+import static io.primeval.aspecio.AspecioConstants.SERVICE_ASPECT_WEAVE_OPTIONAL;
+import static io.primeval.aspecio.AspecioConstants._SERVICE_ASPECT_WOVEN;
+import static io.primeval.aspecio.internal.AspecioUtils.asStringProperties;
+import static io.primeval.aspecio.internal.AspecioUtils.getIntValue;
+import static io.primeval.aspecio.internal.AspecioUtils.getLongValue;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -23,6 +23,16 @@ import java.util.stream.Stream;
 
 import com.github.gfx.util.WeakIdentityHashMap;
 
+import io.primeval.aspecio.AspecioConstants;
+import io.primeval.aspecio.internal.AspecioUtils;
+import io.primeval.aspecio.internal.logging.AspecioLogger;
+import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
+import io.primeval.aspecio.internal.weaving.AspectWeaver;
+import io.primeval.aspecio.internal.weaving.BridgingClassLoader;
+import io.primeval.aspecio.internal.weaving.DynamicClassLoader;
+import io.primeval.aspecio.internal.weaving.WovenClassHolder;
+import io.primeval.aspecio.internal.weaving.shared.Woven;
+
 import org.osgi.framework.AllServiceListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -31,16 +41,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.wiring.BundleRevision;
-
-import io.lambdacube.aspecio.AspecioConstants;
-import io.lambdacube.aspecio.internal.AspecioUtils;
-import io.lambdacube.aspecio.internal.logging.AspecioLogger;
-import io.lambdacube.aspecio.internal.logging.AspecioLoggerFactory;
-import io.lambdacube.aspecio.internal.weaving.AspectWeaver;
-import io.lambdacube.aspecio.internal.weaving.BridgingClassLoader;
-import io.lambdacube.aspecio.internal.weaving.DynamicClassLoader;
-import io.lambdacube.aspecio.internal.weaving.WovenClassHolder;
-import io.lambdacube.aspecio.internal.weaving.shared.Woven;
 
 public final class ServiceWeavingManager implements AllServiceListener {
     private static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(ServiceWeavingManager.class);

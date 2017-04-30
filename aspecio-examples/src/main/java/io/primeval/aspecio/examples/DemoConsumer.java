@@ -1,4 +1,4 @@
-package io.lambdacube.aspecio.examples;
+package io.primeval.aspecio.examples;
 
 import java.io.PrintStream;
 

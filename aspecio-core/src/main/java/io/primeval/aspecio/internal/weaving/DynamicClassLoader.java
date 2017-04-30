@@ -1,6 +1,6 @@
-package io.lambdacube.aspecio.internal.weaving;
+package io.primeval.aspecio.internal.weaving;
 
-import static io.lambdacube.aspecio.internal.AspecioUtils.trust;
+import static io.primeval.aspecio.internal.AspecioUtils.trust;
 
 import java.lang.reflect.Method;
 import java.util.Collections;

@@ -1,11 +1,11 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
 import org.osgi.framework.wiring.BundleRevision;
 
-import io.lambdacube.aspecio.internal.weaving.DynamicClassLoader;
+import io.primeval.aspecio.internal.weaving.DynamicClassLoader;
 
 public final class BundleRevPath {
     private DynamicClassLoader classLoader;

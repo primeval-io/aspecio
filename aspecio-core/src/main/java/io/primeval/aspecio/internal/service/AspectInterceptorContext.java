@@ -1,8 +1,8 @@
-package io.lambdacube.aspecio.internal.service;
+package io.primeval.aspecio.internal.service;
 
 import java.util.Set;
 
-import io.lambdacube.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.aspecio.aspect.interceptor.Interceptor;
 
 public final class AspectInterceptorContext {
 
