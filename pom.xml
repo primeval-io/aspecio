@@ -12,36 +12,36 @@
 	<groupId>io.primeval.aspecio</groupId>
 	<artifactId>aspecio</artifactId>
 	<packaging>pom</packaging>
-	
+
 	<name>Aspecio Project</name>
-  
-  <description>OSGi Service Aspects</description>
-  <url>http://primeval.io/aspecio</url>
 
-  <organization>
-    <name>Primeval</name>
-    <url>http://www.primeval.io</url>
-  </organization>
+	<description>OSGi Service Aspects</description>
+	<url>http://primeval.io/aspecio</url>
 
-  <developers>
-    <developer>
-      <id>magnet</id>
-      <name>Simon Chemouil</name>
-      <organization>Lambdacube</organization>
-    </developer>
-  </developers>
+	<organization>
+		<name>Primeval</name>
+		<url>http://www.primeval.io</url>
+	</organization>
 
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+	<developers>
+		<developer>
+			<id>magnet</id>
+			<name>Simon Chemouil</name>
+			<organization>Lambdacube</organization>
+		</developer>
+	</developers>
 
-  <scm>
-    <url>https://github.com/primeval-io/aspecio</url>
-  </scm>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>https://github.com/primeval-io/aspecio</url>
+	</scm>
 
 
 	<profiles>

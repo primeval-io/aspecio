@@ -21,6 +21,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
 
+import org.osgi.framework.AllServiceListener;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.wiring.BundleRevision;
+
 import com.github.gfx.util.WeakIdentityHashMap;
 
 import io.primeval.aspecio.AspecioConstants;
@@ -32,15 +41,6 @@ import io.primeval.aspecio.internal.weaving.BridgingClassLoader;
 import io.primeval.aspecio.internal.weaving.DynamicClassLoader;
 import io.primeval.aspecio.internal.weaving.WovenClassHolder;
 import io.primeval.aspecio.internal.weaving.shared.Woven;
-
-import org.osgi.framework.AllServiceListener;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.wiring.BundleRevision;
 
 public final class ServiceWeavingManager implements AllServiceListener {
     private static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(ServiceWeavingManager.class);
