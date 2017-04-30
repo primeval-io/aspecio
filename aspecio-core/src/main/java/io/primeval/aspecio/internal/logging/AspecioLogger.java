@@ -11,6 +11,8 @@ public abstract class AspecioLogger {
     public abstract void debug(String format, Object... arguments);
 
     public abstract void warn(String format, Object... arguments);
+    
+    public abstract void trace(String format, Object... arguments);
 
     public abstract void error(String format, Object... arguments);
 
@@ -55,6 +57,11 @@ final class SLF4JLogger extends AspecioLogger {
     public void error(String msg, Throwable error) {
         logger.error(msg, error);
     }
+    
+    @Override
+    public void trace(String format, Object... arguments) {
+        logger.trace(format, arguments);
+    }
 
 }
 
@@ -93,6 +100,11 @@ final class JULLogger extends AspecioLogger {
     @Override
     public void error(String msg, Throwable error) {
         logger.log(Level.SEVERE, msg, error);
+    }
+    
+    @Override
+    public void trace(String format, Object... arguments) {
+        logger.log(Level.FINEST, () -> sl4jFormatToJul(format, arguments));
     }
 
     private static String sl4jFormatToJul(String format, Object... arguments) {

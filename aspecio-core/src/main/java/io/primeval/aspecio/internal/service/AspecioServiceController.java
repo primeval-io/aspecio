@@ -102,7 +102,7 @@ public final class AspecioServiceController implements AspectInterceptorListener
             boolean servicePropertiesChanged) {
         ManagedWovenService managed = managedServices.get(wovenService.originalReference);
         if (managed == null) {
-            LOGGER.warn("Couldn't find an old service while we should for service id {}, treating the update as a new service...(?)",
+            LOGGER.trace("Couldn't find an old service while we should for service id {}, treating the update as a new service...(?)",
                     wovenService.originalServiceId);
             handleServiceArrival(wovenService);
             return;
