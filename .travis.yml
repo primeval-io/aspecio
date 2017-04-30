@@ -1,6 +1,17 @@
 language: java
 jdk:
-  - oraclejdk8
+- oraclejdk8
 sudo: false
+dist: trusty
 script: mvn clean verify
-
+after_success:
+- VERSION=`python -c "import xml.etree.ElementTree as ET;  print(ET.parse(open('pom.xml')).getroot().find('{http://maven.apache.org/POM/4.0.0}version').text)"`
+- echo "Found version $VERSION"
+- if [[ $VERSION == *-SNAPSHOT ]]; then echo "Deploying to OSSRH Snapshots..."; mvn
+  clean deploy -DaltDeploymentRepository=ossrh::default::https://oss.sonatype.org/content/repositories/snapshots
+  -DskipTests -B --settings .travis-deploy-settings.xml; else echo "Release version,
+  deploy is manual."; fi
+env:
+  global:
+  - secure: EqBjLpQdb25hfYH0qoD1Hz9DTuTKDEskzG5Ag+x03ytXl+8zyokhRKBq86NWF+PxdJG5TxyLBRTLqlzMfAGlmEURcgmXVYeuQ3mtDG22Q+x9wMCV7DwuyV5ojR9LBwIwtlgd2TDNFAUfxH/XP+4DWzVzUwFq8Vf61mUJ1gPD91xeneF/pYub1IGQTS9D7XYWO6ngIrXYDpg+RT6zjyC/5aGrnmqwiTDJYuhxV4AUgcuLRR4QKdZU/DcVhFmx39+a/P9vyLRpZ6W3wE3YWYHS6e5DhyL+qLymJUHAEJOoZSWV4RwDBESPGuXXuDjiJc9IC0G/iGMxOI61sq0VmMTCS+WGlFGpkf4CWSmkgZoCkw/j15HZFsds/r1sx/2rCTS82EZwsPmwjy6ftiGfgMAA0CGDLNRsMJj81GHtxeDf30/cBeGWLW0P5kI/xg+q1S+XfZhOkO8jOPQz0phoZ8Sf7eaCQr8CuRzHbNcBYsyMpG294PzDgwmU8PRfaICJ9MVkTqQNgTtnmALjLGpqBi7+wXoVxe03I+dKuGGQl5OXPOuRg7qoC6unUSAw/t1gtpNEf3q7ZIZO6kLJnxFCgyp47Eab8gIG3crzaCO/ahGp7df06UlF57se1QVKHH2Y8d67AHvN+m6AQD/QoAk/BcCoFaASoQOkJkokxq3sdTMHVas=
+  - secure: DODYFUoQ0fK9Hhr3U4cB0ZMMCNARxomjAFqrczeCzLNhARh2zZ0FAO4gEuo39IeCz5fZ6J9yRKmTeXHS+lCnZWRMR7sHRhDuQUw6Gt0/1Gxp4msvXsEBcuCtJmYn9feW0u8GAE4CcpHpXI5k3dVecagc4HmAbAvGwFV/izO9jP6565Dl+lV93OhJObYp6QzBTYPLp0EZm4x0Z2uOCK8+1CapJTuMUD2NYbErmp73/fuNWC+NOZF8G0ecpX+uPUHa01dTffXhHWp1ekOT/U+Zmy2L90XpB9EA0i+rqANk2RSCc3l42npd2TKIrkrtUD7XaagPyhpcaUrhCzHQLpVi0BXkqFS955ehjyhaVeZp0jFJW7QVc3Bmqs8zDxnlCj40MQMy299PLM3P4Uia7KY38F/u7/LTre2vIu97fH7Bh39Ll1wdepawCg7wtfsXh8Nbc6zYeMFf3c07kDaIwNYehtn1ULj8oUlFdJ8auCrSZJ2xn7dF/ZpqjXAlHtnEWiofcoZD6ZjEuOYkgBIgEUcSuIBHfvnfrpqI7MgIs6NhpeU3o/yONlkykkM/dWE4tmA2SLCgJp1CsBDeutyyW4yQgvX78nAZj8ncfuYAZcLh5Jy3T+uMTRvgp+J0MJNgESpEulHnl8kgrssrEGULYprJx/8R6E+VlzHuhZhGTfW3BfY=
