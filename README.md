@@ -1,5 +1,7 @@
 # Aspecio [![Build Status](https://api.travis-ci.org/Lambdacube/aspecio.png)](https://travis-ci.org/Lambdacube/aspecio/)
 
+## Aspecio is moving from Lambdacube/aspecio to primeval-io/aspecio ... WIP to Aspecio 2.
+
 Aspecio is a Java/OSGi R6 'micro-framework' that brings a mix of component-oriented and aspect-oriented programming to your application. Aspecio lets you define _Aspects_ that you can later pick to add behavior to your components and avoid duplicating boilerplate dealing with cross-cutting concerns.
 
 
