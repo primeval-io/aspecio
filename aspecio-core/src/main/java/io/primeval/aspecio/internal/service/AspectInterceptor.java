@@ -4,7 +4,8 @@ import java.util.Set;
 
 import org.osgi.framework.ServiceReference;
 
-import io.primeval.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.reflect.proxy.Interceptor;
+
 
 public final class AspectInterceptor implements Comparable<AspectInterceptor> {
 

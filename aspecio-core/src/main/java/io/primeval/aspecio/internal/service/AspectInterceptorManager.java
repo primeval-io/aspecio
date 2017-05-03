@@ -36,11 +36,11 @@ import org.osgi.framework.ServiceReference;
 import io.primeval.aspecio.AspecioConstants;
 import io.primeval.aspecio.AspectDescription;
 import io.primeval.aspecio.InterceptorDescription;
-import io.primeval.aspecio.aspect.interceptor.Interceptor;
-import io.primeval.aspecio.aspect.interceptor.composite.Interceptors;
 import io.primeval.aspecio.internal.logging.AspecioLogger;
 import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
 import io.primeval.aspecio.internal.service.AspectInterceptorListener.EventKind;
+import io.primeval.reflect.proxy.Interceptor;
+import io.primeval.reflect.proxy.composite.Interceptors;
 
 public final class AspectInterceptorManager implements ServiceListener {
 

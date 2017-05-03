@@ -5,13 +5,13 @@ import java.util.function.Supplier;
 
 import org.osgi.framework.wiring.BundleRevision;
 
-import io.primeval.aspecio.internal.weaving.DynamicClassLoader;
+import io.primeval.reflect.proxy.bytecode.ProxyClassLoader;
 
 public final class BundleRevPath {
-    private DynamicClassLoader classLoader;
+    private ProxyClassLoader classLoader;
     private Map<BundleRevision, BundleRevPath> subMap;
 
-    public synchronized DynamicClassLoader computeClassLoaderIfAbsent(Supplier<DynamicClassLoader> classLoaderSupplier) {
+    public synchronized ProxyClassLoader computeClassLoaderIfAbsent(Supplier<ProxyClassLoader> classLoaderSupplier) {
         if (classLoader == null) {
             classLoader = classLoaderSupplier.get();
         }

@@ -3,19 +3,18 @@ package io.primeval.aspecio.examples.aspect.counting.internal;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 
+import com.google.common.collect.Maps;
+
 import io.primeval.aspecio.aspect.annotations.Aspect;
-import io.primeval.aspecio.aspect.interceptor.Advice;
-import io.primeval.aspecio.aspect.interceptor.AdviceAdapter;
-import io.primeval.aspecio.aspect.interceptor.CallContext;
-import io.primeval.aspecio.aspect.interceptor.Interceptor;
 import io.primeval.aspecio.examples.aspect.counting.CountingAspect;
+import io.primeval.reflect.proxy.CallContext;
+import io.primeval.reflect.proxy.Interceptor;
+import io.primeval.reflect.proxy.handler.InterceptionHandler;
 
 @Component
 @Aspect(provides = CountingAspect.class)
@@ -41,30 +40,23 @@ public final class CountingAspectImpl implements Interceptor, CountingAspect {
     }
 
     @Override
-    public Advice onCall(CallContext callContext) {
+    public <T, E extends Throwable> T onCall(CallContext context, InterceptionHandler<T> handler) throws E {
         if (countOnlySuccessful) {
-            return new AdviceAdapter() {
-                @Override
-                public int afterPhases() {
-                    return CallReturn.PHASE;
-                }
-
-                @Override
-                public void onSuccessfulReturn() {
-                    methodCallCount.compute(callContext.method, (k, v) -> v == null ? 1 : (v += 1));
-                }
-            };
+            T res = handler.invoke();
+            methodCallCount.compute(context.method, (k, v) -> v == null ? 1 : (v += 1));
+            return res;
         } else {
-            methodCallCount.compute(callContext.method, (k, v) -> v == null ? 1 : (v += 1));
-            return Advice.DEFAULT;
+            methodCallCount.compute(context.method, (k, v) -> v == null ? 1 : (v += 1));
+            return handler.invoke();
         }
     }
 
     @Override
     public void printCounts() {
-        methodCallCount.forEach((m, count) -> System.out.println(m.getDeclaringClass().getName() + "::" + m.getName() + " -> " + count));
+        methodCallCount.forEach((m, count) -> System.out
+                .println(m.getDeclaringClass().getName() + "::" + m.getName() + " -> " + count));
     }
-    
+
     @Override
     public String toString() {
         return "Counting";

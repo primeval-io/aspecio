@@ -11,21 +11,21 @@ import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
-import io.primeval.aspecio.aspect.interceptor.Interceptor;
-import io.primeval.aspecio.internal.weaving.shared.Woven;
+import io.primeval.reflect.proxy.Interceptor;
+import io.primeval.reflect.proxy.bytecode.Proxy;
 
 public final class AspecioServiceObject {
     private final ServiceScope serviceScope;
     private final ServiceReference<?> originalRef;
-    private final Function<Object, Woven> proxyFunction;
-    private final List<Woven> instances = new CopyOnWriteArrayList<>();
+    private final Function<Object, Proxy> proxyFunction;
+    private final List<Proxy> instances = new CopyOnWriteArrayList<>();
     // Try to de-duplicate for servicefactories that are just lazy singletons.
-    private final ServicePool<Woven> servicePool = new ServicePool<>();
+    private final ServicePool<Proxy> servicePool = new ServicePool<>();
     private Object serviceToRegister;
-    private volatile Interceptor interceptor = Interceptor.NOOP;
+    private volatile Interceptor interceptor = Interceptor.DEFAULT;
 
     public AspecioServiceObject(ServiceScope serviceScope, ServiceReference<?> originalRef,
-            Function<Object, Woven> proxyFunction) {
+            Function<Object, Proxy> proxyFunction) {
         this.serviceScope = serviceScope;
         this.originalRef = originalRef;
         this.proxyFunction = proxyFunction;
@@ -33,7 +33,7 @@ public final class AspecioServiceObject {
 
     public void setInterceptor(Interceptor interceptor) {
         this.interceptor = interceptor;
-        for (Woven w : instances) {
+        for (Proxy w : instances) {
             w.setInterceptor(interceptor);
         }
     }
@@ -48,18 +48,18 @@ public final class AspecioServiceObject {
     private Object makeServiceObjectToRegister() {
         switch (serviceScope) {
         case PROTOTYPE:
-            return new PrototypeServiceFactory<Woven>() {
+            return new PrototypeServiceFactory<Proxy>() {
                 @Override
-                public Woven getService(Bundle bundle, ServiceRegistration<Woven> registration) {
+                public Proxy getService(Bundle bundle, ServiceRegistration<Proxy> registration) {
                     Object originalService = bundle.getBundleContext().getService(originalRef);
-                    Woven instance = proxyFunction.apply(originalService);
+                    Proxy instance = proxyFunction.apply(originalService);
                     instance.setInterceptor(interceptor);
                     instances.add(instance);
                     return instance;
                 }
 
                 @Override
-                public void ungetService(Bundle bundle, ServiceRegistration<Woven> registration, Woven service) {
+                public void ungetService(Bundle bundle, ServiceRegistration<Proxy> registration, Proxy service) {
                     instances.remove(service);
                     BundleContext bundleContext = bundle.getBundleContext();
                     // If bundle is still there, let's unget, otherwise ignore.
@@ -70,12 +70,12 @@ public final class AspecioServiceObject {
             };
 
         case BUNDLE:
-            return new ServiceFactory<Woven>() {
+            return new ServiceFactory<Proxy>() {
                 @Override
-                public Woven getService(Bundle bundle, ServiceRegistration<Woven> registration) {
+                public Proxy getService(Bundle bundle, ServiceRegistration<Proxy> registration) {
                     Object originalService = bundle.getBundleContext().getService(originalRef);
                     return servicePool.get(originalService, () -> {
-                        Woven woven = proxyFunction.apply(originalService);
+                        Proxy woven = proxyFunction.apply(originalService);
                         woven.setInterceptor(interceptor);
                         instances.add(woven);
                         return woven;
@@ -83,7 +83,7 @@ public final class AspecioServiceObject {
                 }
 
                 @Override
-                public void ungetService(Bundle bundle, ServiceRegistration<Woven> registration, Woven service) {
+                public void ungetService(Bundle bundle, ServiceRegistration<Proxy> registration, Proxy service) {
                     boolean empty = servicePool.unget(service);
                     if (empty) {
                         instances.remove(service);
@@ -97,7 +97,7 @@ public final class AspecioServiceObject {
             };
         default:
             Object originalService = originalRef.getBundle().getBundleContext().getService(originalRef);
-            Woven instance = proxyFunction.apply(originalService);
+            Proxy instance = proxyFunction.apply(originalService);
             instance.setInterceptor(interceptor);
             instances.add(instance);
             return instance;

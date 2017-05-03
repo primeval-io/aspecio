@@ -1,7 +1,5 @@
 package io.primeval.aspecio.it;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import static io.primeval.aspecio.it.TestProvisioningConfig.baseOptions;
 import static io.primeval.aspecio.it.TestProvisioningConfig.dsAndFriends;
 import static io.primeval.aspecio.it.TestProvisioningConfig.slf4jLogging;
@@ -10,6 +8,8 @@ import static org.ops4j.pax.exam.Constants.START_LEVEL_TEST_BUNDLE;
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -73,6 +73,8 @@ public class AspecioIntegrationTest {
                 baseOptions(),
                 testingBundles(),
                 slf4jLogging(),
+                mavenBundle("org.ow2.asm", "asm").version("5.2"),
+                mavenBundle("io.primeval", "primeval-reflect").versionAsInProject(),
                 mavenBundle("io.primeval.aspecio", "aspecio-core").versionAsInProject(),
                 exampleApplication(),
                 frameworkStartLevel(START_LEVEL_TEST_BUNDLE)
@@ -126,7 +128,7 @@ public class AspecioIntegrationTest {
         Goodbye goodbye = goodbyeTracker.getService();
 
         assertThat(hello).isSameAs(goodbye);
-        assertThat(hello.getClass().getName()).isEqualTo("io.primeval.aspecio.examples.greetings.internal.HelloGoodbyeImpl$Woven$");
+        assertThat(hello.getClass().getName()).isEqualTo("io.primeval.aspecio.examples.greetings.internal.HelloGoodbyeImpl$Proxy$");
 
         hello.hello();
 

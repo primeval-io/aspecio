@@ -1,6 +1,6 @@
 package io.primeval.aspecio;
 
-import io.primeval.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.reflect.proxy.Interceptor;
 
 /**
  * Public constants in Aspecio.

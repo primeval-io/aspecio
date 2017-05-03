@@ -8,7 +8,8 @@ import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
-import io.primeval.aspecio.aspect.interceptor.Interceptor;
+import io.primeval.reflect.proxy.Interceptor;
+
 
 /**
  * <p>

@@ -9,6 +9,10 @@
 	<artifactId>aspecio-core</artifactId>
 	<name>Aspecio</name>
 
+	<properties>
+		<primeval-reflect.version>1.0.0-SNAPSHOT</primeval-reflect.version>
+	</properties>
+
 	<dependencies>
 		<!-- OSGi -->
 		<dependency>
@@ -29,13 +33,18 @@
 			<version>6.0.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>io.primeval</groupId>
+			<artifactId>primeval-reflect</artifactId>
+			<version>${primeval-reflect.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>io.primeval.component.annotation</groupId>
 			<artifactId>component-annotation-properties</artifactId>
 			<version>2.0.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
