@@ -40,7 +40,7 @@ import io.primeval.aspecio.internal.logging.AspecioLogger;
 import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
 import io.primeval.aspecio.internal.service.AspectInterceptorListener.EventKind;
 import io.primeval.reflect.proxy.Interceptor;
-import io.primeval.reflect.proxy.composite.Interceptors;
+import io.primeval.reflect.proxy.Interceptors;
 
 public final class AspectInterceptorManager implements ServiceListener {
 
@@ -303,7 +303,7 @@ public final class AspectInterceptorManager implements ServiceListener {
         Set<String> satisfiedAspects = new LinkedHashSet<>();
         satisfiedAspects.addAll(satisfiedRequiredAspects);
         satisfiedAspects.addAll(satisfiedOptionalAspects);
-        Interceptor interceptor = Interceptors.compose(interceptors.stream().map(ai -> ai.interceptor).iterator());
+        Interceptor interceptor = Interceptors.stack(interceptors.stream().map(ai -> ai.interceptor).iterator());
 
         AspectInterceptorContext aspectInterceptorContext = new AspectInterceptorContext(interceptor, satisfiedAspects,
                 satisfiedRequiredAspects, unsatisfiedRequiredAspects, satisfiedOptionalAspects,
