@@ -81,11 +81,14 @@ Aspecio uses [Primeval Reflex](http://github.com/primeval-io/primeval-reflex) to
 See [Primeval Reflex](http://github.com/primeval-io/primeval-reflex) for documentation on the proxies and writing interceptors.
 
 
-
 ### Installing Aspecio in an OSGi Framework
 
-Right now Aspecio has to be installed early, a fix is coming for release 2.0.0.
+Just start Aspecio in your OSGi framework and it will work right away.
 
+If there are already registered services with the weaving property, Aspecio will restart their bundles to make sure it has the opportunity to apply its service hook.
+
+Aspecio first collects the set of bundles providing services to weave, sorts them using the natural `Bundle` comparator (based on bundleIds). It stops them all in that order, then starts them all. The ordering should allow to keep the original installation order, and stopping and starting them by batch is aiming to minimize service level interactions between these bundles (such as re-creating components with static references too many times).
+  
 
 ## Defining an Aspect with Aspecio
 

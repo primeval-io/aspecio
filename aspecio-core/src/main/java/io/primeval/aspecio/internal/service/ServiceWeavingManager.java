@@ -16,13 +16,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.framework.AllServiceListener;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
@@ -75,9 +80,34 @@ public final class ServiceWeavingManager implements AllServiceListener {
                     SERVICE_FILTER);
 
             if (serviceReferences != null) {
-                synchronized (this) {
-                    for (ServiceReference<?> sr : serviceReferences) {
-                        onServiceRegistration(sr);
+                Set<Bundle> bundlesToRestart = new TreeSet<>();
+                for (ServiceReference<?> sr : serviceReferences) {
+                    bundlesToRestart.add(sr.getBundle());
+                }
+                int bundleRestartCount = bundlesToRestart.size();
+                if (bundleRestartCount > 0) {
+                    String bundlesList = bundlesToRestart.stream().map(Bundle::toString)
+                            .collect(Collectors.joining(", "));
+                    if (bundlesToRestart.size() == 1) {
+                        LOGGER.info("Aspecio: active bundle {} requires weaving... restarting it", bundlesList);
+                    } else if (bundlesToRestart.size() > 1) {
+                        LOGGER.info("Aspecio: active bundles {} require weaving... restarting them", bundlesList);
+                    }
+
+                    for (Bundle b : bundlesToRestart) {
+                        try {
+                            b.stop(Bundle.STOP_TRANSIENT);
+                        } catch (BundleException e) {
+                            LOGGER.error("Could not stop bundle {}", b, e);
+                        }
+                    }
+
+                    for (Bundle b : bundlesToRestart) {
+                        try {
+                            b.start(Bundle.START_TRANSIENT);
+                        } catch (BundleException e) {
+                            LOGGER.error("Could not start bundle {}", b, e);
+                        }
                     }
                 }
             }
