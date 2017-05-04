@@ -12,9 +12,9 @@ import com.google.common.collect.Maps;
 
 import io.primeval.aspecio.aspect.annotations.Aspect;
 import io.primeval.aspecio.examples.aspect.counting.CountingAspect;
-import io.primeval.reflect.proxy.CallContext;
-import io.primeval.reflect.proxy.Interceptor;
-import io.primeval.reflect.proxy.handler.InterceptionHandler;
+import io.primeval.reflex.proxy.CallContext;
+import io.primeval.reflex.proxy.Interceptor;
+import io.primeval.reflex.proxy.handler.InterceptionHandler;
 
 @Component
 @Aspect(provides = CountingAspect.class)

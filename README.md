@@ -5,7 +5,7 @@ Aspecio is a 'micro-framework' that provide AOP Proxies to OSGi R6. It brings a 
 
 ## Aspecio 2.0.0, now at Primeval!
 
-Aspecio 2.0.0 is a complete overhaul with a new proxy model that is simpler, completely unrestricted and faster. See [Primeval Reflect](http://github.com/primeval-io/primeval-reflect) for proxy capabilities. 
+Aspecio 2.0.0 is a complete overhaul with a new proxy model that is simpler, completely unrestricted and faster. See [Primeval Reflex](http://github.com/primeval-io/primeval-reflex) for proxy capabilities. 
 
 ## Maven coordinates
 
@@ -25,7 +25,7 @@ Aspecio requires Java 8 and depends on primeval-reflect.
 ```xml
 	<dependency>
 		<groupId>io.primeval</groupId>
-		<artifactId>primeval-reflect</artifactId>
+		<artifactId>primeval-reflex</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</dependency>
 ```	
@@ -76,9 +76,9 @@ In the following examples, Declarative Services will be used.
 
 Aspecio picks service objects that ask for certain aspects in their service properties, hiding (by default) the original service from all bundles except the system bundle and Aspecio itself.
 
-Aspecio uses [Primeval Reflect](http://github.com/primeval-io/primeval-reflect) to proxy services requesting weaving. All interfaces and public methods are proxied.
+Aspecio uses [Primeval Reflex](http://github.com/primeval-io/primeval-reflex) to proxy services requesting weaving. All interfaces and public methods are proxied.
 
-See [Primeval Reflect](http://github.com/primeval-io/primeval-reflect) for documentation on the proxies and writing interceptors.
+See [Primeval Reflex](http://github.com/primeval-io/primeval-reflex) for documentation on the proxies and writing interceptors.
 
 
 
@@ -194,7 +194,7 @@ public final class MyAnnotationDrivenAspectImpl implements AnnotationInterceptor
 ```
 
 
-See `AnnotationInterceptor` in [Primeval Reflect](http://github.com/primeval-io/primeval-reflect).
+See `AnnotationInterceptor` in [Primeval Reflex](http://github.com/primeval-io/primeval-reflex).
 
 
 ### Aspects that bridge services

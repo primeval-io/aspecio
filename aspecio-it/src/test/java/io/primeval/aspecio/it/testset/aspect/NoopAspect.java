@@ -1,8 +1,8 @@
 package io.primeval.aspecio.it.testset.aspect;
 
-import io.primeval.reflect.proxy.CallContext;
-import io.primeval.reflect.proxy.Interceptor;
-import io.primeval.reflect.proxy.handler.InterceptionHandler;
+import io.primeval.reflex.proxy.CallContext;
+import io.primeval.reflex.proxy.Interceptor;
+import io.primeval.reflex.proxy.handler.InterceptionHandler;
 
 public final class NoopAspect implements Interceptor {
 

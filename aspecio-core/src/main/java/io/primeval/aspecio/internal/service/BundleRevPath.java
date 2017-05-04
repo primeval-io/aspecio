@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 
 import org.osgi.framework.wiring.BundleRevision;
 
-import io.primeval.reflect.proxy.bytecode.ProxyClassLoader;
+import io.primeval.reflex.proxy.bytecode.ProxyClassLoader;
 
 public final class BundleRevPath {
     private ProxyClassLoader classLoader;

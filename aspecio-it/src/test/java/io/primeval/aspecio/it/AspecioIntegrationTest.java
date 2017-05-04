@@ -74,7 +74,7 @@ public class AspecioIntegrationTest {
                 testingBundles(),
                 slf4jLogging(),
                 mavenBundle("org.ow2.asm", "asm").version("5.2"),
-                mavenBundle("io.primeval", "primeval-reflect").versionAsInProject(),
+                mavenBundle("io.primeval", "primeval-reflex").versionAsInProject(),
                 mavenBundle("io.primeval.aspecio", "aspecio-core").versionAsInProject(),
                 exampleApplication(),
                 frameworkStartLevel(START_LEVEL_TEST_BUNDLE)

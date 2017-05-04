@@ -36,11 +36,11 @@ import io.primeval.aspecio.AspecioConstants;
 import io.primeval.aspecio.internal.AspecioUtils;
 import io.primeval.aspecio.internal.logging.AspecioLogger;
 import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
-import io.primeval.reflect.proxy.bytecode.BridgingClassLoader;
-import io.primeval.reflect.proxy.bytecode.Proxy;
-import io.primeval.reflect.proxy.bytecode.ProxyBuilder;
-import io.primeval.reflect.proxy.bytecode.ProxyClass;
-import io.primeval.reflect.proxy.bytecode.ProxyClassLoader;
+import io.primeval.reflex.proxy.bytecode.BridgingClassLoader;
+import io.primeval.reflex.proxy.bytecode.Proxy;
+import io.primeval.reflex.proxy.bytecode.ProxyBuilder;
+import io.primeval.reflex.proxy.bytecode.ProxyClass;
+import io.primeval.reflex.proxy.bytecode.ProxyClassLoader;
 
 public final class ServiceWeavingManager implements AllServiceListener {
     private static final AspecioLogger LOGGER = AspecioLoggerFactory.getLogger(ServiceWeavingManager.class);

@@ -11,8 +11,8 @@ import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
-import io.primeval.reflect.proxy.Interceptor;
-import io.primeval.reflect.proxy.bytecode.Proxy;
+import io.primeval.reflex.proxy.Interceptor;
+import io.primeval.reflex.proxy.bytecode.Proxy;
 
 public final class AspecioServiceObject {
     private final ServiceScope serviceScope;

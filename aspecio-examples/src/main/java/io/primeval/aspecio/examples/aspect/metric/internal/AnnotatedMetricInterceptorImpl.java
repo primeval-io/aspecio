@@ -10,9 +10,9 @@ import com.google.common.base.Stopwatch;
 import io.primeval.aspecio.aspect.annotations.Aspect;
 import io.primeval.aspecio.examples.aspect.metric.MetricAspect;
 import io.primeval.aspecio.examples.aspect.metric.Timed;
-import io.primeval.reflect.proxy.CallContext;
-import io.primeval.reflect.proxy.annotation.AnnotationInterceptor;
-import io.primeval.reflect.proxy.handler.InterceptionHandler;
+import io.primeval.reflex.proxy.CallContext;
+import io.primeval.reflex.proxy.annotation.AnnotationInterceptor;
+import io.primeval.reflex.proxy.handler.InterceptionHandler;
 
 @Component
 @Aspect(provides = MetricAspect.AnnotatedOnly.class, extraProperties = "measured")

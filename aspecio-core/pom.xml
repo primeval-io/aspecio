@@ -10,7 +10,7 @@
 	<name>Aspecio</name>
 
 	<properties>
-		<primeval-reflect.version>1.0.0-SNAPSHOT</primeval-reflect.version>
+		<primeval-reflex.version>1.0.0-SNAPSHOT</primeval-reflex.version>
 	</properties>
 
 	<dependencies>
@@ -35,8 +35,8 @@
 
 		<dependency>
 			<groupId>io.primeval</groupId>
-			<artifactId>primeval-reflect</artifactId>
-			<version>${primeval-reflect.version}</version>
+			<artifactId>primeval-reflex</artifactId>
+			<version>${primeval-reflex.version}</version>
 		</dependency>
 
 		<dependency>

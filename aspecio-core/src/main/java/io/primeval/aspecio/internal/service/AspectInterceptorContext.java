@@ -2,7 +2,7 @@ package io.primeval.aspecio.internal.service;
 
 import java.util.Set;
 
-import io.primeval.reflect.proxy.Interceptor;
+import io.primeval.reflex.proxy.Interceptor;
 
 
 public final class AspectInterceptorContext {

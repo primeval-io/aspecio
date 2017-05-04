@@ -39,8 +39,8 @@ import io.primeval.aspecio.InterceptorDescription;
 import io.primeval.aspecio.internal.logging.AspecioLogger;
 import io.primeval.aspecio.internal.logging.AspecioLoggerFactory;
 import io.primeval.aspecio.internal.service.AspectInterceptorListener.EventKind;
-import io.primeval.reflect.proxy.Interceptor;
-import io.primeval.reflect.proxy.Interceptors;
+import io.primeval.reflex.proxy.Interceptor;
+import io.primeval.reflex.proxy.Interceptors;
 
 public final class AspectInterceptorManager implements ServiceListener {
 
