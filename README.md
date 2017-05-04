@@ -1,4 +1,4 @@
-# Aspecio, AOP Proxies for OSGi [![Build Status](https://api.travis-ci.org/Lambdacube/aspecio.png)](https://travis-ci.org/Lambdacube/aspecio/) [![Gitter primeval-io/Lobby](https://badges.gitter.im/primeval-io/Lobby.svg)](https://gitter.im/primeval-io/Lobby)
+# Aspecio, AOP Proxies for OSGi [![Build Status](https://travis-ci.org/primeval-io/aspecio.svg?branch=master)](https://travis-ci.org/primeval-io/aspecio) [![Gitter primeval-io/Lobby](https://badges.gitter.im/primeval-io/Lobby.svg)](https://gitter.im/primeval-io/Lobby)
 
 Aspecio is a 'micro-framework' that provide AOP Proxies to OSGi R6. It brings a mix of component-oriented and aspect-oriented programming to your application. Aspecio lets you define _Aspects_ that you can later pick to add behavior to your components and avoid duplicating boilerplate dealing with cross-cutting concerns.
 
