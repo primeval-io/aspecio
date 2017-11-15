@@ -9,8 +9,6 @@
 		<relativePath />
 	</parent>
 
-
-
 	<groupId>io.primeval.aspecio</groupId>
 	<artifactId>aspecio</artifactId>
 	<version>2.0.0-SNAPSHOT</version>
@@ -18,57 +16,39 @@
 	<packaging>pom</packaging>
 
 	<name>Aspecio Project</name>
-
 	<description>OSGi Service Aspects</description>
+
 	<url>http://primeval.io/aspecio</url>
-
-	<organization>
-		<name>Primeval</name>
-		<url>http://www.primeval.io</url>
-	</organization>
-
-	<developers>
-		<developer>
-			<id>magnet</id>
-			<name>Simon Chemouil</name>
-			<organization>Lambdacube</organization>
-		</developer>
-	</developers>
-
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
 
 	<scm>
 		<url>https://github.com/primeval-io/aspecio</url>
 	</scm>
 
+	<properties>
+		<primeval-3rdparty-bom.version>1.0.0-SNAPSHOT</primeval-3rdparty-bom.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.primeval</groupId>
+				<artifactId>primeval-thirdparty-bom</artifactId>
+				<version>${primeval-3rdparty-bom.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 
 	<profiles>
 		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
+			<id>deploy-aspecio</id>
+			<activation>
+				<property>
+					<name>deploy</name>
+				</property>
+			</activation>
 			<modules>
 				<module>aspecio-core</module>
 			</modules>
@@ -76,7 +56,9 @@
 		<profile>
 			<id>default</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>!deploy</name>
+				</property>
 			</activation>
 
 			<modules>
