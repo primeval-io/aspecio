@@ -42,9 +42,9 @@ public final class TestProvisioningConfig {
 
     public static Option dsAndFriends() {
         return composite(mavenBundle("org.apache.felix", "org.apache.felix.log", "1.0.1"),
-                mavenBundle("org.apache.felix", "org.apache.felix.metatype", "1.1.2"),
-                mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.8.8"),
-                mavenBundle("org.apache.felix", "org.apache.felix.scr", "2.0.2"));
+                mavenBundle("org.apache.felix", "org.apache.felix.metatype", "1.2.0"),
+                mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.9.2"),
+                mavenBundle("org.apache.felix", "org.apache.felix.scr", "2.1.0"));
     }
 
 }
